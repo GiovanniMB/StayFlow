@@ -1,80 +1,108 @@
 package com.StayFlow.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-
 @Entity
-@Table(name = "logSistema")
+@Table(name = "logsistema")
+@Schema(description = "Bitácora de auditoría que registra todas las acciones importantes realizadas en el sistema")
 public class LogSistema {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ID único del registro de log", example = "1")
     private Integer idLogSistema;
+
+    @Schema(description = "Nombre de la tabla de base de datos afectada por la acción", example = "usuario", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false, length = 50)
     private String tablaAfectada;
+
+    @Schema(description = "ID del registro que fue afectado en la tabla", example = "45", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false)
     private Integer idRegistroAfectado;
+
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Tipo de acción realizada", example = "INSERT", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false)
     private Accion accion;
+
     @ManyToOne
     @JoinColumn(name = "idUsuarioAccion")
+    @Schema(description = "Usuario que ejecutó la acción (puede ser NULL si fue un proceso automático del sistema)")
     private Usuario usuarioAccion;
+
+    @Schema(description = "Fecha y hora exacta en que ocurrió el evento", example = "2024-12-20T10:30:00")
+    @Column(nullable = false)
     private LocalDateTime fechaEvento = LocalDateTime.now();
 
-    public enum Accion { INSERT, UPDATE, DELETE_LOGICO }
+    // Enumeración para los tipos de acción
+    public enum Accion {
+        @Schema(description = "Inserción de un nuevo registro")
+        INSERT,
+        @Schema(description = "Actualización de un registro existente")
+        UPDATE,
+        @Schema(description = "Eliminación lógica de un registro (cambio de estado estaEliminado = true)")
+        DELETE_LOGICO
+    }
 
-	public Integer getIdLogSistema() {
-		return idLogSistema;
-	}
+    // Constructores
+    public LogSistema() {}
 
-	public void setIdLogSistema(Integer idLogSistema) {
-		this.idLogSistema = idLogSistema;
-	}
+    public LogSistema(String tablaAfectada, Integer idRegistroAfectado, Accion accion, Usuario usuarioAccion) {
+        this.tablaAfectada = tablaAfectada;
+        this.idRegistroAfectado = idRegistroAfectado;
+        this.accion = accion;
+        this.usuarioAccion = usuarioAccion;
+        this.fechaEvento = LocalDateTime.now();
+    }
 
-	public String getTablaAfectada() {
-		return tablaAfectada;
-	}
+    // Getters y Setters
+    public Integer getIdLogSistema() {
+        return idLogSistema;
+    }
 
-	public void setTablaAfectada(String tablaAfectada) {
-		this.tablaAfectada = tablaAfectada;
-	}
+    public void setIdLogSistema(Integer idLogSistema) {
+        this.idLogSistema = idLogSistema;
+    }
 
-	public Integer getIdRegistroAfectado() {
-		return idRegistroAfectado;
-	}
+    public String getTablaAfectada() {
+        return tablaAfectada;
+    }
 
-	public void setIdRegistroAfectado(Integer idRegistroAfectado) {
-		this.idRegistroAfectado = idRegistroAfectado;
-	}
+    public void setTablaAfectada(String tablaAfectada) {
+        this.tablaAfectada = tablaAfectada;
+    }
 
-	public Accion getAccion() {
-		return accion;
-	}
+    public Integer getIdRegistroAfectado() {
+        return idRegistroAfectado;
+    }
 
-	public void setAccion(Accion accion) {
-		this.accion = accion;
-	}
+    public void setIdRegistroAfectado(Integer idRegistroAfectado) {
+        this.idRegistroAfectado = idRegistroAfectado;
+    }
 
-	public Usuario getUsuarioAccion() {
-		return usuarioAccion;
-	}
+    public Accion getAccion() {
+        return accion;
+    }
 
-	public void setUsuarioAccion(Usuario usuarioAccion) {
-		this.usuarioAccion = usuarioAccion;
-	}
+    public void setAccion(Accion accion) {
+        this.accion = accion;
+    }
 
-	public LocalDateTime getFechaEvento() {
-		return fechaEvento;
-	}
+    public Usuario getUsuarioAccion() {
+        return usuarioAccion;
+    }
 
-	public void setFechaEvento(LocalDateTime fechaEvento) {
-		this.fechaEvento = fechaEvento;
-	}
-   
+    public void setUsuarioAccion(Usuario usuarioAccion) {
+        this.usuarioAccion = usuarioAccion;
+    }
+
+    public LocalDateTime getFechaEvento() {
+        return fechaEvento;
+    }
+
+    public void setFechaEvento(LocalDateTime fechaEvento) {
+        this.fechaEvento = fechaEvento;
+    }
 }

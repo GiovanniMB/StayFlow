@@ -1,59 +1,54 @@
 package com.StayFlow.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "rol")
-public class Rol 
-{
+@Schema(description = "Entidad que representa los roles/perfiles del sistema (arrendador, arrendatario, administrador, etc.)")
+public class Rol {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ID único del rol", example = "1")
     private Integer idRol;
 
+    @Schema(description = "Nombre del rol", example = "ARRENDADOR", requiredMode = Schema.RequiredMode.REQUIRED)
     @Column(nullable = false, length = 30)
     private String nombreRol;
 
+    @Schema(description = "Estado de eliminación lógica", example = "false")
     private boolean estaEliminado = false;
 
+    // Constructores
     public Rol() {}
-    public Rol(Integer idRol, String nombreRol) 
-    {
-        this.idRol = idRol;
+
+    public Rol(String nombreRol) {
         this.nombreRol = nombreRol;
     }
 
-    public Integer getIdRol() 
-    { 
-    	return idRol; 
-    }
-    
-    public void setIdRol(Integer idRol)
-    { 
-    	this.idRol = idRol; 
+    // Getters y Setters
+    public Integer getIdRol() {
+        return idRol;
     }
 
-    public String getNombreRol() 
-    {
-    	return nombreRol; 
-    }
-    
-    public void setNombreRol(String nombreRol) 
-    { 
-    	this.nombreRol = nombreRol; 
+    public void setIdRol(Integer idRol) {
+        this.idRol = idRol;
     }
 
-    public boolean isEstaEliminado() 
-    {
-    	return estaEliminado; 
+    public String getNombreRol() {
+        return nombreRol;
     }
-    
-    public void setEstaEliminado(boolean estaEliminado) 
-    { 
-    	this.estaEliminado = estaEliminado; 
+
+    public void setNombreRol(String nombreRol) {
+        this.nombreRol = nombreRol;
+    }
+
+    public boolean isEstaEliminado() {
+        return estaEliminado;
+    }
+
+    public void setEstaEliminado(boolean estaEliminado) {
+        this.estaEliminado = estaEliminado;
     }
 }

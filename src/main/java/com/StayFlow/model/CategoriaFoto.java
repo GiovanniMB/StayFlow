@@ -1,56 +1,76 @@
 package com.StayFlow.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "categoriaFoto")
+@Table(name = "categoriafoto")
+@Schema(description = "Categorías para clasificar las fotos de habitaciones y propiedades (interior/exterior)")
 public class CategoriaFoto {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Schema(description = "ID único de la categoría", example = "1")
     private Integer idCategoriaFoto;
+
+    @Schema(description = "Nombre de la categoría", example = "Fachada", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false, length = 50)
     private String nombreCategoria;
+
     @Enumerated(EnumType.STRING)
+    @Schema(description = "Tipo macro de la categoría", example = "exterior", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false)
     private TipoMacro tipoMacro;
+
+    @Schema(description = "Estado de eliminación lógica", example = "false")
     private boolean estaEliminado = false;
 
-    public enum TipoMacro { interior, exterior }
+    // Enum para tipoMacro
+    public enum TipoMacro {
+        @Schema(description = "Fotos del interior de la propiedad/habitación")
+        interior,
+        @Schema(description = "Fotos del exterior de la propiedad/habitación")
+        exterior
+    }
 
-	public Integer getIdCategoriaFoto() {
-		return idCategoriaFoto;
-	}
+    // Constructores
+    public CategoriaFoto() {}
 
-	public void setIdCategoriaFoto(Integer idCategoriaFoto) {
-		this.idCategoriaFoto = idCategoriaFoto;
-	}
+    public CategoriaFoto(String nombreCategoria, TipoMacro tipoMacro) {
+        this.nombreCategoria = nombreCategoria;
+        this.tipoMacro = tipoMacro;
+    }
 
-	public String getNombreCategoria() {
-		return nombreCategoria;
-	}
+    // Getters y Setters
+    public Integer getIdCategoriaFoto() {
+        return idCategoriaFoto;
+    }
 
-	public void setNombreCategoria(String nombreCategoria) {
-		this.nombreCategoria = nombreCategoria;
-	}
+    public void setIdCategoriaFoto(Integer idCategoriaFoto) {
+        this.idCategoriaFoto = idCategoriaFoto;
+    }
 
-	public TipoMacro getTipoMacro() {
-		return tipoMacro;
-	}
+    public String getNombreCategoria() {
+        return nombreCategoria;
+    }
 
-	public void setTipoMacro(TipoMacro tipoMacro) {
-		this.tipoMacro = tipoMacro;
-	}
+    public void setNombreCategoria(String nombreCategoria) {
+        this.nombreCategoria = nombreCategoria;
+    }
 
-	public boolean isEstaEliminado() {
-		return estaEliminado;
-	}
+    public TipoMacro getTipoMacro() {
+        return tipoMacro;
+    }
 
-	public void setEstaEliminado(boolean estaEliminado) {
-		this.estaEliminado = estaEliminado;
-	}
+    public void setTipoMacro(TipoMacro tipoMacro) {
+        this.tipoMacro = tipoMacro;
+    }
 
+    public boolean isEstaEliminado() {
+        return estaEliminado;
+    }
+
+    public void setEstaEliminado(boolean estaEliminado) {
+        this.estaEliminado = estaEliminado;
+    }
 }
