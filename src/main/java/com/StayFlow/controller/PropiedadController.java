@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 // Controlador REST para la gestión de propiedades
@@ -27,9 +28,10 @@ public class PropiedadController {
     // Endpoint para crear una nueva propiedad
     @PostMapping
     @Operation(summary = "Crear una nueva propiedad")
-    public ResponseEntity<ApiResponseDTO<PropiedadResponseDTO>> crearPropiedad(@RequestBody PropiedadRequestDTO request) {
+    public ResponseEntity<ApiResponseDTO<PropiedadResponseDTO>> crearPropiedad(
+            @Valid @RequestBody PropiedadRequestDTO request) { // @Valid para activar la validación de los campos del DTO
+        
         PropiedadResponseDTO response = propiedadService.crearPropiedad(request);
-        // Uso el método estático created() del equipo para retornar un 201
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponseDTO.created("Propiedad creada exitosamente", response));
     }
@@ -55,7 +57,7 @@ public class PropiedadController {
     @Operation(summary = "Actualizar una propiedad existente")
     public ResponseEntity<ApiResponseDTO<PropiedadResponseDTO>> actualizarPropiedad(
             @PathVariable Integer id, 
-            @RequestBody PropiedadRequestDTO request) {
+            @Valid @RequestBody PropiedadRequestDTO request) { // @Valid para activar la validación de los campos del DTO
         
         PropiedadResponseDTO response = propiedadService.actualizarPropiedad(id, request);
         return ResponseEntity.ok(ApiResponseDTO.success("Propiedad actualizada exitosamente", response));

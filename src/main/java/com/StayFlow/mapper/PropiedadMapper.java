@@ -21,7 +21,7 @@ public class PropiedadMapper {
         Propiedad propiedad = new Propiedad();
         propiedad.setNombreComercial(request.getNombreComercial());
         propiedad.setTelefono(request.getTelefono());
-        propiedad.setSeRentaPorHabitaciones(request.isSeRentaPorHabitaciones());
+        propiedad.setSeRentaPorHabitaciones(request.getSeRentaPorHabitaciones());
         propiedad.setDescripcion(request.getDescripcion());
         
         if (request.getDireccion() != null) {

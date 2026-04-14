@@ -69,7 +69,7 @@ public class PropiedadServiceImpl implements IPropiedadService {
 
         propiedadExistente.setNombreComercial(request.getNombreComercial());
         propiedadExistente.setTelefono(request.getTelefono());
-        propiedadExistente.setSeRentaPorHabitaciones(request.isSeRentaPorHabitaciones());
+        propiedadExistente.setSeRentaPorHabitaciones(request.getSeRentaPorHabitaciones());
         propiedadExistente.setDescripcion(request.getDescripcion());
 
         if (request.getDireccion() != null) {
