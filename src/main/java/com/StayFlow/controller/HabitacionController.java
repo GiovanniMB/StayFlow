@@ -1,0 +1,94 @@
+package com.StayFlow.controller;
+
+import com.StayFlow.Service.Interfaces.IHabitacionService;
+import com.StayFlow.dto.request.HabitacionRequestDTO;
+import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
+import com.StayFlow.dto.response.ApiResponseDTO;
+import com.StayFlow.dto.response.HabitacionResponseDTO;
+import com.StayFlow.dto.response.TipoHabitacionResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api")
+@Tag(name = "Habitaciones", description = "Gestión de categorías y cuartos físicos de las propiedades") // Agrega una etiqueta para agrupar los endpoints relacionados con habitaciones en la documentación de Swagger
+public class HabitacionController {
+
+    private final IHabitacionService habitacionService;
+
+    public HabitacionController(IHabitacionService habitacionService) {
+        this.habitacionService = habitacionService;
+    }
+
+    // --- Endpoints para TipoHabitacion (Categorías) ---
+    // El endpoint crearTipoHabitacion permite a los propietarios crear una nueva categoría de habitación para una propiedad específica. Esto es útil para que los propietarios puedan organizar sus habitaciones físicas en categorías que tengan características comunes, como el tipo de cama, los servicios incluidos o el precio por noche.
+    @PostMapping("/propiedades/{idPropiedad}/tipos-habitacion")
+    @Operation(summary = "Crear una nueva categoría de habitación para una propiedad")
+    public ResponseEntity<ApiResponseDTO<TipoHabitacionResponseDTO>> crearTipoHabitacion(
+            @PathVariable Integer idPropiedad,
+            @Valid @RequestBody TipoHabitacionRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.created("Categoría creada exitosamente", habitacionService.crearTipoHabitacion(idPropiedad, request)));
+    }
+    // El endpoint obtenerTiposPorPropiedad permite listar todas las categorías de habitación asociadas a una propiedad específica. Esto es útil para que los propietarios puedan ver y gestionar las categorías de habitación que han definido para cada una de sus propiedades.
+    @GetMapping("/propiedades/{idPropiedad}/tipos-habitacion")
+    @Operation(summary = "Obtener todas las categorías de habitación de una propiedad")
+    public ResponseEntity<ApiResponseDTO<List<TipoHabitacionResponseDTO>>> obtenerTiposPorPropiedad(
+            @PathVariable Integer idPropiedad) {
+        return ResponseEntity.ok(ApiResponseDTO.success("Categorías recuperadas correctamente", habitacionService.obtenerTiposPorPropiedad(idPropiedad)));
+    }
+    // El endpoint actualizarTipoHabitacion permite modificar el nombre, la descripción, el precio por noche y los servicios asociados a una categoría de habitación específica. Esto es útil para mantener actualizada la información de las categorías de habitación, especialmente si hay cambios en los servicios ofrecidos o en los precios.
+    @PutMapping("/tipos-habitacion/{idTipoHabitacion}")
+    @Operation(summary = "Actualizar una categoría de habitación")
+    public ResponseEntity<ApiResponseDTO<TipoHabitacionResponseDTO>> actualizarTipoHabitacion(
+            @PathVariable Integer idTipoHabitacion,
+            @Valid @RequestBody TipoHabitacionRequestDTO request) {
+        return ResponseEntity.ok(ApiResponseDTO.success("Categoría actualizada", habitacionService.actualizarTipoHabitacion(idTipoHabitacion, request)));
+    }
+    // El endpoint eliminarTipoHabitacion realiza un borrado lógico de la categoría de habitación, lo que significa que no se elimina físicamente de la base de datos, sino que se marca como eliminada para mantener la integridad referencial y permitir posibles recuperaciones futuras.
+    @DeleteMapping("/tipos-habitacion/{idTipoHabitacion}")
+    @Operation(summary = "Eliminar una categoría de habitación (Borrado lógico)")
+    public ResponseEntity<ApiResponseDTO<Void>> eliminarTipoHabitacion(@PathVariable Integer idTipoHabitacion) {
+        habitacionService.eliminarTipoHabitacion(idTipoHabitacion);
+        return ResponseEntity.ok(ApiResponseDTO.success("Categoría eliminada exitosamente"));
+    }
+
+    // --- Endpoints para Habitacion (Cuartos Físicos) ---
+    // El endpoint crearHabitacion permite a los propietarios dar de alta un nuevo cuarto físico dentro de una categoría específica. Esto es útil para que los propietarios puedan gestionar las habitaciones físicas asociadas a cada tipo de habitación que han definido para su propiedad.
+    @PostMapping("/tipos-habitacion/{idTipoHabitacion}/habitaciones")
+    @Operation(summary = "Dar de alta un cuarto físico dentro de una categoría")
+    public ResponseEntity<ApiResponseDTO<HabitacionResponseDTO>> crearHabitacion(
+            @PathVariable Integer idTipoHabitacion,
+            @Valid @RequestBody HabitacionRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponseDTO.created("Habitación registrada exitosamente", habitacionService.crearHabitacion(idTipoHabitacion, request)));
+    }
+    // El endpoint obtenerHabitacionesPorTipo permite listar todos los cuartos físicos asociados a una categoría específica. Esto es útil para que los propietarios puedan ver y gestionar las habitaciones que pertenecen a cada tipo de habitación que han definido para su propiedad.
+    @GetMapping("/tipos-habitacion/{idTipoHabitacion}/habitaciones")
+    @Operation(summary = "Listar todos los cuartos físicos de una categoría")
+    public ResponseEntity<ApiResponseDTO<List<HabitacionResponseDTO>>> obtenerHabitacionesPorTipo(
+            @PathVariable Integer idTipoHabitacion) {
+        return ResponseEntity.ok(ApiResponseDTO.success("Habitaciones recuperadas correctamente", habitacionService.obtenerHabitacionesPorTipo(idTipoHabitacion)));
+    }
+    // El endpoint actualizarHabitacion permite modificar el número o la cantidad de camas de un cuarto físico específico. Esto es útil para mantener actualizada la información de las habitaciones, especialmente si hay cambios en la configuración o en la disponibilidad de camas.
+    @PutMapping("/habitaciones/{idHabitacion}")
+    @Operation(summary = "Actualizar el número o camas de un cuarto físico")
+    public ResponseEntity<ApiResponseDTO<HabitacionResponseDTO>> actualizarHabitacion(
+            @PathVariable Integer idHabitacion,
+            @Valid @RequestBody HabitacionRequestDTO request) {
+        return ResponseEntity.ok(ApiResponseDTO.success("Habitación actualizada", habitacionService.actualizarHabitacion(idHabitacion, request)));
+    }
+    // El endpoint eliminarHabitacion realiza un borrado lógico de la habitación, lo que significa que no se elimina físicamente de la base de datos, sino que se marca como eliminada para mantener la integridad referencial y permitir posibles recuperaciones futuras.
+    @DeleteMapping("/habitaciones/{idHabitacion}")
+    @Operation(summary = "Eliminar un cuarto físico (Borrado lógico)")
+    public ResponseEntity<ApiResponseDTO<Void>> eliminarHabitacion(@PathVariable Integer idHabitacion) {
+        habitacionService.eliminarHabitacion(idHabitacion);
+        return ResponseEntity.ok(ApiResponseDTO.success("Habitación eliminada exitosamente"));
+    }
+}

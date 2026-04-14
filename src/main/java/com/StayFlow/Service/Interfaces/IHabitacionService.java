@@ -12,8 +12,12 @@ public interface IHabitacionService {
     // --- Operaciones para TipoHabitacion (Categorías) ---
     TipoHabitacionResponseDTO crearTipoHabitacion(Integer idPropiedad, TipoHabitacionRequestDTO request);
     List<TipoHabitacionResponseDTO> obtenerTiposPorPropiedad(Integer idPropiedad);
+    TipoHabitacionResponseDTO actualizarTipoHabitacion(Integer idTipoHabitacion, TipoHabitacionRequestDTO request);
+    void eliminarTipoHabitacion(Integer idTipoHabitacion);
     
     // --- Operaciones para Habitacion (Físicas) ---
     HabitacionResponseDTO crearHabitacion(Integer idTipoHabitacion, HabitacionRequestDTO request);
     List<HabitacionResponseDTO> obtenerHabitacionesPorTipo(Integer idTipoHabitacion);
+    HabitacionResponseDTO actualizarHabitacion(Integer idHabitacion, HabitacionRequestDTO request);
+    void eliminarHabitacion(Integer idHabitacion);
 }
