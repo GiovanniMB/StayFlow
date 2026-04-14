@@ -1,6 +1,7 @@
 package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,4 +17,5 @@ public class PropiedadResponseDTO {
     private boolean seRentaPorHabitaciones;
     private Integer contadorReservas;
     private String descripcion;
+    private List<ServicioResponseDTO> servicios;
 }

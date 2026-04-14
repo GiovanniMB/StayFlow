@@ -9,12 +9,13 @@ import com.StayFlow.model.Propiedad;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.StayFlow.dto.response.ServicioResponseDTO;
 
 @Component
 public class PropiedadMapper {
 
     // --- Mapeo a Entidades ---
-
+    // Método principal para mapear un PropiedadRequestDTO a una Propiedad, incluyendo su dirección. Los servicios se asignarán en la capa de Servicio, por lo que no se incluyen en este método.
     public Propiedad toEntity(PropiedadRequestDTO request) {
         if (request == null) return null;
 
@@ -31,6 +32,7 @@ public class PropiedadMapper {
         return propiedad;
     }
 
+    // Mapeo de DireccionRequestDTO a Direccion
     private Direccion toDireccionEntity(DireccionRequestDTO request) {
         if (request == null) return null;
         
@@ -45,7 +47,7 @@ public class PropiedadMapper {
     }
 
     // --- Mapeo a Response DTOs ---
-
+    // Método principal para mapear una Propiedad a PropiedadResponseDTO, incluyendo sus relaciones (Dueño, Dirección, Servicios)
     public PropiedadResponseDTO toResponseDTO(Propiedad propiedad) {
         if (propiedad == null) return null;
 
@@ -65,9 +67,15 @@ public class PropiedadMapper {
             response.setDireccion(toDireccionResponseDTO(propiedad.getDireccion()));
         }
 
+        if (propiedad.getServicios() != null && !propiedad.getServicios().isEmpty()) {
+            response.setServicios(propiedad.getServicios().stream()
+                .map(this::toServicioResponseDTO)
+                .collect(Collectors.toList()));
+        }
         return response;
     }
 
+    // Mapeo de Direccion a DireccionResponseDTO
     private DireccionResponseDTO toDireccionResponseDTO(Direccion direccion) {
         if (direccion == null) return null;
 
@@ -87,10 +95,20 @@ public class PropiedadMapper {
         return response;
     }
 
+    // Método para mapear una lista de Propiedad a una lista de PropiedadResponseDTO
     public List<PropiedadResponseDTO> toResponseDTOList(List<Propiedad> propiedades) {
         if (propiedades == null) return null;
         return propiedades.stream()
             .map(this::toResponseDTO)
             .collect(Collectors.toList());
+    }
+
+    // Mapeo de Servicio a ServicioResponseDTO
+    private ServicioResponseDTO toServicioResponseDTO(com.StayFlow.model.Servicio servicio) {
+        if (servicio == null) return null;
+        ServicioResponseDTO dto = new ServicioResponseDTO();
+        dto.setIdServicio(servicio.getIdServicio());
+        dto.setNombreServicio(servicio.getNombreServicio());
+        return dto;
     }
 }
