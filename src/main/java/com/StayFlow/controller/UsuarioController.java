@@ -20,7 +20,7 @@ import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.LoginResponseDTO;
 import com.StayFlow.dto.response.UsuarioResponseDTO;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.service.interfaces.IUsuarioService;
+import com.StayFlow.Service.Interfaces.IUsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
