@@ -20,6 +20,6 @@ public interface PropiedadRepository extends JpaRepository<Propiedad, Integer> {
     // Busca una propiedad por su ID, asegurándose de que no esté eliminada
     Optional<Propiedad> findByIdPropiedadAndEstaEliminadoFalse(Integer idPropiedad);
     
-    // (Opcional por ahora) Si quisieras buscar propiedades por dueño
+    // (Opcional por ahora) buscar propiedades por dueño
     // List<Propiedad> findByDuenoIdUsuarioAndEstaEliminadoFalse(Integer idDueno);
 }

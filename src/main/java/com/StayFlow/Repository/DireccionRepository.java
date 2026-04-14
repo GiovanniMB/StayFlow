@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface DireccionRepository extends JpaRepository<Direccion, Integer> {
-    // Para Dirección, con las operaciones CRUD por defecto es suficiente por ahora.
+    // Para Dirección, con las operaciones CRUD por defecto por ahora.
 }
