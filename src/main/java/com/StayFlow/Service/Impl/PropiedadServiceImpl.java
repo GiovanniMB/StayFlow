@@ -4,6 +4,7 @@ import com.StayFlow.Repository.ColoniaRepository;
 import com.StayFlow.Repository.DireccionRepository;
 import com.StayFlow.Repository.PropiedadRepository;
 import com.StayFlow.Repository.UsuarioRepository; 
+import com.StayFlow.Repository.RolRepository;
 import com.StayFlow.Service.Interfaces.IPropiedadService;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
@@ -14,6 +15,7 @@ import com.StayFlow.model.Colonia;
 import com.StayFlow.model.Direccion;
 import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Usuario; 
+import com.StayFlow.model.Rol; 
 import org.springframework.security.core.context.SecurityContextHolder; 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +37,7 @@ public class PropiedadServiceImpl implements IPropiedadService {
     private final PropiedadMapper propiedadMapper;
     private final ServicioRepository servicioRepository;
     private final ILogSistemaService logSistemaService;
+    private final RolRepository rolRepository;
 
     public PropiedadServiceImpl(PropiedadRepository propiedadRepository, 
                                 ColoniaRepository coloniaRepository, 
@@ -42,7 +45,8 @@ public class PropiedadServiceImpl implements IPropiedadService {
                                 UsuarioRepository usuarioRepository, 
                                 PropiedadMapper propiedadMapper,
                                 ServicioRepository servicioRepository,
-                                ILogSistemaService logSistemaService) {
+                                ILogSistemaService logSistemaService,
+                                RolRepository rolRepository) { 
         this.propiedadRepository = propiedadRepository;
         this.coloniaRepository = coloniaRepository;
         this.direccionRepository = direccionRepository;
@@ -50,6 +54,7 @@ public class PropiedadServiceImpl implements IPropiedadService {
         this.propiedadMapper = propiedadMapper;
         this.servicioRepository = servicioRepository;
         this.logSistemaService = logSistemaService;
+        this.rolRepository = rolRepository; 
     }
 
     @Override
@@ -66,15 +71,15 @@ public class PropiedadServiceImpl implements IPropiedadService {
             propiedad.getDireccion().setColonia(colonia);
 
             if (request.getIdServicios() != null && !request.getIdServicios().isEmpty()) {
-            List<Servicio> serviciosEncontrados = servicioRepository.findAllById(request.getIdServicios());
-            
-            if (serviciosEncontrados.size() != request.getIdServicios().size()) {
-                throw new BusinessException("Uno o más servicios proporcionados no existen en el catálogo.");
+                List<Servicio> serviciosEncontrados = servicioRepository.findAllById(request.getIdServicios());
+                
+                if (serviciosEncontrados.size() != request.getIdServicios().size()) {
+                    throw new BusinessException("Uno o más servicios proporcionados no existen en el catálogo.");
+                }
+                propiedad.setServicios(serviciosEncontrados);
+            } else {
+                propiedad.setServicios(new ArrayList<>());
             }
-            propiedad.setServicios(serviciosEncontrados);
-        } else {
-            propiedad.setServicios(new ArrayList<>());
-        }
             
             Direccion direccionGuardada = direccionRepository.save(propiedad.getDireccion());
             propiedad.setDireccion(direccionGuardada);
@@ -87,13 +92,22 @@ public class PropiedadServiceImpl implements IPropiedadService {
         Usuario dueno = usuarioRepository.findByEmail(emailAutenticado)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", emailAutenticado));
 
-        // 3. REGLA DE NEGOCIO: ¿Es arrendador?
-        // Comprobamos si en su lista de roles alguno coincide con "arrendador"
+        // 3. REGLA DE NEGOCIO: ¿Es arrendador? (Lógica de Promoción Dinámica)
+        // Se comprueba si en su lista de roles alguno coincide con "arrendador"
         boolean esArrendador = dueno.getRoles().stream()
                 .anyMatch(rol -> rol.getNombreRol().equalsIgnoreCase("arrendador"));
 
         if (!esArrendador) {
-            throw new BusinessException("Acción denegada: Tu cuenta debe ser de perfil 'arrendador' para publicar propiedades.");
+            // En lugar de lanzar error se busca el rol en el catálogo
+            Rol rolArrendador = rolRepository.findByNombreRol("arrendador")
+                    .orElseThrow(() -> new BusinessException("El rol 'arrendador' no existe en el catálogo del sistema."));
+            
+            // Le agregamos el nuevo rol conservando los que ya tenga (ej. arrendatario)
+            dueno.getRoles().add(rolArrendador);
+            usuarioRepository.save(dueno);
+            
+            // Registramos en auditoría que este usuario fue promovido automáticamente
+            logSistemaService.registrarLog("usuario", dueno.getIdUsuario(), Accion.UPDATE);
         }
 
         // 4. Asignar el dueño a la propiedad
