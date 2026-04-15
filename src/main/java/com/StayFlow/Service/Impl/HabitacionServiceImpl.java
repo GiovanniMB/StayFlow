@@ -14,6 +14,8 @@ import com.StayFlow.model.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.model.LogSistema.Accion; 
 
 import java.util.List;
 
@@ -26,12 +28,14 @@ public class HabitacionServiceImpl implements IHabitacionService {
     private final TipoCamaRepository tipoCamaRepository;
     private final ServicioRepository servicioRepository;
     private final HabitacionMapper habitacionMapper;
+    private final ILogSistemaService logSistemaService;
 
     public HabitacionServiceImpl(TipoHabitacionRepository tipoHabitacionRepository,
                                  HabitacionRepository habitacionRepository,
                                  PropiedadRepository propiedadRepository,
                                  TipoCamaRepository tipoCamaRepository,
                                  ServicioRepository servicioRepository,
+                                 ILogSistemaService logSistemaService,
                                  HabitacionMapper habitacionMapper) {
         this.tipoHabitacionRepository = tipoHabitacionRepository;
         this.habitacionRepository = habitacionRepository;
@@ -39,6 +43,7 @@ public class HabitacionServiceImpl implements IHabitacionService {
         this.tipoCamaRepository = tipoCamaRepository;
         this.servicioRepository = servicioRepository;
         this.habitacionMapper = habitacionMapper;
+        this.logSistemaService = logSistemaService;
     }
 
     // -------------------------------------------------------------------
@@ -60,7 +65,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
             nuevoTipo.setServicios(serviciosEncontrados);
         }
 
-        return habitacionMapper.toTipoResponseDTO(tipoHabitacionRepository.save(nuevoTipo));
+        TipoHabitacion tipoGuardado = tipoHabitacionRepository.save(nuevoTipo);
+        logSistemaService.registrarLog("tipohabitacion", tipoGuardado.getIdTipoHabitacion(), Accion.INSERT);
+
+        return habitacionMapper.toTipoResponseDTO(tipoGuardado);
     }
     // El método obtenerTiposPorPropiedad primero valida que la propiedad exista antes de buscar los tipos de habitación asociados a esa propiedad. Esto garantiza que no se intente recuperar tipos de habitación para una propiedad que no existe, lo que podría causar confusión o errores en la aplicación.
     @Override
@@ -90,7 +98,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
             if(tipoExistente.getServicios() != null) tipoExistente.getServicios().clear();
         }
 
-        return habitacionMapper.toTipoResponseDTO(tipoHabitacionRepository.save(tipoExistente));
+        TipoHabitacion tipoActualizado = tipoHabitacionRepository.save(tipoExistente);
+        logSistemaService.registrarLog("tipohabitacion", tipoActualizado.getIdTipoHabitacion(), Accion.UPDATE);
+        
+        return habitacionMapper.toTipoResponseDTO(tipoActualizado);
     }
     // El método eliminarTipoHabitacion busca el tipo de habitación por su ID, valida que el usuario autenticado sea el dueño de la propiedad a la que pertenece ese tipo de habitación, y luego marca el tipo de habitación como eliminado en lugar de borrarlo físicamente de la base de datos. Esto permite mantener un historial de tipos de habitación eliminados y evita problemas de integridad referencial con las habitaciones físicas asociadas a ese tipo.
     @Override
@@ -101,6 +112,7 @@ public class HabitacionServiceImpl implements IHabitacionService {
         validarDueno(tipoExistente.getPropiedad());
         tipoExistente.setEstaEliminado(true);
         tipoHabitacionRepository.save(tipoExistente);
+        logSistemaService.registrarLog("tipohabitacion", tipoExistente.getIdTipoHabitacion(), Accion.DELETE_LOGICO);
     }
 
     // -------------------------------------------------------------------
@@ -121,7 +133,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
 
         procesarCamas(nuevaHabitacion, request.getCamas());
 
-        return habitacionMapper.toHabitacionResponseDTO(habitacionRepository.save(nuevaHabitacion));
+        Habitacion habitacionGuardada = habitacionRepository.save(nuevaHabitacion);
+        logSistemaService.registrarLog("habitacion", habitacionGuardada.getIdHabitacion(), Accion.INSERT);
+
+        return habitacionMapper.toHabitacionResponseDTO(habitacionGuardada);
     }
     // El método obtenerHabitacionesPorTipo primero valida que el tipo de habitación exista antes de buscar las habitaciones asociadas a ese tipo. Esto garantiza que no se intente recuperar habitaciones para un tipo que no existe, lo que podría causar confusión o errores en la aplicación.
     @Override
@@ -145,7 +160,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
         habitacionExistente.getHabitacionTipoCamas().clear();
         procesarCamas(habitacionExistente, request.getCamas());
 
-        return habitacionMapper.toHabitacionResponseDTO(habitacionRepository.save(habitacionExistente));
+        Habitacion habitacionActualizada = habitacionRepository.save(habitacionExistente);
+        logSistemaService.registrarLog("habitacion", habitacionActualizada.getIdHabitacion(), Accion.UPDATE);
+
+        return habitacionMapper.toHabitacionResponseDTO(habitacionActualizada);
     }
     // El método eliminarHabitacion busca la habitación por su ID, valida que el usuario autenticado sea el dueño de la propiedad a la que pertenece la habitación, y luego marca la habitación como eliminada en lugar de borrarla físicamente de la base de datos. Esto permite mantener un historial de habitaciones eliminadas y evita problemas de integridad referencial con reservas u otras entidades relacionadas.
     @Override
@@ -156,6 +174,8 @@ public class HabitacionServiceImpl implements IHabitacionService {
         validarDueno(habitacionExistente.getPropiedad());
         habitacionExistente.setEstaEliminado(true);
         habitacionRepository.save(habitacionExistente);
+        
+        logSistemaService.registrarLog("habitacion", idHabitacion, Accion.DELETE_LOGICO);
     }
 
     // -------------------------------------------------------------------

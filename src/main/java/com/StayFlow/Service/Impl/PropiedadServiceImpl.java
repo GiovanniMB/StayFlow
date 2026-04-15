@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.StayFlow.Repository.ServicioRepository;
 import com.StayFlow.model.Servicio;
-import java.util.ArrayList;
+import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.model.LogSistema.Accion;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,19 +34,22 @@ public class PropiedadServiceImpl implements IPropiedadService {
     private final UsuarioRepository usuarioRepository; 
     private final PropiedadMapper propiedadMapper;
     private final ServicioRepository servicioRepository;
+    private final ILogSistemaService logSistemaService;
 
     public PropiedadServiceImpl(PropiedadRepository propiedadRepository, 
                                 ColoniaRepository coloniaRepository, 
                                 DireccionRepository direccionRepository,
                                 UsuarioRepository usuarioRepository, 
                                 PropiedadMapper propiedadMapper,
-                                ServicioRepository servicioRepository) {
+                                ServicioRepository servicioRepository,
+                                ILogSistemaService logSistemaService) {
         this.propiedadRepository = propiedadRepository;
         this.coloniaRepository = coloniaRepository;
         this.direccionRepository = direccionRepository;
         this.usuarioRepository = usuarioRepository;
         this.propiedadMapper = propiedadMapper;
         this.servicioRepository = servicioRepository;
+        this.logSistemaService = logSistemaService;
     }
 
     @Override
@@ -96,6 +101,10 @@ public class PropiedadServiceImpl implements IPropiedadService {
 
         // 5. Guardar en BD
         Propiedad propiedadGuardada = propiedadRepository.save(propiedad);
+        
+        // 6. Registrar en auditoría
+        logSistemaService.registrarLog("propiedad", propiedadGuardada.getIdPropiedad(), Accion.INSERT);
+        
         return propiedadMapper.toResponseDTO(propiedadGuardada);
     }
 
@@ -160,6 +169,10 @@ public class PropiedadServiceImpl implements IPropiedadService {
         }
 
         Propiedad propiedadActualizada = propiedadRepository.save(propiedadExistente);
+        
+        // Registrar en auditoría
+        logSistemaService.registrarLog("propiedad", propiedadActualizada.getIdPropiedad(), Accion.UPDATE);
+        
         return propiedadMapper.toResponseDTO(propiedadActualizada);
     }
 
@@ -177,6 +190,9 @@ public class PropiedadServiceImpl implements IPropiedadService {
 
         propiedadExistente.setEstaEliminado(true);
         propiedadRepository.save(propiedadExistente); 
+        
+        // Registrar en auditoría
+        logSistemaService.registrarLog("propiedad", idPropiedad, Accion.DELETE_LOGICO);
     }
 
     // MÉTODO AUXILIAR PARA BUSCAR PROPIEDAD O LANZAR EXCEPCIÓN SI NO EXISTE O ESTÁ ELIMINADA
