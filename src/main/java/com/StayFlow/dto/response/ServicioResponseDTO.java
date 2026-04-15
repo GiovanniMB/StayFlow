@@ -1,13 +1,17 @@
 package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Schema(description = "Datos de salida para un servicio (Amenity)")
 public class ServicioResponseDTO {
     private Integer idServicio;
     private String nombreServicio;
+
+    public ServicioResponseDTO() {}
+
+    public Integer getIdServicio() { return idServicio; }
+    public void setIdServicio(Integer idServicio) { this.idServicio = idServicio; } 
+
+    public String getNombreServicio() { return nombreServicio; }
+    public void setNombreServicio(String nombreServicio) { this.nombreServicio = nombreServicio; }
 }

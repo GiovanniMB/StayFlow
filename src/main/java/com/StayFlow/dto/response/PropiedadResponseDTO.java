@@ -2,11 +2,7 @@ package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Schema(description = "Datos de salida de una propiedad")
 public class PropiedadResponseDTO {
     private Integer idPropiedad;
@@ -18,4 +14,33 @@ public class PropiedadResponseDTO {
     private Integer contadorReservas;
     private String descripcion;
     private List<ServicioResponseDTO> servicios;
+
+    public PropiedadResponseDTO() {}
+
+    public Integer getIdPropiedad() { return idPropiedad; }
+    public void setIdPropiedad(Integer idPropiedad) { this.idPropiedad = idPropiedad; }
+
+    public Integer getIdDueno() { return idDueno; }
+    public void setIdDueno(Integer idDueno) { this.idDueno = idDueno; }
+
+    public String getNombreComercial() { return nombreComercial; }
+    public void setNombreComercial(String nombreComercial) { this.nombreComercial = nombreComercial; }
+
+    public DireccionResponseDTO getDireccion() { return direccion; }
+    public void setDireccion(DireccionResponseDTO direccion) { this.direccion = direccion; }
+
+    public String getTelefono() { return telefono; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+
+    public boolean isSeRentaPorHabitaciones() { return seRentaPorHabitaciones; }
+    public void setSeRentaPorHabitaciones(boolean seRentaPorHabitaciones) { this.seRentaPorHabitaciones = seRentaPorHabitaciones; } // Solo para casos donde se quiera mostrar si la propiedad se renta por habitaciones o no, sera útil para el frontend saberlo para la implementacion de filtros
+
+    public Integer getContadorReservas() { return contadorReservas; }
+    public void setContadorReservas(Integer contadorReservas) { this.contadorReservas = contadorReservas; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public List<ServicioResponseDTO> getServicios() { return servicios; }
+    public void setServicios(List<ServicioResponseDTO> servicios) { this.servicios = servicios; }
 }
