@@ -3,12 +3,9 @@ package com.StayFlow.dto.request;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
 import java.math.BigDecimal;
+
 // DTO para recibir los datos de la dirección de una propiedad en las solicitudes de creación o actualización. Incluye validaciones para asegurar que se proporcionen los datos necesarios y que tengan el formato correcto.
-@Getter
-@Setter
 @Schema(description = "Datos de entrada para la dirección de una propiedad") // Descripción general del DTO para Swagger
 public class DireccionRequestDTO {
     
@@ -33,4 +30,68 @@ public class DireccionRequestDTO {
     @NotNull(message = "La longitud es obligatoria")
     @Schema(description = "Longitud geográfica", example = "-99.133209")
     private BigDecimal longitud;
+
+    // --- Constructor vacío ---
+    public DireccionRequestDTO() {
+    }
+
+    // --- Constructor con parámetros ---
+    public DireccionRequestDTO(String calle, String numero, String numeroInterior, Integer idColonia, BigDecimal latitud, BigDecimal longitud) {
+        this.calle = calle;
+        this.numero = numero;
+        this.numeroInterior = numeroInterior;
+        this.idColonia = idColonia;
+        this.latitud = latitud;
+        this.longitud = longitud;
+    }
+
+    // --- Getters y Setters ---
+
+    public String getCalle() {
+        return calle;
+    }
+
+    public void setCalle(String calle) {
+        this.calle = calle;
+    }
+
+    public String getNumero() {
+        return numero;
+    }
+
+    public void setNumero(String numero) {
+        this.numero = numero;
+    }
+
+    public String getNumeroInterior() {
+        return numeroInterior;
+    }
+
+    public void setNumeroInterior(String numeroInterior) {
+        this.numeroInterior = numeroInterior;
+    }
+
+    public Integer getIdColonia() {
+        return idColonia;
+    }
+
+    public void setIdColonia(Integer idColonia) {
+        this.idColonia = idColonia;
+    }
+
+    public BigDecimal getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(BigDecimal latitud) {
+        this.latitud = latitud;
+    }
+
+    public BigDecimal getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(BigDecimal longitud) {
+        this.longitud = longitud;
+    }
 }

@@ -1,39 +1,32 @@
 package com.StayFlow.Service.Impl;
 
-import com.StayFlow.Repository.BloqueoHabitacionRepository;
-import com.StayFlow.Repository.HabitacionRepository;
-import com.StayFlow.Repository.PrecioTemporadaRepository;
-import com.StayFlow.Repository.ReservaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
-import com.StayFlow.Service.Interfaces.IReservaService;
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
 import com.StayFlow.exception.BusinessException;
 import com.StayFlow.exception.ResourceNotFoundException;
-import com.StayFlow.model.BloqueoHabitacion;
-import com.StayFlow.model.Habitacion;
-import com.StayFlow.model.PrecioTemporada;
-import com.StayFlow.model.Reserva;
-import com.StayFlow.model.TipoHabitacion;
-import com.StayFlow.model.Usuario;
+import com.StayFlow.model.*;
+import com.StayFlow.Repository.*;
+import com.StayFlow.Service.Interfaces.IReservaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReservaServiceImpl implements IReservaService {
 
+    // Dependencias inyectadas de forma nativa
     private final ReservaRepository reservaRepository;
     private final BloqueoHabitacionRepository bloqueoHabitacionRepository;
     private final PrecioTemporadaRepository precioTemporadaRepository;
     private final HabitacionRepository habitacionRepository;
     private final UsuarioRepository usuarioRepository;
 
+    // Constructor nativo para inyección de dependencias (Reemplaza a @RequiredArgsConstructor)
     public ReservaServiceImpl(ReservaRepository reservaRepository,
                               BloqueoHabitacionRepository bloqueoHabitacionRepository,
                               PrecioTemporadaRepository precioTemporadaRepository,
@@ -46,294 +39,191 @@ public class ReservaServiceImpl implements IReservaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Crear una nueva reserva validando fechas, bloqueos y traslapes.
     @Override
     @Transactional
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
-
-        // Validar que las fechas existan y tengan sentido.
         validarFechas(request.getFechaEntrada(), request.getFechaSalida());
 
-        // Buscar habitación existente.
-        Habitacion habitacion = habitacionRepository
-                .findByIdHabitacionAndEstaEliminadoFalse(request.getIdHabitacion())
-                .orElseThrow(() -> new ResourceNotFoundException("Habitación", "id", request.getIdHabitacion()));
+        Habitacion habitacion = habitacionRepository.findById(request.getIdHabitacion())
+                .orElseThrow(() -> new ResourceNotFoundException("Habitación no encontrada con id: " + request.getIdHabitacion()));
 
-        // Buscar cliente existente.
-        // Si tu UsuarioRepository tiene un método específico para no eliminados,
-        // aquí se puede cambiar después.
-        Usuario cliente = usuarioRepository
-                .findById(request.getIdCliente())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getIdCliente()));
+        Usuario cliente = usuarioRepository.findById(request.getIdCliente())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente no encontrado con id: " + request.getIdCliente()));
 
-        // Validar disponibilidad antes de guardar.
-        validarDisponibilidadInterna(
-                habitacion.getIdHabitacion(),
-                request.getFechaEntrada(),
-                request.getFechaSalida()
-        );
+        validarDisponibilidadInterna(habitacion.getIdHabitacion(), request.getFechaEntrada(), request.getFechaSalida());
 
-        // Calcular el monto total de la estancia.
-        BigDecimal montoTotal = calcularMontoTotal(
-                habitacion.getTipoHabitacion(),
-                request.getFechaEntrada(),
-                request.getFechaSalida()
-        );
+        BigDecimal montoTotal = calcularMontoTotal(habitacion.getTipoHabitacion(), request.getFechaEntrada(), request.getFechaSalida());
 
-        // Crear la entidad de reserva.
+        // Creación de la entidad sin patrón Builder
         Reserva reserva = new Reserva();
         reserva.setHabitacion(habitacion);
         reserva.setCliente(cliente);
         reserva.setFechaEntrada(request.getFechaEntrada());
         reserva.setFechaSalida(request.getFechaSalida());
         reserva.setMontoTotal(montoTotal);
-        reserva.setEstadoReserva(Reserva.EstadoReserva.pendiente);
+        reserva.setEstadoReserva(EstadoReserva.pendiente); // Asignación del estado inicial
 
-        // Guardar y responder en formato DTO.
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+
+        return toReservaResponseDTO(reservaGuardada);
     }
 
-    // Obtener una reserva puntual por su id.
     @Override
     @Transactional(readOnly = true)
     public ReservaResponseDTO obtenerReservaPorId(Integer idReserva) {
         Reserva reserva = reservaRepository.findById(idReserva)
-                .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id", idReserva));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con id: " + idReserva));
         return toReservaResponseDTO(reserva);
     }
 
-    // Obtener todas las reservas de un cliente.
     @Override
     @Transactional(readOnly = true)
     public List<ReservaResponseDTO> obtenerReservasPorCliente(Integer idCliente) {
-
-        // Validar que el cliente exista.
-        usuarioRepository.findById(idCliente)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", idCliente));
-
-        List<Reserva> reservas = reservaRepository.findByCliente_IdUsuario(idCliente);
-        List<ReservaResponseDTO> respuesta = new ArrayList<>();
-
-        for (Reserva reserva : reservas) {
-            respuesta.add(toReservaResponseDTO(reserva));
+        if (!usuarioRepository.existsById(idCliente)) {
+            throw new ResourceNotFoundException("Cliente no encontrado con id: " + idCliente);
         }
 
-        return respuesta;
+        List<Reserva> reservas = reservaRepository.findByCliente_IdUsuario(idCliente);
+        
+        return reservas.stream()
+                .map(this::toReservaResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    // Cancelar una reserva si aún no está cancelada.
     @Override
     @Transactional
     public ReservaResponseDTO cancelarReserva(Integer idReserva) {
         Reserva reserva = reservaRepository.findById(idReserva)
-                .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id", idReserva));
+                .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con id: " + idReserva));
 
-        // Evitar cancelar dos veces la misma reserva.
-        if (reserva.getEstadoReserva() == Reserva.EstadoReserva.cancelada) {
-            throw new BusinessException("La reserva ya está cancelada");
+        if (reserva.getEstadoReserva() == EstadoReserva.cancelada) {
+            throw new BusinessException("La reserva ya se encuentra cancelada.");
         }
 
-        // No permitir cancelar reservas ya finalizadas.
-        if (reserva.getEstadoReserva() == Reserva.EstadoReserva.check_out) {
-            throw new BusinessException("No se puede cancelar una reserva ya finalizada");
+        if (reserva.getEstadoReserva() == EstadoReserva.check_out) {
+            throw new BusinessException("No se puede cancelar una reserva que ya ha finalizado (check-out).");
         }
 
-        reserva.setEstadoReserva(Reserva.EstadoReserva.cancelada);
+        reserva.setEstadoReserva(EstadoReserva.cancelada);
+        Reserva reservaActualizada = reservaRepository.save(reserva);
 
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        return toReservaResponseDTO(reservaActualizada);
     }
 
-    // Revisar si una habitación está disponible en cierto rango.
     @Override
     @Transactional(readOnly = true)
-    public DisponibilidadResponseDTO verificarDisponibilidad(Integer idHabitacion,
-                                                             LocalDate fechaEntrada,
-                                                             LocalDate fechaSalida) {
-
-        // Validar datos básicos.
-        validarFechas(fechaEntrada, fechaSalida);
-
-        // Validar que la habitación exista.
-        habitacionRepository.findByIdHabitacionAndEstaEliminadoFalse(idHabitacion)
-                .orElseThrow(() -> new ResourceNotFoundException("Habitación", "id", idHabitacion));
-
-        DisponibilidadResponseDTO response = new DisponibilidadResponseDTO();
-        response.setIdHabitacion(idHabitacion);
-        response.setFechaEntrada(fechaEntrada);
-        response.setFechaSalida(fechaSalida);
-
-        // Revisar bloqueos.
-        List<BloqueoHabitacion> bloqueos = bloqueoHabitacionRepository
-                .findByHabitacion_IdHabitacionAndFechaInicioLessThanAndFechaFinGreaterThan(
-                        idHabitacion,
-                        fechaSalida,
-                        fechaEntrada
-                );
-
-        if (!bloqueos.isEmpty()) {
-            response.setDisponible(false);
-            response.setMensaje("La habitación está bloqueada en ese rango de fechas");
-            return response;
+    public DisponibilidadResponseDTO verificarDisponibilidad(Integer idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
+        try {
+            validarFechas(fechaEntrada, fechaSalida);
+            
+            if (!habitacionRepository.existsById(idHabitacion)) {
+                throw new ResourceNotFoundException("Habitación no encontrada con id: " + idHabitacion);
+            }
+            
+            validarDisponibilidadInterna(idHabitacion, fechaEntrada, fechaSalida);
+            
+            // Si pasa las validaciones, está disponible (usando constructor nativo)
+            return new DisponibilidadResponseDTO(idHabitacion, fechaEntrada, fechaSalida, true, "La habitación está disponible para las fechas solicitadas.");
+            
+        } catch (BusinessException e) {
+            // Si hay conflicto de fechas o bloqueos, atrapamos la excepción de negocio para retornar el DTO en false
+            return new DisponibilidadResponseDTO(idHabitacion, fechaEntrada, fechaSalida, false, e.getMessage());
         }
-
-        // Revisar traslapes con otras reservas activas.
-        List<Reserva> traslapes = reservaRepository
-                .findByHabitacion_IdHabitacionAndEstadoReservaNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
-                        idHabitacion,
-                        Reserva.EstadoReserva.cancelada,
-                        fechaSalida,
-                        fechaEntrada
-                );
-
-        if (!traslapes.isEmpty()) {
-            response.setDisponible(false);
-            response.setMensaje("La habitación ya tiene una reserva activa en ese rango de fechas");
-            return response;
-        }
-
-        response.setDisponible(true);
-        response.setMensaje("La habitación está disponible");
-        return response;
     }
 
-    // Validar fechas obligatorias y orden lógico.
+    // --- MÉTODOS AUXILIARES ---
+
     private void validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida) {
-
         if (fechaEntrada == null || fechaSalida == null) {
-            throw new BusinessException("Las fechas de entrada y salida son obligatorias");
+            throw new BusinessException("Las fechas de entrada y salida son obligatorias.");
         }
-
-        if (!fechaEntrada.isBefore(fechaSalida)) {
-            throw new BusinessException("La fecha de entrada debe ser anterior a la fecha de salida");
-        }
-
         if (fechaEntrada.isBefore(LocalDate.now())) {
-            throw new BusinessException("No se puede reservar con fecha de entrada en el pasado");
+            throw new BusinessException("La fecha de entrada no puede estar en el pasado.");
+        }
+        if (!fechaEntrada.isBefore(fechaSalida)) {
+            throw new BusinessException("La fecha de entrada debe ser anterior a la fecha de salida.");
         }
     }
 
-    // Validar que no existan bloqueos ni reservas activas cruzadas.
-    private void validarDisponibilidadInterna(Integer idHabitacion,
-                                              LocalDate fechaEntrada,
-                                              LocalDate fechaSalida) {
-
+    private void validarDisponibilidadInterna(Integer idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
+        // Validar si hay bloqueos en esas fechas
         List<BloqueoHabitacion> bloqueos = bloqueoHabitacionRepository
-                .findByHabitacion_IdHabitacionAndFechaInicioLessThanAndFechaFinGreaterThan(
-                        idHabitacion,
-                        fechaSalida,
-                        fechaEntrada
-                );
-
+                .findByHabitacion_IdHabitacionAndFechaInicioLessThanAndFechaFinGreaterThan(idHabitacion, fechaSalida, fechaEntrada);
+        
         if (!bloqueos.isEmpty()) {
-            throw new BusinessException("La habitación está bloqueada para las fechas seleccionadas");
+            throw new BusinessException("La habitación se encuentra bloqueada en las fechas seleccionadas.");
         }
 
-        List<Reserva> traslapes = reservaRepository
+        // Validar si hay reservas activas en esas fechas (excluyendo canceladas)
+        List<Reserva> reservasConflictivas = reservaRepository
                 .findByHabitacion_IdHabitacionAndEstadoReservaNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(
-                        idHabitacion,
-                        Reserva.EstadoReserva.cancelada,
-                        fechaSalida,
-                        fechaEntrada
-                );
-
-        if (!traslapes.isEmpty()) {
-            throw new BusinessException("La habitación ya tiene una reserva activa en ese rango de fechas");
+                        idHabitacion, EstadoReserva.cancelada, fechaSalida, fechaEntrada);
+        
+        if (!reservasConflictivas.isEmpty()) {
+            throw new BusinessException("La habitación ya cuenta con una reserva activa para estas fechas.");
         }
     }
 
-    // Calcular el monto total día por día.
-    // Si hay precio de temporada para un día, se usa ese.
-    // Si no hay precio de temporada, se usa el precio base del tipo de habitación.
-    private BigDecimal calcularMontoTotal(TipoHabitacion tipoHabitacion,
-                                          LocalDate fechaEntrada,
-                                          LocalDate fechaSalida) {
-
-        if (tipoHabitacion == null) {
-            throw new BusinessException("La habitación no tiene un tipo de habitación asociado");
-        }
-
-        if (tipoHabitacion.getPrecioBaseNoche() == null) {
-            throw new BusinessException("El tipo de habitación no tiene precio base por noche");
-        }
-
-        BigDecimal total = BigDecimal.ZERO;
+    private BigDecimal calcularMontoTotal(TipoHabitacion tipoHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
+        BigDecimal montoTotal = BigDecimal.ZERO;
         LocalDate fechaActual = fechaEntrada;
 
         while (fechaActual.isBefore(fechaSalida)) {
-            total = total.add(obtenerPrecioPorNoche(tipoHabitacion, fechaActual));
+            BigDecimal precioNoche = obtenerPrecioPorNoche(tipoHabitacion, fechaActual);
+            montoTotal = montoTotal.add(precioNoche);
             fechaActual = fechaActual.plusDays(1);
         }
 
-        return total;
+        return montoTotal;
     }
 
-    // Obtener el precio aplicable para una fecha concreta.
     private BigDecimal obtenerPrecioPorNoche(TipoHabitacion tipoHabitacion, LocalDate fecha) {
-
+        // Busca si hay un precio especial de temporada para esta fecha
         List<PrecioTemporada> preciosTemporada = precioTemporadaRepository
                 .findByTipoHabitacion_IdTipoHabitacionAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqualAndEstaEliminadoFalse(
-                        tipoHabitacion.getIdTipoHabitacion(),
-                        fecha,
-                        fecha
-                );
+                        tipoHabitacion.getIdTipoHabitacion(), fecha, fecha);
 
         if (!preciosTemporada.isEmpty()) {
+            // Si hay un precio de temporada activo, usa el primero que encuentre
             return preciosTemporada.get(0).getPrecioEspecial();
         }
 
+        // Si no hay precio de temporada, retorna el precio base
         return tipoHabitacion.getPrecioBaseNoche();
     }
 
-    // Convertir la entidad Reserva a DTO de respuesta.
     private ReservaResponseDTO toReservaResponseDTO(Reserva reserva) {
+        // Mapeo manual usando el constructor con parámetros o setters (sin Builder)
         ReservaResponseDTO dto = new ReservaResponseDTO();
-
+        
         dto.setIdReserva(reserva.getIdReserva());
-
+        
         if (reserva.getHabitacion() != null) {
             dto.setIdHabitacion(reserva.getHabitacion().getIdHabitacion());
             dto.setNumeroHabitacion(reserva.getHabitacion().getNumeroHabitacion());
         }
-
+        
         if (reserva.getCliente() != null) {
             dto.setIdCliente(reserva.getCliente().getIdUsuario());
             dto.setNombreCliente(construirNombreCompleto(reserva.getCliente()));
         }
-
+        
         dto.setFechaEntrada(reserva.getFechaEntrada());
         dto.setFechaSalida(reserva.getFechaSalida());
         dto.setMontoTotal(reserva.getMontoTotal());
-
+        
         if (reserva.getEstadoReserva() != null) {
             dto.setEstadoReserva(reserva.getEstadoReserva().name());
         }
-
+        
         return dto;
     }
 
-    // Armar nombre completo del cliente para respuesta.
     private String construirNombreCompleto(Usuario usuario) {
-        StringBuilder nombreCompleto = new StringBuilder();
-
-        if (usuario.getNombre() != null) {
-            nombreCompleto.append(usuario.getNombre());
-        }
-
-        if (usuario.getApellidoPaterno() != null) {
-            if (!nombreCompleto.isEmpty()) {
-                nombreCompleto.append(" ");
-            }
-            nombreCompleto.append(usuario.getApellidoPaterno());
-        }
-
-        if (usuario.getApellidoMaterno() != null) {
-            if (!nombreCompleto.isEmpty()) {
-                nombreCompleto.append(" ");
-            }
-            nombreCompleto.append(usuario.getApellidoMaterno());
-        }
-
-        return nombreCompleto.toString().trim();
+        String nombre = usuario.getNombre() != null ? usuario.getNombre() : "";
+        String paterno = usuario.getApellidoPaterno() != null ? usuario.getApellidoPaterno() : "";
+        String materno = usuario.getApellidoMaterno() != null ? usuario.getApellidoMaterno() : "";
+        
+        return String.format("%s %s %s", nombre, paterno, materno).trim();
     }
 }

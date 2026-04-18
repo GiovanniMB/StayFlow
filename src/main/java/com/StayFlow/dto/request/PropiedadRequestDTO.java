@@ -6,11 +6,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+
 // DTO para recibir los datos de una propiedad en las solicitudes de creación o actualización. Incluye validaciones para asegurar que se proporcionen los datos necesarios y que tengan el formato correcto. Además, incluye un objeto anidado para la dirección, que también se valida.
-@Getter
-@Setter
 @Schema(description = "Datos de entrada para registrar o actualizar una propiedad") // Descripción general del DTO para Swagger
 public class PropiedadRequestDTO {
 
@@ -38,4 +35,68 @@ public class PropiedadRequestDTO {
     // Para los servicios, recibe una lista de IDs que corresponden a los servicios que ofrece la propiedad.
     @Schema(description = "Lista de IDs de los servicios (amenities) que ofrece la propiedad", example = "[1, 2, 3]")
     private List<Integer> idServicios;
+
+    // --- Constructor vacío ---
+    public PropiedadRequestDTO() {
+    }
+
+    // --- Constructor con parámetros ---
+    public PropiedadRequestDTO(String nombreComercial, String telefono, Boolean seRentaPorHabitaciones, String descripcion, DireccionRequestDTO direccion, List<Integer> idServicios) {
+        this.nombreComercial = nombreComercial;
+        this.telefono = telefono;
+        this.seRentaPorHabitaciones = seRentaPorHabitaciones;
+        this.descripcion = descripcion;
+        this.direccion = direccion;
+        this.idServicios = idServicios;
+    }
+
+    // --- Getters y Setters ---
+
+    public String getNombreComercial() {
+        return nombreComercial;
+    }
+
+    public void setNombreComercial(String nombreComercial) {
+        this.nombreComercial = nombreComercial;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public Boolean getSeRentaPorHabitaciones() {
+        return seRentaPorHabitaciones;
+    }
+
+    public void setSeRentaPorHabitaciones(Boolean seRentaPorHabitaciones) {
+        this.seRentaPorHabitaciones = seRentaPorHabitaciones;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public DireccionRequestDTO getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(DireccionRequestDTO direccion) {
+        this.direccion = direccion;
+    }
+
+    public List<Integer> getIdServicios() {
+        return idServicios;
+    }
+
+    public void setIdServicios(List<Integer> idServicios) {
+        this.idServicios = idServicios;
+    }
 }

@@ -5,13 +5,9 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.Getter;
-import lombok.Setter;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Getter
-@Setter
 @Schema(description = "Datos para crear o actualizar una categoría de habitación") // DTO para solicitudes de creación o actualización de tipo de habitación
 public class TipoHabitacionRequestDTO {
 
@@ -35,4 +31,59 @@ public class TipoHabitacionRequestDTO {
 
     @Schema(description = "Lista de IDs de servicios (amenities) de esta habitación", example = "[4, 5]")
     private List<Integer> idServicios;
+
+    // --- Constructor vacío ---
+    public TipoHabitacionRequestDTO() {
+    }
+
+    // --- Constructor con parámetros ---
+    public TipoHabitacionRequestDTO(String nombreTipo, Integer capacidad, BigDecimal precioBaseNoche, Boolean tieneBanoPrivado, List<Integer> idServicios) {
+        this.nombreTipo = nombreTipo;
+        this.capacidad = capacidad;
+        this.precioBaseNoche = precioBaseNoche;
+        this.tieneBanoPrivado = tieneBanoPrivado;
+        this.idServicios = idServicios;
+    }
+
+    // --- Getters y Setters ---
+
+    public String getNombreTipo() {
+        return nombreTipo;
+    }
+
+    public void setNombreTipo(String nombreTipo) {
+        this.nombreTipo = nombreTipo;
+    }
+
+    public Integer getCapacidad() {
+        return capacidad;
+    }
+
+    public void setCapacidad(Integer capacidad) {
+        this.capacidad = capacidad;
+    }
+
+    public BigDecimal getPrecioBaseNoche() {
+        return precioBaseNoche;
+    }
+
+    public void setPrecioBaseNoche(BigDecimal precioBaseNoche) {
+        this.precioBaseNoche = precioBaseNoche;
+    }
+
+    public Boolean getTieneBanoPrivado() {
+        return tieneBanoPrivado;
+    }
+
+    public void setTieneBanoPrivado(Boolean tieneBanoPrivado) {
+        this.tieneBanoPrivado = tieneBanoPrivado;
+    }
+
+    public List<Integer> getIdServicios() {
+        return idServicios;
+    }
+
+    public void setIdServicios(List<Integer> idServicios) {
+        this.idServicios = idServicios;
+    }
 }
