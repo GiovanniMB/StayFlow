@@ -1,6 +1,5 @@
 package com.StayFlow.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,7 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${app.base-url:http://localhost:8080}")
-    private String baseUrl;
+ 
 
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
@@ -28,7 +26,7 @@ public class EmailService {
             helper.setTo(destinatario);
             helper.setSubject("StayFlow - Confirma tu cuenta");
             
-            String urlConfirmacion = baseUrl + "/api/usuarios/confirmar-email?codigo=" + codigo;
+            String urlConfirmacion = "http://localhost:5173/confirmar-email?codigo=" + codigo;
             
             String htmlContent = construirHTMLConfirmacion(nombre, urlConfirmacion);
             helper.setText(htmlContent, true);
@@ -48,7 +46,7 @@ public class EmailService {
             helper.setTo(destinatario);
             helper.setSubject("StayFlow - Recuperación de contraseña");
             
-            String urlRecuperacion = baseUrl + "/api/usuarios/reset-password?codigo=" + codigo;
+            String urlRecuperacion = "http://localhost:5173/reset-password?codigo=" + codigo;
             
             String htmlContent = construirHTMLRecuperacion(nombre, urlRecuperacion);
             helper.setText(htmlContent, true);

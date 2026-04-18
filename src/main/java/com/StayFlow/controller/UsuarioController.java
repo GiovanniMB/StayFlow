@@ -4,6 +4,7 @@ import static com.StayFlow.security.SecurityConstants.REFRESH_TOKEN_HEADER;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -106,19 +107,33 @@ public class UsuarioController {
     }
 
   
-    @GetMapping("/perfil/{id}")
-    @Operation(summary = "Obtener perfil de usuario", 
-               description = "Retorna la información completa de un usuario por su ID")
+    @GetMapping("/perfil")
+    @Operation(summary = "Obtener perfil del usuario autenticado", 
+               description = "Retorna la información del usuario usando el token JWT")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Perfil encontrado"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+        @ApiResponse(responseCode = "401", description = "No autenticado")
     })
-    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfil(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfilAutenticado(
+            @RequestHeader("Authorization") String token) {
+        
+        // Extraer email del token
+        String email = jwtUtil.extractEmail(token.substring(7));
+        
+        UsuarioResponseDTO data = usuarioService.getPerfilByEmail(email);
+        ApiResponseDTO<UsuarioResponseDTO> response = ApiResponseDTO.success("Perfil encontrado", data);
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/perfil/{id}")
+    @Operation(summary = "Obtener perfil de usuario por ID (solo administradores)", 
+               description = "Retorna la información completa de un usuario por su ID")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfilById(@PathVariable Integer id) {
         UsuarioResponseDTO data = usuarioService.getPerfil(id);
         ApiResponseDTO<UsuarioResponseDTO> response = ApiResponseDTO.success("Perfil encontrado", data);
         return ResponseEntity.ok(response);
     }
-
    
     @PutMapping("/perfil/{id}")
     @Operation(summary = "Actualizar perfil de usuario", 

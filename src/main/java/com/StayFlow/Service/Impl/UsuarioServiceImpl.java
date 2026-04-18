@@ -308,6 +308,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
         if (usuario.getCodigoExpiracion().isBefore(LocalDateTime.now())) {
             throw new BusinessException("El código ha expirado", "USER_005");
         }
+        
+        if (usuario.isEmailConfirmado()) {
+            return;
+        }
 
         usuario.setEmailConfirmado(true);
         usuario.setCodigoConfirmacion(null);
@@ -322,7 +326,6 @@ public class UsuarioServiceImpl implements IUsuarioService {
         log.setUsuarioAccion(usuario);
         logSistemaRepository.save(log);
     }
-
 
     @Override
     @Transactional
@@ -433,5 +436,13 @@ public class UsuarioServiceImpl implements IUsuarioService {
         log.setAccion(LogSistema.Accion.REACTIVAR);
         log.setUsuarioAccion(usuario);
         logSistemaRepository.save(log);
+    }
+    
+    @Override
+    public UsuarioResponseDTO getPerfilByEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));
+        
+        return usuarioMapper.toResponseDTO(usuario);
     }
 }

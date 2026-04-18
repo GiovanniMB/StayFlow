@@ -26,6 +26,6 @@ public class SecurityConstants {
     	    "/swagger-ui.html",
     	    "/api-docs/**",
     	    "/v3/api-docs/**",
-    	    "/api/usuarios/cuenta/reactivar",
+    	    "/api/usuarios/cuenta/reactivar"
     	};
 }

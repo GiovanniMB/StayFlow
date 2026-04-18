@@ -45,4 +45,6 @@ public interface IUsuarioService {
 
     @Operation(summary = "Reactivar cuenta de usuario", description = "Re-activa una cuenta previamente desactivada.")
     void reactivarCuenta(ReactivarCuentaRequestDTO request);
+    
+    UsuarioResponseDTO getPerfilByEmail(String email);
 }
