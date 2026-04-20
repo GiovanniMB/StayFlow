@@ -1,12 +1,10 @@
 package com.StayFlow.controller;
 
-import com.StayFlow.Service.Interfaces.IReservaService;
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import com.StayFlow.Service.Interfaces.IReservaService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -18,84 +16,77 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@Tag(name = "Reservas", description = "Gestión de reservas y disponibilidad de habitaciones")
 public class ReservaController {
 
     private final IReservaService reservaService;
 
+    // Constructor nativo para inyección de dependencias (Reemplaza a @RequiredArgsConstructor)
     public ReservaController(IReservaService reservaService) {
         this.reservaService = reservaService;
     }
 
-    // Crear una nueva reserva
     @PostMapping("/reservas")
-    @Operation(summary = "Crear una reserva")
-    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> crearReserva(
-            @Valid @RequestBody ReservaRequestDTO request) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(
-                ApiResponseDTO.success(
-                        "Reserva creada exitosamente",
-                        reservaService.crearReserva(request)
-                )
-        );
+    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> crearReserva(@Valid @RequestBody ReservaRequestDTO request) {
+        ReservaResponseDTO reserva = reservaService.crearReserva(request);
+        
+        ApiResponseDTO<ReservaResponseDTO> response = new ApiResponseDTO<>();
+        // Ajusta estos setters si los nombres en tu ApiResponseDTO son ligeramente distintos
+        response.setSuccess(true);
+        response.setMessage("Reserva creada exitosamente");
+        response.setData(reserva);
+        
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Obtener una reserva por su id
     @GetMapping("/reservas/{idReserva}")
-    @Operation(summary = "Obtener una reserva por id")
-    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> obtenerReservaPorId(
-            @PathVariable Integer idReserva) {
-
-        return ResponseEntity.ok(
-                ApiResponseDTO.success(
-                        "Reserva recuperada correctamente",
-                        reservaService.obtenerReservaPorId(idReserva)
-                )
-        );
+    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> obtenerReservaPorId(@PathVariable Integer idReserva) {
+        ReservaResponseDTO reserva = reservaService.obtenerReservaPorId(idReserva);
+        
+        ApiResponseDTO<ReservaResponseDTO> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Reserva obtenida exitosamente");
+        response.setData(reserva);
+        
+        return ResponseEntity.ok(response);
     }
 
-    // Obtener todas las reservas de un cliente
     @GetMapping("/clientes/{idCliente}/reservas")
-    @Operation(summary = "Obtener reservas por cliente")
-    public ResponseEntity<ApiResponseDTO<List<ReservaResponseDTO>>> obtenerReservasPorCliente(
-            @PathVariable Integer idCliente) {
-
-        return ResponseEntity.ok(
-                ApiResponseDTO.success(
-                        "Reservas recuperadas correctamente",
-                        reservaService.obtenerReservasPorCliente(idCliente)
-                )
-        );
+    public ResponseEntity<ApiResponseDTO<List<ReservaResponseDTO>>> obtenerReservasPorCliente(@PathVariable Integer idCliente) {
+        List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorCliente(idCliente);
+        
+        ApiResponseDTO<List<ReservaResponseDTO>> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Reservas del cliente obtenidas exitosamente");
+        response.setData(reservas);
+        
+        return ResponseEntity.ok(response);
     }
 
-    // Cancelar una reserva existente
     @PutMapping("/reservas/{idReserva}/cancelar")
-    @Operation(summary = "Cancelar una reserva")
-    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> cancelarReserva(
-            @PathVariable Integer idReserva) {
-
-        return ResponseEntity.ok(
-                ApiResponseDTO.success(
-                        "Reserva cancelada exitosamente",
-                        reservaService.cancelarReserva(idReserva)
-                )
-        );
+    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> cancelarReserva(@PathVariable Integer idReserva) {
+        ReservaResponseDTO reservaCancelada = reservaService.cancelarReserva(idReserva);
+        
+        ApiResponseDTO<ReservaResponseDTO> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Reserva cancelada exitosamente");
+        response.setData(reservaCancelada);
+        
+        return ResponseEntity.ok(response);
     }
 
-    // Verificar disponibilidad de una habitación en un rango de fechas
     @GetMapping("/habitaciones/{idHabitacion}/disponibilidad")
-    @Operation(summary = "Verificar disponibilidad de una habitación")
     public ResponseEntity<ApiResponseDTO<DisponibilidadResponseDTO>> verificarDisponibilidad(
             @PathVariable Integer idHabitacion,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaEntrada,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaSalida) {
-
-        return ResponseEntity.ok(
-                ApiResponseDTO.success(
-                        "Disponibilidad consultada correctamente",
-                        reservaService.verificarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida)
-                )
-        );
+        
+        DisponibilidadResponseDTO disponibilidad = reservaService.verificarDisponibilidad(idHabitacion, fechaEntrada, fechaSalida);
+        
+        ApiResponseDTO<DisponibilidadResponseDTO> response = new ApiResponseDTO<>();
+        response.setSuccess(true);
+        response.setMessage("Consulta de disponibilidad completada");
+        response.setData(disponibilidad);
+        
+        return ResponseEntity.ok(response);
     }
 }

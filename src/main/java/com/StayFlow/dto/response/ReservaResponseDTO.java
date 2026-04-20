@@ -32,8 +32,77 @@ public class ReservaResponseDTO {
         this.estadoReserva = estadoReserva;
     }
 
-    // Genera todos los Getters y Setters aquí para las 9 propiedades...
-    public Integer getIdReserva() { return idReserva; }
-    public void setIdReserva(Integer idReserva) { this.idReserva = idReserva; }
-    // ... haz lo mismo para el resto
+    // --- TODOS LOS GETTERS Y SETTERS ---
+
+    public Integer getIdReserva() {
+        return idReserva;
+    }
+
+    public void setIdReserva(Integer idReserva) {
+        this.idReserva = idReserva;
+    }
+
+    public Integer getIdHabitacion() {
+        return idHabitacion;
+    }
+
+    public void setIdHabitacion(Integer idHabitacion) {
+        this.idHabitacion = idHabitacion;
+    }
+
+    public String getNumeroHabitacion() {
+        return numeroHabitacion;
+    }
+
+    public void setNumeroHabitacion(String numeroHabitacion) {
+        this.numeroHabitacion = numeroHabitacion;
+    }
+
+    public Integer getIdCliente() {
+        return idCliente;
+    }
+
+    public void setIdCliente(Integer idCliente) {
+        this.idCliente = idCliente;
+    }
+
+    public String getNombreCliente() {
+        return nombreCliente;
+    }
+
+    public void setNombreCliente(String nombreCliente) {
+        this.nombreCliente = nombreCliente;
+    }
+
+    public LocalDate getFechaEntrada() {
+        return fechaEntrada;
+    }
+
+    public void setFechaEntrada(LocalDate fechaEntrada) {
+        this.fechaEntrada = fechaEntrada;
+    }
+
+    public LocalDate getFechaSalida() {
+        return fechaSalida;
+    }
+
+    public void setFechaSalida(LocalDate fechaSalida) {
+        this.fechaSalida = fechaSalida;
+    }
+
+    public BigDecimal getMontoTotal() {
+        return montoTotal;
+    }
+
+    public void setMontoTotal(BigDecimal montoTotal) {
+        this.montoTotal = montoTotal;
+    }
+
+    public String getEstadoReserva() {
+        return estadoReserva;
+    }
+
+    public void setEstadoReserva(String estadoReserva) {
+        this.estadoReserva = estadoReserva;
+    }
 }

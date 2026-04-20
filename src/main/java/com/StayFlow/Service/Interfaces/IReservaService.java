@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface IReservaService {
 
-    // Métodos que ya tenías
+    // Métodos
     ReservaResponseDTO crearReserva(ReservaRequestDTO request);
     
     ReservaResponseDTO obtenerReservaPorId(Integer idReserva);
@@ -18,8 +18,6 @@ public interface IReservaService {
     ReservaResponseDTO cancelarReserva(Integer idReserva);
     
     DisponibilidadResponseDTO verificarDisponibilidad(Integer idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida);
-
-    // --- AQUÍ AGREGAMOS LOS NUEVOS MÉTODOS ---
     
     ReservaResponseDTO registrarCheckIn(Integer idReserva);
     
