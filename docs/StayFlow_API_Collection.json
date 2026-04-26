@@ -1,0 +1,130 @@
+{
+	"info": {
+		"name": "StayFlow API - Módulo Propiedades",
+		"description": "Colección centralizada para probar los endpoints del clon de Airbnb (StayFlow).",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080/api",
+			"type": "string"
+		},
+		{
+			"key": "token",
+			"value": "pega_tu_token_jwt_aqui",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "1. Auth",
+			"item": [
+				{
+					"name": "Login (Obtener Token)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"tu_correo@gmail.com\",\n  \"password\": \"tu_clave\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/usuarios/login",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "usuarios", "login" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "2. Propiedades",
+			"item": [
+				{
+					"name": "Crear Propiedad",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+						},
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombreComercial\": \"Hotel Paraíso Postman\",\n  \"telefono\": \"5512345678\",\n  \"seRentaPorHabitaciones\": true,\n  \"descripcion\": \"Prueba desde Postman\",\n  \"direccion\": {\n    \"calle\": \"Av. Reforma\",\n    \"numero\": \"123\",\n    \"idColonia\": 1,\n    \"latitud\": 19.432608,\n    \"longitud\": -99.133209\n  },\n  \"idServicios\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/propiedades",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "propiedades" ]
+						}
+					}
+				},
+				{
+					"name": "Listar Propiedades",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/propiedades",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "propiedades" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "3. Habitaciones",
+			"item": [
+				{
+					"name": "Crear Tipo Habitacion (Categoría)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+						},
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"nombreTipo\": \"Suite Presidencial\",\n  \"capacidad\": 4,\n  \"precioBaseNoche\": 2500.00,\n  \"tieneBanoPrivado\": true,\n  \"idServicios\": [1]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/propiedades/1/tipos-habitacion",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "propiedades", "1", "tipos-habitacion" ]
+						}
+					}
+				},
+				{
+					"name": "Crear Habitacion (Cuarto Físico)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [ { "key": "token", "value": "{{token}}", "type": "string" } ]
+						},
+						"method": "POST",
+						"header": [ { "key": "Content-Type", "value": "application/json" } ],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"numeroHabitacion\": \"101A\",\n  \"camas\": [\n    {\n      \"idTipoCama\": 2,\n      \"cantidad\": 1\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/tipos-habitacion/1/habitaciones",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "tipos-habitacion", "1", "habitaciones" ]
+						}
+					}
+				}
+			]
+		}
+	]
+}
