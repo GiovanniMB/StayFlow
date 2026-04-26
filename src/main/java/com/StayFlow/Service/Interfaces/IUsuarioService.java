@@ -1,6 +1,7 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 
 import com.StayFlow.dto.request.LoginRequestDTO;
+import com.StayFlow.dto.request.ReactivarCuentaRequestDTO;
 import com.StayFlow.dto.request.RegistroRequestDTO;
 import com.StayFlow.dto.response.LoginResponseDTO;
 import com.StayFlow.dto.response.UsuarioResponseDTO;
@@ -38,4 +39,12 @@ public interface IUsuarioService {
 
     @Operation(summary = "Restablecer contraseña", description = "Cambia la contraseña usando el código de recuperación")
     void resetPassword(String codigo, String nuevaPassword);
+    
+    @Operation(summary = "Desactivar cuenta de usuario", description = "Realiza un soft delete de la cuenta.")
+    void desactivarCuenta(Integer idUsuario);
+
+    @Operation(summary = "Reactivar cuenta de usuario", description = "Re-activa una cuenta previamente desactivada.")
+    void reactivarCuenta(ReactivarCuentaRequestDTO request);
+    
+    UsuarioResponseDTO getPerfilByEmail(String email);
 }

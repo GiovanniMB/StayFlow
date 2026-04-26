@@ -9,11 +9,23 @@ import java.util.List;
 public class TipoHabitacionResponseDTO {
     
     private Integer idTipoHabitacion;
+    
+    @Schema(description = "ID de la propiedad a la que pertenece", example = "1")
     private Integer idPropiedad;
+    
+    @Schema(description = "Nombre de la categoría o recámara", example = "Suite Ejecutiva")
     private String nombreTipo;
+    
+    @Schema(description = "Capacidad máxima de personas", example = "2")
     private Integer capacidad;
+    
+    @Schema(description = "Precio base por noche", example = "1600.00")
     private BigDecimal precioBaseNoche;
+    
+    @Schema(description = "Indica si cuenta con baño privado interior", example = "true")
     private boolean tieneBanoPrivado;
+    
+    @Schema(description = "Lista de amenidades incluidas en la habitación")
     private List<ServicioResponseDTO> servicios;
 
     // --- Constructor vacío ---

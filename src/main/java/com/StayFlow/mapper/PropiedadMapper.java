@@ -10,6 +10,8 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.StayFlow.dto.response.ServicioResponseDTO;
+import com.StayFlow.model.FotoHabitacion;
+import com.StayFlow.dto.response.FotoResponseDTO;
 
 @Component
 public class PropiedadMapper {
@@ -24,6 +26,7 @@ public class PropiedadMapper {
         propiedad.setTelefono(request.getTelefono());
         propiedad.setSeRentaPorHabitaciones(request.getSeRentaPorHabitaciones());
         propiedad.setDescripcion(request.getDescripcion());
+        propiedad.setPrecioNoche(request.getPrecioNoche());
         
         if (request.getDireccion() != null) {
             propiedad.setDireccion(toDireccionEntity(request.getDireccion()));
@@ -42,11 +45,11 @@ public class PropiedadMapper {
         direccion.setNumeroInterior(request.getNumeroInterior());
         direccion.setLatitud(request.getLatitud());
         direccion.setLongitud(request.getLongitud());
-        // Nota: La Colonia se asignará en la capa de Servicio
+        //La Colonia se asignará en la capa de Servicio
         return direccion;
     }
 
-    // --- Mapeo a Response DTOs ---
+    //Mapeo a Response DTOs
     // Método principal para mapear una Propiedad a PropiedadResponseDTO, incluyendo sus relaciones (Dueño, Dirección, Servicios)
     public PropiedadResponseDTO toResponseDTO(Propiedad propiedad) {
         if (propiedad == null) return null;
@@ -58,6 +61,7 @@ public class PropiedadMapper {
         response.setSeRentaPorHabitaciones(propiedad.isSeRentaPorHabitaciones());
         response.setContadorReservas(propiedad.getContadorReservas());
         response.setDescripcion(propiedad.getDescripcion());
+        response.setPrecioNoche(propiedad.getPrecioNoche());
 
         if (propiedad.getDueno() != null) {
             response.setIdDueno(propiedad.getDueno().getIdUsuario());
@@ -72,6 +76,14 @@ public class PropiedadMapper {
                 .map(this::toServicioResponseDTO)
                 .collect(Collectors.toList()));
         }
+
+        if (propiedad.getFotos() != null && !propiedad.getFotos().isEmpty()) {
+            response.setFotosGenerales(propiedad.getFotos().stream()
+                .filter(foto -> !foto.isEstaEliminado() && foto.getTipoHabitacion() == null) // Solo las de la propiedad
+                .map(this::toFotoResponseDTO)
+                .collect(Collectors.toList()));
+        }
+                
         return response;
     }
 
@@ -87,9 +99,18 @@ public class PropiedadMapper {
         response.setLatitud(direccion.getLatitud());
         response.setLongitud(direccion.getLongitud());
 
+        // --- EXTRACCIÓN PROFUNDA PARA EL BUSCADOR DE REACT (Sin Código Postal) ---
         if (direccion.getColonia() != null) {
             response.setIdColonia(direccion.getColonia().getId());
-            response.setNombreColonia(direccion.getColonia().getNombre());
+            response.setNombreColonia(direccion.getColonia().getNombre()); 
+
+            if (direccion.getColonia().getMunicipio() != null) {
+                response.setMunicipio(direccion.getColonia().getMunicipio().getNombre());
+
+                if (direccion.getColonia().getMunicipio().getEstado() != null) {
+                    response.setEstado(direccion.getColonia().getMunicipio().getEstado().getNombre());
+                }
+            }
         }
 
         return response;
@@ -109,6 +130,16 @@ public class PropiedadMapper {
         ServicioResponseDTO dto = new ServicioResponseDTO();
         dto.setIdServicio(servicio.getIdServicio());
         dto.setNombreServicio(servicio.getNombreServicio());
+        return dto;
+    }
+
+    
+    private FotoResponseDTO toFotoResponseDTO(FotoHabitacion foto) {
+        if (foto == null) return null;
+        FotoResponseDTO dto = new FotoResponseDTO();
+        dto.setIdFoto(foto.getIdFotoHabitacion());
+        dto.setUrlFoto(foto.getUrlFoto());
+        dto.setEsPrincipal(foto.isEsPrincipal());
         return dto;
     }
 }

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class DireccionRequestDTO {
     
     @NotBlank(message = "La calle es obligatoria")
-    @Schema(description = "Calle", example = "Av. Reforma")
+    @Schema(description = "Calle", example = "Av. Reforma") 
     private String calle;
     
     @Schema(description = "Número exterior", example = "123")
@@ -20,11 +20,11 @@ public class DireccionRequestDTO {
     private String numeroInterior;
     
     @NotNull(message = "El ID de la colonia es obligatorio")
-    @Schema(description = "ID de la colonia correspondiente", example = "5")
+    @Schema(description = "ID de la colonia correspondiente", example = "5") // Se espera que el cliente proporcione el ID de la colonia, que se validará en el backend para asegurar que corresponde a una colonia válida, el frontend puede mostrar una lista de colonias disponibles para que el usuario seleccione el ID correcto
     private Integer idColonia;
     
     @NotNull(message = "La latitud es obligatoria")
-    @Schema(description = "Latitud geográfica", example = "19.432608")
+    @Schema(description = "Latitud geográfica", example = "19.432608") // Se espera que el cliente proporcione la latitud de la propiedad, que se validará en el backend para asegurar que es un valor numérico válido, el frontend mostrara un mapa para que el usuario seleccione la ubicación exacta y se obtengan automáticamente las coordenadas de latitud y longitud
     private BigDecimal latitud;
     
     @NotNull(message = "La longitud es obligatoria")

@@ -7,13 +7,29 @@ import java.util.List;
 public class PropiedadResponseDTO {
     
     private Integer idPropiedad;
+    
+    @Schema(description = "ID del usuario propietario", example = "3")
     private Integer idDueno; // Solo enviamos el ID del dueño por seguridad
+    
+    @Schema(description = "Nombre del alojamiento", example = "Hotel Paraíso")
     private String nombreComercial;
+    
+    @Schema(description = "Detalles de la dirección y geolocalización")
     private DireccionResponseDTO direccion;
+    
+    @Schema(description = "Teléfono de contacto de la recepción o anfitrión", example = "5512345678")
     private String telefono;
+    
+    @Schema(description = "Define la modalidad del alojamiento (true=Hotel, false=Casa Entera)", example = "true")
     private boolean seRentaPorHabitaciones;
+    
+    @Schema(description = "Cantidad de veces que se ha reservado (útil para ranking)", example = "15")
     private Integer contadorReservas;
+    
+    @Schema(description = "Descripción narrativa del lugar redactada por el anfitrión", example = "Un lugar mágico en el centro...")
     private String descripcion;
+    
+    @Schema(description = "Lista de servicios generales de la propiedad (Wifi, Alberca, etc.)")
     private List<ServicioResponseDTO> servicios;
 
     // --- Constructor vacío ---

@@ -1,4 +1,4 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
 import com.StayFlow.model.Propiedad;
 import org.springframework.data.jpa.repository.JpaRepository;

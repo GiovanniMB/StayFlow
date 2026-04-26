@@ -7,12 +7,32 @@ import java.math.BigDecimal;
 public class DireccionResponseDTO {
     
     private Integer id;
+    
+    @Schema(description = "Calle principal", example = "Av. Reforma")
     private String calle;
+    
+    @Schema(description = "Número exterior", example = "123")
     private String numero;
+    
+    @Schema(description = "Número interior (si aplica)", example = "Int 4B")
     private String numeroInterior;
+    
+    @Schema(description = "ID de la colonia en el catálogo", example = "450")
     private Integer idColonia;
-    private String nombreColonia; // Útil para que el frontend no tenga que hacer otra petición
+    
+    @Schema(description = "Nombre en texto de la colonia", example = "Roma Norte")
+    private String nombreColonia; 
+    
+    @Schema(description = "Nombre en texto del municipio o alcaldía", example = "Cuauhtémoc")
+    private String municipio;
+    
+    @Schema(description = "Nombre en texto del estado", example = "Ciudad de México")
+    private String estado;
+    
+    @Schema(description = "Latitud para renderizar el mapa", example = "19.420300")
     private BigDecimal latitud;
+    
+    @Schema(description = "Longitud para renderizar el mapa", example = "-99.163100")
     private BigDecimal longitud;
 
     // --- Constructor vacío ---

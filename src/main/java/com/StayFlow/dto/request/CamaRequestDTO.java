@@ -8,12 +8,12 @@ import jakarta.validation.constraints.NotNull;
 public class CamaRequestDTO {
 
     @NotNull(message = "El ID del tipo de cama es obligatorio")
-    @Schema(description = "ID del tipo de cama (ej. 1 para Individual, 2 para King)", example = "1")
+    @Schema(description = "ID del tipo de cama (ej. 1 para Individual, 2 para King)", example = "1") // Se espera que el cliente proporcione el ID del tipo de cama, que se validará en el backend para asegurar que corresponde a un tipo de cama válido, el frontend puede mostrar una lista de tipos de cama disponibles para que el usuario seleccione el ID correcto
     private Integer idTipoCama;
 
     @NotNull(message = "La cantidad de camas es obligatoria")
     @Min(value = 1, message = "Debe agregar al menos 1 cama de este tipo")
-    @Schema(description = "Número de camas de este tipo", example = "2")
+    @Schema(description = "Número de camas de este tipo", example = "2") // Se espera que el cliente proporcione la cantidad de camas de este tipo que desea agregar a la habitación, el backend validará que sea un número positivo y el frontend puede mostrar controles para aumentar o disminuir la cantidad fácilmente
     private Integer cantidad;
 
     // 1. Constructor vacío

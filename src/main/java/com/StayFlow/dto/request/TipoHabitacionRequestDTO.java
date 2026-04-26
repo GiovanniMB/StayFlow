@@ -1,8 +1,10 @@
 package com.StayFlow.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
@@ -12,24 +14,24 @@ import java.util.List;
 public class TipoHabitacionRequestDTO {
 
     @NotBlank(message = "El nombre del tipo es obligatorio")
-    @Schema(description = "Nombre de la categoría", example = "Suite Presidencial")
+    @Schema(description = "Nombre de la categoría o recámara", example = "Suite Ejecutiva")
     private String nombreTipo;
 
     @NotNull(message = "La capacidad es obligatoria")
     @Min(value = 1, message = "La capacidad debe ser al menos de 1 persona")
-    @Schema(description = "Capacidad máxima de personas", example = "4")
+    @Schema(description = "Cantidad máxima de personas que pueden dormir aquí", example = "2")
     private Integer capacidad;
 
     @NotNull(message = "El precio base es obligatorio")
-    @Positive(message = "El precio debe ser mayor a cero")
-    @Schema(description = "Precio base por noche", example = "1500.50")
+    @PositiveOrZero(message = "El precio no puede ser negativo")
+    @Schema(description = "Precio por noche de esta categoría (0 si es Casa Entera)", example = "1500.00")
     private BigDecimal precioBaseNoche;
 
     @NotNull(message = "Debe indicar si tiene baño privado")
-    @Schema(description = "Indica si tiene baño privado", example = "true")
+    @Schema(description = "Indica si la recámara cuenta con baño al interior", example = "true")
     private Boolean tieneBanoPrivado;
 
-    @Schema(description = "Lista de IDs de servicios (amenities) de esta habitación", example = "[4, 5]")
+    @Schema(description = "Lista de IDs de amenidades que incluye esta recámara", example = "[1, 4, 7]")
     private List<Integer> idServicios;
 
     // --- Constructor vacío ---

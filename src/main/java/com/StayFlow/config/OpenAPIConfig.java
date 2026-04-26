@@ -18,7 +18,6 @@ public class OpenAPIConfig {
     // Configuración de OpenAPI para la documentación de la API REST
     @Bean
     public OpenAPI customOpenAPI() {
-        final String securitySchemeName = "bearerAuth";
         // Configuración de la información general de la API, servidores y seguridad
         return new OpenAPI()
             .info(new Info()
@@ -31,18 +30,15 @@ public class OpenAPIConfig {
             .servers(List.of(
                 new Server().url("http://localhost:8081").description("Servidor de desarrollo")
             ))
-            // 1. Requerimiento global de seguridad
-            .addSecurityItem(new SecurityRequirement().addList(securitySchemeName))
-            // 2. Definición del componente de seguridad (JWT Bearer)
-            .components(
-                new Components()
-                    .addSecuritySchemes(securitySchemeName,
-                        new SecurityScheme()
-                            .name(securitySchemeName)
-                            .type(SecurityScheme.Type.HTTP)
-                            .scheme("bearer")
-                            .bearerFormat("JWT")
-                    )
+            .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
+            .components(new Components()
+                .addSecuritySchemes("BearerAuth", new SecurityScheme()
+                    .name("BearerAuth")
+                    .type(SecurityScheme.Type.HTTP)
+                    .scheme("bearer")
+                    .bearerFormat("JWT")
+                    .description("Ingresa el token JWT. Ejemplo: eyJhbGciOiJIUzI1NiIs...")
+                )
             );
     }
 }

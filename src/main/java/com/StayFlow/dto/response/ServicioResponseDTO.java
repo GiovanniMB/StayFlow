@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public class ServicioResponseDTO {
     
     private Integer idServicio;
+    
+    @Schema(description = "Nombre descriptivo del servicio", example = "Wifi de alta velocidad")
     private String nombreServicio;
 
     // --- Constructor vacío ---

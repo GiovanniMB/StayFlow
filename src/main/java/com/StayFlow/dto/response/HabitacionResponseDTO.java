@@ -8,9 +8,17 @@ import java.util.List;
 public class HabitacionResponseDTO {
     
     private Integer idHabitacion;
+    
+    @Schema(description = "ID de la categoría a la que pertenece", example = "2")
     private Integer idTipoHabitacion;
+    
+    @Schema(description = "Nombre de la categoría padre", example = "Suite Ejecutiva")
     private String nombreTipoHabitacion;
+    
+    @Schema(description = "Identificador físico de la puerta", example = "101A")
     private String numeroHabitacion;
+    
+    @Schema(description = "Estado actual del cuarto (disponible, ocupada, mantenimiento)", example = "disponible")
     private String estado;
     private List<String> detalleCamas; // Devolverá ej: ["1x King", "2x Individual"]
     private Integer totalCamas;
