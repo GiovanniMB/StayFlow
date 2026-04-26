@@ -5,34 +5,64 @@ import java.math.BigDecimal;
 
 @Schema(description = "Datos de salida de la dirección de una propiedad")
 public class DireccionResponseDTO {
+    
+    @Schema(description = "ID de la dirección en base de datos", example = "5")
     private Integer id;
+    
+    @Schema(description = "Calle principal", example = "Av. Reforma")
     private String calle;
+    
+    @Schema(description = "Número exterior", example = "123")
     private String numero;
+    
+    @Schema(description = "Número interior (si aplica)", example = "Int 4B")
     private String numeroInterior;
+    
+    @Schema(description = "ID de la colonia en el catálogo", example = "450")
     private Integer idColonia;
-    private String nombreColonia; // Útil para que el frontend no tenga que hacer otra petición
+    
+    @Schema(description = "Nombre en texto de la colonia", example = "Roma Norte")
+    private String nombreColonia; 
+    
+    @Schema(description = "Nombre en texto del municipio o alcaldía", example = "Cuauhtémoc")
+    private String municipio;
+    
+    @Schema(description = "Nombre en texto del estado", example = "Ciudad de México")
+    private String estado;
+    
+    @Schema(description = "Latitud para renderizar el mapa", example = "19.420300")
     private BigDecimal latitud;
+    
+    @Schema(description = "Longitud para renderizar el mapa", example = "-99.163100")
     private BigDecimal longitud;
 
     public DireccionResponseDTO() {}
 
     public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; } // Solo para casos donde se quiera mostrar el ID de la dirección
+    public void setId(Integer id) { this.id = id; } 
 
     public String getCalle() { return calle; }
-    public void setCalle(String calle) { this.calle = calle; } // Solo para casos donde se quiera mostrar la calle de la dirección
+    public void setCalle(String calle) { this.calle = calle; } 
 
     public String getNumero() { return numero; }
-    public void setNumero(String numero) { this.numero = numero; } // Solo para casos donde se quiera mostrar el número exterior de la dirección
+    public void setNumero(String numero) { this.numero = numero; } 
 
     public String getNumeroInterior() { return numeroInterior; }
-    public void setNumeroInterior(String numeroInterior) { this.numeroInterior = numeroInterior; } // Solo para casos donde se quiera mostrar el número interior de la dirección
+    public void setNumeroInterior(String numeroInterior) { this.numeroInterior = numeroInterior; } 
 
     public Integer getIdColonia() { return idColonia; }
-    public void setIdColonia(Integer idColonia) { this.idColonia = idColonia; } // Solo para casos donde se quiera mostrar el ID de la colonia
+    public void setIdColonia(Integer idColonia) { this.idColonia = idColonia; } 
 
     public String getNombreColonia() { return nombreColonia; }
-    public void setNombreColonia(String nombreColonia) { this.nombreColonia = nombreColonia; } // Solo para casos donde se quiera mostrar el nombre de la colonia, útil para que el frontend no tenga que hacer otra petición para obtenerlo a partir del ID
+    public void setNombreColonia(String nombreColonia) { this.nombreColonia = nombreColonia; } 
+
+    // --- GETTERS Y SETTERS NUEVOS ---
+    public String getMunicipio() { return municipio; }
+    public void setMunicipio(String municipio) { this.municipio = municipio; }
+
+    public String getEstado() { return estado; }
+    public void setEstado(String estado) { this.estado = estado; }
+    // ---------------------------------
 
     public BigDecimal getLatitud() { return latitud; }
     public void setLatitud(BigDecimal latitud) { this.latitud = latitud; }

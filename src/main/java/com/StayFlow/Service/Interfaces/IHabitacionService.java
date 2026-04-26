@@ -1,9 +1,10 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
 import com.StayFlow.dto.response.HabitacionResponseDTO;
 import com.StayFlow.dto.response.TipoHabitacionResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +21,11 @@ public interface IHabitacionService {
     List<HabitacionResponseDTO> obtenerHabitacionesPorTipo(Integer idTipoHabitacion);
     HabitacionResponseDTO actualizarHabitacion(Integer idHabitacion, HabitacionRequestDTO request);
     void eliminarHabitacion(Integer idHabitacion);
+
+    void subirFotoHabitacion(Integer idTipoHabitacion, Integer idCategoriaFoto, MultipartFile archivo, boolean esPrincipal);
+    
+    void subirFotoPropiedad(Integer idPropiedad, Integer idCategoriaFoto, MultipartFile archivo, boolean esPrincipal);
+    
+    void eliminarFoto(Integer idFoto);
+
 }

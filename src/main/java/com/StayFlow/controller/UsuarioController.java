@@ -4,6 +4,7 @@ import static com.StayFlow.security.SecurityConstants.REFRESH_TOKEN_HEADER;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,12 +16,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.StayFlow.dto.request.LoginRequestDTO;
+import com.StayFlow.dto.request.ReactivarCuentaRequestDTO;
 import com.StayFlow.dto.request.RegistroRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.LoginResponseDTO;
 import com.StayFlow.dto.response.UsuarioResponseDTO;
+import com.StayFlow.exception.ResourceNotFoundException;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Service.Interfaces.IUsuarioService;
+import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.security.JwtUtil;
+import com.StayFlow.service.interfaces.IUsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -34,9 +39,15 @@ import jakarta.validation.Valid;
 public class UsuarioController {
 
     private final IUsuarioService usuarioService;
+    private final UsuarioRepository usuarioRepository;
+    private final JwtUtil jwtUtil;
 
-    public UsuarioController(IUsuarioService usuarioService) {
+    public UsuarioController(IUsuarioService usuarioService,
+                             UsuarioRepository usuarioRepository,
+                             JwtUtil jwtUtil) {
         this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
+        this.jwtUtil = jwtUtil;
     }
 
 
@@ -96,19 +107,33 @@ public class UsuarioController {
     }
 
   
-    @GetMapping("/perfil/{id}")
-    @Operation(summary = "Obtener perfil de usuario", 
-               description = "Retorna la información completa de un usuario por su ID")
+    @GetMapping("/perfil")
+    @Operation(summary = "Obtener perfil del usuario autenticado", 
+               description = "Retorna la información del usuario usando el token JWT")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Perfil encontrado"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+        @ApiResponse(responseCode = "401", description = "No autenticado")
     })
-    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfil(@PathVariable Integer id) {
+    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfilAutenticado(
+            @RequestHeader("Authorization") String token) {
+        
+        // Extraer email del token
+        String email = jwtUtil.extractEmail(token.substring(7));
+        
+        UsuarioResponseDTO data = usuarioService.getPerfilByEmail(email);
+        ApiResponseDTO<UsuarioResponseDTO> response = ApiResponseDTO.success("Perfil encontrado", data);
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/perfil/{id}")
+    @Operation(summary = "Obtener perfil de usuario por ID (solo administradores)", 
+               description = "Retorna la información completa de un usuario por su ID")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfilById(@PathVariable Integer id) {
         UsuarioResponseDTO data = usuarioService.getPerfil(id);
         ApiResponseDTO<UsuarioResponseDTO> response = ApiResponseDTO.success("Perfil encontrado", data);
         return ResponseEntity.ok(response);
     }
-
    
     @PutMapping("/perfil/{id}")
     @Operation(summary = "Actualizar perfil de usuario", 
@@ -125,21 +150,20 @@ public class UsuarioController {
     }
 
    
-    @PostMapping("/confirmar-email")
+    @GetMapping("/confirmar-email")
     @Operation(summary = "Confirmar email", 
-               description = "Confirma el email del usuario mediante el código de verificación enviado")
+               description = "Confirma el email del usuario mediante el código de verificación enviado por email")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Email confirmado exitosamente"),
         @ApiResponse(responseCode = "400", description = "Código inválido o expirado")
     })
     public ResponseEntity<ApiResponseDTO<Void>> confirmarEmail(@RequestParam String codigo) {
         usuarioService.confirmarEmail(codigo);
-        ApiResponseDTO<Void> response = ApiResponseDTO.success("Email confirmado exitosamente");
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponseDTO.success("Email confirmado exitosamente"));
     }
 
    
-    @PostMapping("/recuperar-password")
+    @GetMapping("/recuperar-password")
     @Operation(summary = "Recuperar contraseña", 
                description = "Envía un código de recuperación al email del usuario")
     @ApiResponses(value = {
@@ -166,4 +190,35 @@ public class UsuarioController {
         ApiResponseDTO<Void> response = ApiResponseDTO.success("Contraseña actualizada exitosamente");
         return ResponseEntity.ok(response);
     }
+    
+    @PostMapping("/cuenta/desactivar")
+    @Operation(summary = "Desactivar cuenta de usuario")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cuenta desactivada exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado"),
+        @ApiResponse(responseCode = "400", description = "La cuenta ya está desactivada")
+    })
+    public ResponseEntity<ApiResponseDTO<Void>> desactivarCuenta(@RequestHeader("Authorization") String token) {
+        String email = jwtUtil.extractEmail(token.substring(7));
+        
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));
+        
+        usuarioService.desactivarCuenta(usuario.getIdUsuario());
+        
+        return ResponseEntity.ok(ApiResponseDTO.success("Cuenta desactivada exitosamente"));
+    }
+    
+    @PostMapping("/cuenta/reactivar")
+    @Operation(summary = "Reactivar cuenta desactivada")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Cuenta reactivada exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Credenciales inválidas o cuenta ya activa"),
+        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    public ResponseEntity<ApiResponseDTO<Void>> reactivarCuenta(@Valid @RequestBody ReactivarCuentaRequestDTO request) {
+        usuarioService.reactivarCuenta(request);
+        return ResponseEntity.ok(ApiResponseDTO.success("Cuenta reactivada exitosamente. Ya puedes iniciar sesión."));
+    }
+
 }

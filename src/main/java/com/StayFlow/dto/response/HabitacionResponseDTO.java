@@ -1,18 +1,24 @@
 package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
 
-// DTO para respuestas que contienen información detallada de una habitación física, incluyendo su ID, número identificador, estado actual, tipo de habitación al que pertenece y un resumen de las camas que contiene.
-@Schema(description = "Datos de salida de una habitación física")
+@Schema(description = "Datos de salida de una habitación física (Ficha de inventario)")
 public class HabitacionResponseDTO {
+    
+    @Schema(description = "ID de la puerta o cuarto físico", example = "8")
     private Integer idHabitacion;
+    
+    @Schema(description = "ID de la categoría a la que pertenece", example = "2")
     private Integer idTipoHabitacion;
+    
+    @Schema(description = "Nombre de la categoría padre", example = "Suite Ejecutiva")
     private String nombreTipoHabitacion;
+    
+    @Schema(description = "Identificador físico de la puerta", example = "101A")
     private String numeroHabitacion;
+    
+    @Schema(description = "Estado actual del cuarto (disponible, ocupada, mantenimiento)", example = "disponible")
     private String estado;
-    private List<String> detalleCamas; // Devolverá ej: ["1x King", "2x Individual"]
-    private Integer totalCamas;
 
     public HabitacionResponseDTO() {}
 
@@ -30,12 +36,4 @@ public class HabitacionResponseDTO {
 
     public String getEstado() { return estado; }
     public void setEstado(String estado) { this.estado = estado; }
-
-    public List<String> getDetalleCamas() { return detalleCamas; }
-    public void setDetalleCamas(List<String> detalleCamas) { this.detalleCamas = detalleCamas; } // ["1x King", "2x Individual"]
-
-    public Integer getTotalCamas() { return totalCamas; }
-    public void setTotalCamas(Integer totalCamas) { this.totalCamas = totalCamas; } // Solo para casos donde se quiera mostrar el total de camas, aunque se
-    //  puede obtener contando el tamaño de la lista detalleCamas, es útil tenerlo como un campo separado para evitar que el frontend tenga que hacer esa cuenta cada vez que reciba la respuesta,
-    //  especialmente si solo necesita mostrar el número total de camas sin importar su tipo.
 }

@@ -1,10 +1,10 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.Impl;
 
-import com.StayFlow.Repository.LogSistemaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
 import com.StayFlow.model.LogSistema;
 import com.StayFlow.model.LogSistema.Accion;
+import com.StayFlow.repository.LogSistemaRepository;
+import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.service.interfaces.ILogSistemaService;
 import com.StayFlow.model.Usuario;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -16,13 +16,18 @@ public class SecurityConstants {
 
 
     public static final String[] PUBLIC_URLS = {
-        "/api/usuarios/registro",
-        "/api/usuarios/login",
-        "/api/usuarios/confirmar-email",
-        "/api/usuarios/refresh-token",
-        "/swagger-ui/**",
-        "/swagger-ui.html",
-        "/api-docs/**",
-        "/v3/api-docs/**"
-    };
+    	    "/api/usuarios/registro",
+    	    "/api/usuarios/login",
+    	    "/api/usuarios/confirmar-email",
+    	    "/api/usuarios/refresh-token",
+    	    "/api/usuarios/recuperar-password",    
+    	    "/api/usuarios/reset-password",
+    	    "/swagger-ui/**",
+    	    "/swagger-ui.html",
+    	    "/api-docs/**",
+			"/api/propiedades/catalogo/**",
+    	    "/v3/api-docs/**",
+    	    "/api/usuarios/cuenta/reactivar",
+			"/api/catalogos/**"
+    	};
 }

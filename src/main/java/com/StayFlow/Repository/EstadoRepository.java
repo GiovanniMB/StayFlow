@@ -1,4 +1,4 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
 import com.StayFlow.model.Estado;
 import org.springframework.data.jpa.repository.JpaRepository;
