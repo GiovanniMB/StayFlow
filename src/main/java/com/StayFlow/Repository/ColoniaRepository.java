@@ -1,4 +1,4 @@
-package com.StayFlow.repository;
+package com.StayFlow.Repository;
 
 import com.StayFlow.model.Colonia;
 import org.springframework.data.jpa.repository.JpaRepository;

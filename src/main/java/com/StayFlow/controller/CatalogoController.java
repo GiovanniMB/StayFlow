@@ -1,10 +1,9 @@
 package com.StayFlow.controller;
 
+import com.StayFlow.Service.Interfaces.ICatalogoService;
 import com.StayFlow.dto.response.CatalogoResponseDTO;
 import com.StayFlow.dto.response.ServicioResponseDTO;
 import com.StayFlow.dto.response.TipoCamaResponseDTO;
-import com.StayFlow.service.interfaces.ICatalogoService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

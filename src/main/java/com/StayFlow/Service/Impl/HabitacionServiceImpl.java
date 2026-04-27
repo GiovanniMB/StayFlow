@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.Service.Impl;
 
 import com.StayFlow.dto.request.CamaRequestDTO;
 import com.StayFlow.dto.request.HabitacionRequestDTO;
@@ -15,9 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import com.StayFlow.model.LogSistema.Accion;
-import com.StayFlow.repository.*;
-import com.StayFlow.service.interfaces.IHabitacionService;
-import com.StayFlow.service.interfaces.ILogSistemaService;
+import com.StayFlow.Repository.*;
+import com.StayFlow.Service.Interfaces.IHabitacionService;
+import com.StayFlow.Service.Interfaces.ILogSistemaService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.Files;
@@ -27,6 +27,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 import java.util.List;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @Service
 public class HabitacionServiceImpl implements IHabitacionService {
@@ -64,8 +65,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         this.categoriaFotoRepository = categoriaFotoRepository;
     }
 
-    //Categorias
-
     @Override
     @Transactional
     public TipoHabitacionResponseDTO crearTipoHabitacion(Integer idPropiedad, TipoHabitacionRequestDTO request) {
@@ -81,7 +80,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         
         nuevoTipo.setPropiedad(propiedad);
         nuevoTipo.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
-        
         
         procesarCamas(nuevoTipo, request.getCamas());
 
@@ -118,7 +116,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         tipoExistente.setTieneBanoPrivado(request.getTieneBanoPrivado());
         tipoExistente.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
 
-        // ACTUALIZAMOS LAS CAMAS
         tipoExistente.getCamas().clear();
         procesarCamas(tipoExistente, request.getCamas());
 
@@ -139,8 +136,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         logSistemaService.registrarLog("tipohabitacion", tipoExistente.getIdTipoHabitacion(), Accion.DELETE_LOGICO);
     }
 
-    //Habitaciones, fichas de inventario vacias
-
     @Override
     @Transactional
     public HabitacionResponseDTO crearHabitacion(Integer idTipoHabitacion, HabitacionRequestDTO request) {
@@ -152,7 +147,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         nuevaHabitacion.setPropiedad(tipoHabitacion.getPropiedad());
         nuevaHabitacion.setTipoHabitacion(tipoHabitacion);
         nuevaHabitacion.setNumeroHabitacion(request.getNumeroHabitacion());
-
 
         Habitacion habitacionGuardada = habitacionRepository.save(nuevaHabitacion);
         logSistemaService.registrarLog("habitacion", habitacionGuardada.getIdHabitacion(), Accion.INSERT);
@@ -176,7 +170,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         validarDueno(habitacionExistente.getPropiedad());
 
         habitacionExistente.setNumeroHabitacion(request.getNumeroHabitacion());
-        
 
         Habitacion habitacionActualizada = habitacionRepository.save(habitacionExistente);
         logSistemaService.registrarLog("habitacion", habitacionActualizada.getIdHabitacion(), Accion.UPDATE);
@@ -195,8 +188,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         logSistemaService.registrarLog("habitacion", idHabitacion, Accion.DELETE_LOGICO);
     }
 
-    // Metodos auxiliares
-
     private Propiedad buscarPropiedadYValidarDueno(Integer idPropiedad) {
         Propiedad propiedad = propiedadRepository.findByIdPropiedadAndEstaEliminadoFalse(idPropiedad)
                 .orElseThrow(() -> new ResourceNotFoundException("Propiedad", "id", idPropiedad));
@@ -211,7 +202,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         }
     }
 
-    // Asigna camas al tipo de habitacion
     private void procesarCamas(TipoHabitacion tipoHabitacion, List<CamaRequestDTO> camasRequest) {
         if (camasRequest != null && !camasRequest.isEmpty()) {
             for (CamaRequestDTO camaDTO : camasRequest) {
@@ -222,7 +212,6 @@ public class HabitacionServiceImpl implements IHabitacionService {
         }
     }
 
-    // Fotografias
     @Override
     @Transactional
     public void subirFotoHabitacion(Integer idTipoHabitacion, Integer idCategoriaFoto, MultipartFile archivo, boolean esPrincipal) {
@@ -318,7 +307,7 @@ public class HabitacionServiceImpl implements IHabitacionService {
     }
 
     private List<Servicio> procesarServicios(List<Integer> idServicios, List<String> nuevosServicios) {
-        List<Servicio> serviciosFinales = new java.util.ArrayList<>();
+        List<Servicio> serviciosFinales = new ArrayList<>();
 
         if (idServicios != null && !idServicios.isEmpty()) {
             List<Servicio> serviciosEncontrados = servicioRepository.findAllById(idServicios);

@@ -1,4 +1,4 @@
-package com.StayFlow.repository;
+package com.StayFlow.Repository;
 
 import com.StayFlow.model.LogSistema;
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -1,4 +1,4 @@
-package com.StayFlow.service.interfaces;
+package com.StayFlow.Service.Interfaces;
 
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;

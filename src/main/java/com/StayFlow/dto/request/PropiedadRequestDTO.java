@@ -29,6 +29,11 @@ public class PropiedadRequestDTO {
     @Schema(description = "Descripción de la propiedad", example = "Hermoso hotel céntrico")
     private String descripcion;
 
+    // 👇 Aquí agregamos la variable del precio que faltaba
+    @NotNull(message = "El precio por noche es obligatorio")
+    @Schema(description = "Precio base por noche de la propiedad", example = "1200.50")
+    private BigDecimal precioNoche;
+
     @NotNull(message = "La dirección de la propiedad es obligatoria")
     @Valid // Esta anotación le dice a Spring que valide también el objeto hijo (DireccionRequestDTO)
     @Schema(description = "Datos de la dirección física")
@@ -38,16 +43,20 @@ public class PropiedadRequestDTO {
     @Schema(description = "Lista de IDs de los servicios que ofrece la propiedad", example = "[1, 2, 3]")
     private List<Integer> idServicios;
 
+    @Schema(description = "Lista de nombres de nuevos servicios personalizados para la propiedad", example = "[\"Caja fuerte\", \"Asador\"]")
+    private List<String> nuevosServicios;
+
     // --- Constructor vacío ---
     public PropiedadRequestDTO() {
     }
 
-    // --- Constructor con parámetros ---
-    public PropiedadRequestDTO(String nombreComercial, String telefono, Boolean seRentaPorHabitaciones, String descripcion, DireccionRequestDTO direccion, List<Integer> idServicios) {
+    // --- Constructor con parámetros actualizado ---
+    public PropiedadRequestDTO(String nombreComercial, String telefono, Boolean seRentaPorHabitaciones, String descripcion, BigDecimal precioNoche, DireccionRequestDTO direccion, List<Integer> idServicios) {
         this.nombreComercial = nombreComercial;
         this.telefono = telefono;
         this.seRentaPorHabitaciones = seRentaPorHabitaciones;
         this.descripcion = descripcion;
+        this.precioNoche = precioNoche;
         this.direccion = direccion;
         this.idServicios = idServicios;
     }
@@ -86,6 +95,15 @@ public class PropiedadRequestDTO {
         this.descripcion = descripcion;
     }
 
+    // 👇 Getters y Setters de la nueva variable
+    public BigDecimal getPrecioNoche() {
+        return precioNoche;
+    }
+
+    public void setPrecioNoche(BigDecimal precioNoche) {
+        this.precioNoche = precioNoche;
+    }
+
     public DireccionRequestDTO getDireccion() {
         return direccion;
     }
@@ -101,4 +119,15 @@ public class PropiedadRequestDTO {
     public void setIdServicios(List<Integer> idServicios) {
         this.idServicios = idServicios;
     }
+
+    public List<String> getNuevosServicios() {
+        return nuevosServicios;
+    }
+
+    public void setNuevosServicios(List<String> nuevosServicios) {
+        this.nuevosServicios = nuevosServicios;
+    }
+
+
+
 }

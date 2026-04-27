@@ -35,6 +35,8 @@ public class DireccionResponseDTO {
     @Schema(description = "Longitud para renderizar el mapa", example = "-99.163100")
     private BigDecimal longitud;
 
+    
+
     // --- Constructor vacío ---
     public DireccionResponseDTO() {
     }
@@ -115,5 +117,21 @@ public class DireccionResponseDTO {
 
     public void setLongitud(BigDecimal longitud) {
         this.longitud = longitud;
+    }
+
+    public String getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(String municipio) {
+        this.municipio = municipio;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public void setEstado(String estado) {
+        this.estado = estado;
     }
 }

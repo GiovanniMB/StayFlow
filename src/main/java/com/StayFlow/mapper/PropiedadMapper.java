@@ -16,8 +16,6 @@ import com.StayFlow.dto.response.FotoResponseDTO;
 @Component
 public class PropiedadMapper {
 
-    // --- Mapeo a Entidades ---
-    // Método principal para mapear un PropiedadRequestDTO a una Propiedad, incluyendo su dirección. Los servicios se asignarán en la capa de Servicio, por lo que no se incluyen en este método.
     public Propiedad toEntity(PropiedadRequestDTO request) {
         if (request == null) return null;
 
@@ -35,7 +33,6 @@ public class PropiedadMapper {
         return propiedad;
     }
 
-    // Mapeo de DireccionRequestDTO a Direccion
     private Direccion toDireccionEntity(DireccionRequestDTO request) {
         if (request == null) return null;
         
@@ -45,12 +42,9 @@ public class PropiedadMapper {
         direccion.setNumeroInterior(request.getNumeroInterior());
         direccion.setLatitud(request.getLatitud());
         direccion.setLongitud(request.getLongitud());
-        //La Colonia se asignará en la capa de Servicio
         return direccion;
     }
 
-    //Mapeo a Response DTOs
-    // Método principal para mapear una Propiedad a PropiedadResponseDTO, incluyendo sus relaciones (Dueño, Dirección, Servicios)
     public PropiedadResponseDTO toResponseDTO(Propiedad propiedad) {
         if (propiedad == null) return null;
 
@@ -59,6 +53,8 @@ public class PropiedadMapper {
         response.setNombreComercial(propiedad.getNombreComercial());
         response.setTelefono(propiedad.getTelefono());
         response.setSeRentaPorHabitaciones(propiedad.isSeRentaPorHabitaciones());
+        
+        // Si marca error, verifica si Gerardo borró o renombró el contador de reservas
         response.setContadorReservas(propiedad.getContadorReservas());
         response.setDescripcion(propiedad.getDescripcion());
         response.setPrecioNoche(propiedad.getPrecioNoche());
@@ -79,7 +75,7 @@ public class PropiedadMapper {
 
         if (propiedad.getFotos() != null && !propiedad.getFotos().isEmpty()) {
             response.setFotosGenerales(propiedad.getFotos().stream()
-                .filter(foto -> !foto.isEstaEliminado() && foto.getTipoHabitacion() == null) // Solo las de la propiedad
+                .filter(foto -> !foto.isEstaEliminado() && foto.getTipoHabitacion() == null)
                 .map(this::toFotoResponseDTO)
                 .collect(Collectors.toList()));
         }
@@ -87,7 +83,6 @@ public class PropiedadMapper {
         return response;
     }
 
-    // Mapeo de Direccion a DireccionResponseDTO
     private DireccionResponseDTO toDireccionResponseDTO(Direccion direccion) {
         if (direccion == null) return null;
 
@@ -99,7 +94,6 @@ public class PropiedadMapper {
         response.setLatitud(direccion.getLatitud());
         response.setLongitud(direccion.getLongitud());
 
-        // --- EXTRACCIÓN PROFUNDA PARA EL BUSCADOR DE REACT (Sin Código Postal) ---
         if (direccion.getColonia() != null) {
             response.setIdColonia(direccion.getColonia().getId());
             response.setNombreColonia(direccion.getColonia().getNombre()); 
@@ -116,7 +110,6 @@ public class PropiedadMapper {
         return response;
     }
 
-    // Método para mapear una lista de Propiedad a una lista de PropiedadResponseDTO
     public List<PropiedadResponseDTO> toResponseDTOList(List<Propiedad> propiedades) {
         if (propiedades == null) return null;
         return propiedades.stream()
@@ -124,7 +117,6 @@ public class PropiedadMapper {
             .collect(Collectors.toList());
     }
 
-    // Mapeo de Servicio a ServicioResponseDTO
     private ServicioResponseDTO toServicioResponseDTO(com.StayFlow.model.Servicio servicio) {
         if (servicio == null) return null;
         ServicioResponseDTO dto = new ServicioResponseDTO();
@@ -132,7 +124,6 @@ public class PropiedadMapper {
         dto.setNombreServicio(servicio.getNombreServicio());
         return dto;
     }
-
     
     private FotoResponseDTO toFotoResponseDTO(FotoHabitacion foto) {
         if (foto == null) return null;

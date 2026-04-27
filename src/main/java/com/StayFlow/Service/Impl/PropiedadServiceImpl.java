@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.Service.Impl;
 
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
@@ -16,16 +16,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.StayFlow.model.Servicio;
 import com.StayFlow.model.LogSistema.Accion;
-import com.StayFlow.repository.ColoniaRepository;
-import com.StayFlow.repository.DireccionRepository;
-import com.StayFlow.repository.PropiedadRepository;
-import com.StayFlow.repository.RolRepository;
-import com.StayFlow.repository.ServicioRepository;
-import com.StayFlow.repository.UsuarioRepository;
-import com.StayFlow.service.interfaces.ILogSistemaService;
-import com.StayFlow.service.interfaces.IPropiedadService;
+import com.StayFlow.Repository.ColoniaRepository;
+import com.StayFlow.Repository.DireccionRepository;
+import com.StayFlow.Repository.PropiedadRepository;
+import com.StayFlow.Repository.RolRepository;
+import com.StayFlow.Repository.ServicioRepository;
+import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.Service.Interfaces.IPropiedadService;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -64,74 +65,55 @@ public class PropiedadServiceImpl implements IPropiedadService {
         Propiedad propiedad = propiedadMapper.toEntity(request);
 
         if (request.getSeRentaPorHabitaciones()) {
-            // Si es hotel, forzamos el precio de la propiedad a 0 por seguridad
             propiedad.setPrecioNoche(BigDecimal.ZERO);
         } else {
-            // Si es casa entera, guardamos el precio (o 0 si viene nulo por error)
             propiedad.setPrecioNoche(request.getPrecioNoche() != null ? request.getPrecioNoche() : BigDecimal.ZERO);
         }
 
-        //Resolver y guardar la Dirección y Colonia
         if (request.getDireccion() != null && request.getDireccion().getIdColonia() != null) {
             Integer idColonia = request.getDireccion().getIdColonia();
             Colonia colonia = coloniaRepository.findById(idColonia)
                     .orElseThrow(() -> new ResourceNotFoundException("Colonia", "id", idColonia));
             
             propiedad.getDireccion().setColonia(colonia);
-
-           propiedad.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
+            propiedad.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
             
             Direccion direccionGuardada = direccionRepository.save(propiedad.getDireccion());
             propiedad.setDireccion(direccionGuardada);
         }
 
-        // Estraccion del usuario mediante el token
-        // Spring Security guarda el email en el 'Name' durante la autenticación
         String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
         
         Usuario dueno = usuarioRepository.findByEmail(emailAutenticado)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", emailAutenticado));
 
-        //¿Es arrendador? (Lógica de Promoción Dinámica)
-        // Se comprueba si en su lista de roles alguno coincide con "arrendador"
         boolean esArrendador = dueno.getRoles().stream()
                 .anyMatch(rol -> rol.getNombreRol().equalsIgnoreCase("arrendador"));
 
         if (!esArrendador) {
-            // En lugar de lanzar error se busca el rol en el catálogo
             Rol rolArrendador = rolRepository.findByNombreRol("arrendador")
                     .orElseThrow(() -> new BusinessException("El rol 'arrendador' no existe en el catálogo del sistema."));
             
-            // Se agrega el nuevo rol conservando los que ya tenga (ej. arrendatario)
             dueno.getRoles().add(rolArrendador);
             usuarioRepository.save(dueno);
             
-            // Registramos en auditoría que este usuario fue promovido automáticamente
             logSistemaService.registrarLog("usuario", dueno.getIdUsuario(), Accion.UPDATE);
         }
 
-        // 4. Asignar el dueño a la propiedad
         propiedad.setDueno(dueno);
-
-        // 5. Guardar en BD
         Propiedad propiedadGuardada = propiedadRepository.save(propiedad);
         
-        // 6. Registrar en auditoría
         logSistemaService.registrarLog("propiedad", propiedadGuardada.getIdPropiedad(), Accion.INSERT);
         
         return propiedadMapper.toResponseDTO(propiedadGuardada);
     }
 
-
-    // metodos de lectura con las reglas de negocio
     @Override
     @Transactional(readOnly = true)
     public List<PropiedadResponseDTO> obtenerTodas() {
         List<Propiedad> propiedades = propiedadRepository.findByEstaEliminadoFalse();
         return propiedadMapper.toResponseDTOList(propiedades);
     }
-
-    // Solo el dueño o un arrendatario pueden verla, obtiene la propiedad por su id
 
     @Override
     @Transactional(readOnly = true)
@@ -140,13 +122,11 @@ public class PropiedadServiceImpl implements IPropiedadService {
         return propiedadMapper.toResponseDTO(propiedad);
     }
 
-    // Solo el dueño puede editar su propiedad
     @Override
     @Transactional
     public PropiedadResponseDTO actualizarPropiedad(Integer idPropiedad, PropiedadRequestDTO request) {
         Propiedad propiedadExistente = buscarPropiedadOArrojarExcepcion(idPropiedad);
 
-        // aqui se aplica la regla de que Solo el dueño puede editar su propiedad obteniendo su email para corrorobar que el usuario logeado es el dueno
         String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!propiedadExistente.getDueno().getEmail().equals(emailAutenticado)) {
             throw new BusinessException("No tienes permiso para editar una propiedad que no te pertenece.");
@@ -182,18 +162,15 @@ public class PropiedadServiceImpl implements IPropiedadService {
 
         Propiedad propiedadActualizada = propiedadRepository.save(propiedadExistente);
         
-        // Registrar en auditoría
         logSistemaService.registrarLog("propiedad", propiedadActualizada.getIdPropiedad(), Accion.UPDATE);
         
         return propiedadMapper.toResponseDTO(propiedadActualizada);
     }
 
-    // Solo el dueño puede eliminar su propiedad (marcar como eliminado lógico)
     @Override
     @Transactional
     public void eliminarPropiedad(Integer idPropiedad) {
         Propiedad propiedadExistente = buscarPropiedadOArrojarExcepcion(idPropiedad);
-        
         
         String emailAutenticado = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!propiedadExistente.getDueno().getEmail().equals(emailAutenticado)) {
@@ -203,21 +180,17 @@ public class PropiedadServiceImpl implements IPropiedadService {
         propiedadExistente.setEstaEliminado(true);
         propiedadRepository.save(propiedadExistente); 
         
-        // Registrar en auditoría
         logSistemaService.registrarLog("propiedad", idPropiedad, Accion.DELETE_LOGICO);
     }
 
-    //Metodo auxiliar para buscar propiedad o lanzar excepcion si no existe o esta eliminada
     private Propiedad buscarPropiedadOArrojarExcepcion(Integer idPropiedad) {
         return propiedadRepository.findByIdPropiedadAndEstaEliminadoFalse(idPropiedad)
                 .orElseThrow(() -> new ResourceNotFoundException("Propiedad", "idPropiedad", idPropiedad));
     }
 
-    //Metodo auxiliar para pocesar los servicios insertados por el usuario
     private List<Servicio> procesarServicios(List<Integer> idServicios, List<String> nuevosServicios) {
-        List<Servicio> serviciosFinales = new java.util.ArrayList<>();
+        List<Servicio> serviciosFinales = new ArrayList<>();
 
-        // Procesar los ids que ya existen
         if (idServicios != null && !idServicios.isEmpty()) {
             List<Servicio> serviciosEncontrados = servicioRepository.findAllById(idServicios);
             if (serviciosEncontrados.size() != idServicios.size()) {
@@ -226,7 +199,6 @@ public class PropiedadServiceImpl implements IPropiedadService {
             serviciosFinales.addAll(serviciosEncontrados);
         }
 
-        // Find or Create: Procesar los nuevos 
         if (nuevosServicios != null && !nuevosServicios.isEmpty()) {
             for (String nombreNuevo : nuevosServicios) {
                 String nombreLimpio = nombreNuevo.trim();

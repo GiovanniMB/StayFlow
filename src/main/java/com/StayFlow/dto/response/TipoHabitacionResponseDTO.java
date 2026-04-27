@@ -28,12 +28,16 @@ public class TipoHabitacionResponseDTO {
     @Schema(description = "Lista de amenidades incluidas en la habitación")
     private List<ServicioResponseDTO> servicios;
 
+    // 👇 Aquí está la nueva variable para las fotos
+    @Schema(description = "Lista de fotografías asociadas a la categoría de habitación")
+    private List<FotoResponseDTO> fotos;
+
     // --- Constructor vacío ---
     public TipoHabitacionResponseDTO() {
     }
 
-    // --- Constructor con parámetros ---
-    public TipoHabitacionResponseDTO(Integer idTipoHabitacion, Integer idPropiedad, String nombreTipo, Integer capacidad, BigDecimal precioBaseNoche, boolean tieneBanoPrivado, List<ServicioResponseDTO> servicios) {
+    // --- Constructor con parámetros (¡Actualizado con fotos!) ---
+    public TipoHabitacionResponseDTO(Integer idTipoHabitacion, Integer idPropiedad, String nombreTipo, Integer capacidad, BigDecimal precioBaseNoche, boolean tieneBanoPrivado, List<ServicioResponseDTO> servicios, List<FotoResponseDTO> fotos) {
         this.idTipoHabitacion = idTipoHabitacion;
         this.idPropiedad = idPropiedad;
         this.nombreTipo = nombreTipo;
@@ -41,6 +45,7 @@ public class TipoHabitacionResponseDTO {
         this.precioBaseNoche = precioBaseNoche;
         this.tieneBanoPrivado = tieneBanoPrivado;
         this.servicios = servicios;
+        this.fotos = fotos;
     }
 
     // --- Getters y Setters ---
@@ -99,5 +104,14 @@ public class TipoHabitacionResponseDTO {
 
     public void setServicios(List<ServicioResponseDTO> servicios) {
         this.servicios = servicios;
+    }
+
+    // --- Getters y Setters de Fotos ---
+    public List<FotoResponseDTO> getFotos() {
+        return fotos;
+    }
+
+    public void setFotos(List<FotoResponseDTO> fotos) {
+        this.fotos = fotos;
     }
 }

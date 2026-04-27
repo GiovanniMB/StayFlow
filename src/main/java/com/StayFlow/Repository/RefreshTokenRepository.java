@@ -1,4 +1,4 @@
-package com.StayFlow.repository;
+package com.StayFlow.Repository;
 
 import com.StayFlow.model.RefreshToken;
 import com.StayFlow.model.Usuario;

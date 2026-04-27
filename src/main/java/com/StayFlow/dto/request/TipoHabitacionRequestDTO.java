@@ -1,12 +1,11 @@
 package com.StayFlow.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -33,6 +32,12 @@ public class TipoHabitacionRequestDTO {
 
     @Schema(description = "Lista de IDs de amenidades que incluye esta recámara", example = "[1, 4, 7]")
     private List<Integer> idServicios;
+
+    @Schema(description = "Lista de nombres de nuevos servicios personalizados", example = "[\"Desayuno vegano\", \"Cuna para bebé\"]")
+    private List<String> nuevosServicios;
+
+    @Schema(description = "Lista de camas configuradas para este tipo de habitación")
+    private List<CamaRequestDTO> camas;
 
     // --- Constructor vacío ---
     public TipoHabitacionRequestDTO() {
@@ -88,4 +93,22 @@ public class TipoHabitacionRequestDTO {
     public void setIdServicios(List<Integer> idServicios) {
         this.idServicios = idServicios;
     }
+
+    public List<String> getNuevosServicios() {
+        return nuevosServicios;
+    }
+
+    public void setNuevosServicios(List<String> nuevosServicios) {
+        this.nuevosServicios = nuevosServicios;
+    }
+
+    public List<CamaRequestDTO> getCamas() {
+        return camas;
+    }
+
+    public void setCamas(List<CamaRequestDTO> camas) {
+        this.camas = camas;
+    }
+
+
 }

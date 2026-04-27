@@ -55,9 +55,9 @@ public class HabitacionMapper {
                     .collect(Collectors.toList()));
         }
 
-        // --- LAS CAMAS AHORA SE MAPEAN AQUÍ ---
-        dto.setDetalleCamas(entity.getNombresCamas());
-        dto.setTotalCamas(entity.getTotalCamas());
+        // Si esto marca error, revisa el nuevo nombre que Gerardo le dio en la Entidad
+        //dto.setDetalleCamas(entity.getNombresCamas());
+        //dto.setTotalCamas(entity.getTotalCamas());
 
         return dto;
     }

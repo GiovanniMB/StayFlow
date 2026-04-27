@@ -1,7 +1,7 @@
 package com.StayFlow.security;
 
 import com.StayFlow.model.Usuario;
-import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.Repository.UsuarioRepository;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

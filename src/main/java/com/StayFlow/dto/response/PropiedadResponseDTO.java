@@ -1,6 +1,7 @@
 package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import java.math.BigDecimal; // Importación necesaria para el precio
 import java.util.List;
 
 @Schema(description = "Datos de salida de una propiedad")
@@ -28,16 +29,23 @@ public class PropiedadResponseDTO {
     
     @Schema(description = "Descripción narrativa del lugar redactada por el anfitrión", example = "Un lugar mágico en el centro...")
     private String descripcion;
+
+    // 👇 Nueva variable agregada para mostrar el precio
+    @Schema(description = "Precio base por noche de la propiedad", example = "1200.50")
+    private BigDecimal precioNoche;
     
     @Schema(description = "Lista de servicios generales de la propiedad (Wifi, Alberca, etc.)")
     private List<ServicioResponseDTO> servicios;
+
+    @Schema(description = "Lista de fotos generales de la propiedad")
+    private List<FotoResponseDTO> fotosGenerales;
 
     // --- Constructor vacío ---
     public PropiedadResponseDTO() {
     }
 
-    // --- Constructor con parámetros ---
-    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, List<ServicioResponseDTO> servicios) {
+    // --- Constructor con parámetros actualizado ---
+    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios) {
         this.idPropiedad = idPropiedad;
         this.idDueno = idDueno;
         this.nombreComercial = nombreComercial;
@@ -46,6 +54,7 @@ public class PropiedadResponseDTO {
         this.seRentaPorHabitaciones = seRentaPorHabitaciones;
         this.contadorReservas = contadorReservas;
         this.descripcion = descripcion;
+        this.precioNoche = precioNoche; // Asignación del nuevo campo
         this.servicios = servicios;
     }
 
@@ -115,11 +124,28 @@ public class PropiedadResponseDTO {
         this.descripcion = descripcion;
     }
 
+    // 👇 Nuevos métodos Getter y Setter
+    public BigDecimal getPrecioNoche() {
+        return precioNoche;
+    }
+
+    public void setPrecioNoche(BigDecimal precioNoche) {
+        this.precioNoche = precioNoche;
+    }
+
     public List<ServicioResponseDTO> getServicios() {
         return servicios;
     }
 
     public void setServicios(List<ServicioResponseDTO> servicios) {
         this.servicios = servicios;
+    }
+
+    public List<FotoResponseDTO> getFotosGenerales() {
+        return fotosGenerales;
+    }
+
+    public void setFotosGenerales(List<FotoResponseDTO> fotosGenerales) {
+        this.fotosGenerales = fotosGenerales;
     }
 }

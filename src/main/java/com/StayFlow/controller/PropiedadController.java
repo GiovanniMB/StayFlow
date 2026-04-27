@@ -3,7 +3,7 @@ package com.StayFlow.controller;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
-import com.StayFlow.service.interfaces.IPropiedadService;
+import com.StayFlow.Service.Interfaces.IPropiedadService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

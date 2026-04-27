@@ -23,9 +23,9 @@ import com.StayFlow.dto.response.LoginResponseDTO;
 import com.StayFlow.dto.response.UsuarioResponseDTO;
 import com.StayFlow.exception.ResourceNotFoundException;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.Repository.UsuarioRepository;
 import com.StayFlow.security.JwtUtil;
-import com.StayFlow.service.interfaces.IUsuarioService;
+import com.StayFlow.Service.Interfaces.IUsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
