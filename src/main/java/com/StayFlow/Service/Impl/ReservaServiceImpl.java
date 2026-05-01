@@ -43,8 +43,8 @@ public class ReservaServiceImpl implements IReservaService {
     public ReservaResponseDTO crearReserva(ReservaRequestDTO request) {
         validarFechas(request.getFechaEntrada(), request.getFechaSalida());
 
-        // 1. REGLA: Borrado Lógico (Solo busca activas)
-        Habitacion habitacion = habitacionRepository.findByIdHabitacionAndEstaEliminadoFalse(request.getIdHabitacion())
+        // 1. REGLA: Borrado Lógico (Solo busca activas) y usa el nuevo método con bloqueo pesimista
+        Habitacion habitacion = habitacionRepository.findByIdHabitacionForUpdate(request.getIdHabitacion())
                 .orElseThrow(() -> new ResourceNotFoundException("Habitación no disponible o eliminada."));
 
         // 2. REGLA: Validación de Capacidad

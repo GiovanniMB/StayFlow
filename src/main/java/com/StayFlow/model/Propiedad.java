@@ -70,6 +70,9 @@ public class Propiedad extends AuditoriaBase {
     @Column(name = "precioNoche", precision = 10, scale = 2)
     private BigDecimal precioNoche;
 
+    @OneToMany(mappedBy = "propiedad")
+    private List<TipoHabitacion> tiposHabitacion;
+
     // Constructores
     public Propiedad() {}
 
@@ -144,6 +147,14 @@ public class Propiedad extends AuditoriaBase {
 
     public void setServicios(List<Servicio> servicios) {
         this.servicios = servicios;
+    }
+
+    public List<TipoHabitacion> getTiposHabitacion() {
+        return tiposHabitacion;
+    }
+
+    public void setTiposHabitacion(List<TipoHabitacion> tiposHabitacion) {
+        this.tiposHabitacion = tiposHabitacion;
     }
 
     // Método de utilidad

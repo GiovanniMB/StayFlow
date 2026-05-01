@@ -26,6 +26,7 @@ import com.StayFlow.Service.Interfaces.ILogSistemaService;
 import com.StayFlow.Service.Interfaces.IPropiedadService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -218,5 +219,28 @@ public class PropiedadServiceImpl implements IPropiedadService {
             }
         }
         return serviciosFinales;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PropiedadResponseDTO> obtenerPropiedadesDisponibles(LocalDate fechaEntrada, LocalDate fechaSalida) {
+        
+        // 1. Reglas de negocio: Validar que las fechas sean correctas
+        if (fechaEntrada == null || fechaSalida == null) {
+            throw new BusinessException("Las fechas de entrada y salida son obligatorias para la búsqueda.");
+        }
+        if (fechaEntrada.isBefore(LocalDate.now())) {
+            throw new BusinessException("La fecha de entrada no puede ser en el pasado.");
+        }
+        if (!fechaEntrada.isBefore(fechaSalida)) {
+            throw new BusinessException("La fecha de salida debe ser estrictamente posterior a la fecha de entrada.");
+        }
+
+        // 2. Ejecutar tu Súper Query OTA
+        // Llama al método que agregamos en PropiedadRepository
+        List<Propiedad> propiedadesDisponibles = propiedadRepository.findDisponiblesByFechas(fechaEntrada, fechaSalida);
+
+        // 3. Convertir la lista de Entidades a DTOs para el Frontend
+        return propiedadMapper.toResponseDTOList(propiedadesDisponibles);
     }
 }

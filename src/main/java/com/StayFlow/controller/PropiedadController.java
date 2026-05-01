@@ -10,11 +10,14 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
+import java.time.LocalDate;
 import java.util.List;
 // Controlador REST para la gestión de propiedades
 @RestController
@@ -115,5 +118,13 @@ public class PropiedadController {
             @Parameter(description = "ID de la propiedad", example = "1") @PathVariable Integer id) {
         PropiedadResponseDTO response = propiedadService.obtenerPorId(id);
         return ResponseEntity.ok(ApiResponseDTO.success("Detalle recuperado exitosamente", response));
+    }
+    
+    @GetMapping("/disponibilidad")
+    public ResponseEntity<List<PropiedadResponseDTO>> buscarDisponibles(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkin,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkout) {
+        
+        return ResponseEntity.ok(propiedadService.obtenerPropiedadesDisponibles(checkin, checkout));
     }
 }

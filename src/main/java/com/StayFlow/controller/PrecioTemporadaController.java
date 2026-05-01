@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/temporadas")
-@CrossOrigin(origins = "*") // Ajusta esto después para seguridad en producción
+@CrossOrigin(origins = "*") 
 public class PrecioTemporadaController {
 
     private final IPrecioTemporadaService precioTemporadaService;

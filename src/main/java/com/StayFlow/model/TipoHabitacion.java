@@ -65,6 +65,9 @@ public class TipoHabitacion extends AuditoriaBase {
     @Schema(description = "Lista de camas configuradas para esta categoría")
     private List<TipoHabitacionCama> camas = new java.util.ArrayList<>();
 
+    @OneToMany(mappedBy = "tipoHabitacion")
+    private List<Habitacion> habitaciones;
+
     // Constructores
     public TipoHabitacion() {}
 
@@ -140,6 +143,14 @@ public class TipoHabitacion extends AuditoriaBase {
     
     public void setFotos(List<FotoHabitacion> fotos) { 
         this.fotos = fotos; 
+    }
+
+    public List<Habitacion> getHabitaciones() {
+        return habitaciones;
+    }
+
+    public void setHabitaciones(List<Habitacion> habitaciones) {
+        this.habitaciones = habitaciones;
     }
 
     // Getters y setters de camas
