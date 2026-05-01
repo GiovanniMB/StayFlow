@@ -40,10 +40,21 @@ public class LogSistema {
     public enum Accion {
         @Schema(description = "Inserción de un nuevo registro")
         INSERT,
+        
         @Schema(description = "Actualización de un registro existente")
         UPDATE,
+        
         @Schema(description = "Eliminación lógica de un registro (cambio de estado estaEliminado = true)")
-        DELETE_LOGICO
+        DELETE_LOGICO,
+        
+        @Schema(description = "Desactivación de cuenta de usuario (soft delete)")
+        DESACTIVAR,
+        
+        @Schema(description = "Reactivación de cuenta de usuario previamente desactivada")
+        REACTIVAR,
+        
+        @Schema(description = "Eliminación permanente de un registro (hard delete)")
+        ELIMINAR_PERMANENTE
     }
 
     // Constructores

@@ -5,9 +5,9 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.StayFlow.model.Rol;
 import com.StayFlow.Repository.RolRepository;
 import com.StayFlow.Service.Interfaces.IRolService;
-import com.StayFlow.model.Rol;
 
 @Service
 public class RolServiceJpa implements IRolService 

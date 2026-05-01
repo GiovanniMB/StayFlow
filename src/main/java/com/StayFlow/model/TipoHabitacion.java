@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,6 +15,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -54,6 +56,17 @@ public class TipoHabitacion extends AuditoriaBase {
     )
     @Schema(description = "Lista de servicios incluidos en este tipo de habitación")
     private List<Servicio> servicios;
+
+    @OneToMany(mappedBy = "tipoHabitacion")
+    @Schema(description = "Lista de fotografías asociadas a esta categoría")
+    private List<FotoHabitacion> fotos;
+
+    @OneToMany(mappedBy = "tipoHabitacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @Schema(description = "Lista de camas configuradas para esta categoría")
+    private List<TipoHabitacionCama> camas = new java.util.ArrayList<>();
+
+    @OneToMany(mappedBy = "tipoHabitacion")
+    private List<Habitacion> habitaciones;
 
     // Constructores
     public TipoHabitacion() {}
@@ -122,5 +135,43 @@ public class TipoHabitacion extends AuditoriaBase {
 
     public void setServicios(List<Servicio> servicios) {
         this.servicios = servicios;
+    }
+
+    public List<FotoHabitacion> getFotos() { 
+        return fotos; 
+    }
+    
+    public void setFotos(List<FotoHabitacion> fotos) { 
+        this.fotos = fotos; 
+    }
+
+    public List<Habitacion> getHabitaciones() {
+        return habitaciones;
+    }
+
+    public void setHabitaciones(List<Habitacion> habitaciones) {
+        this.habitaciones = habitaciones;
+    }
+
+    // Getters y setters de camas
+    public List<TipoHabitacionCama> getCamas() { return camas; }
+    public void setCamas(List<TipoHabitacionCama> camas) { this.camas = camas; }
+
+    public void addCama(TipoCama tipoCama, int cantidad) {
+        TipoHabitacionCama thc = new TipoHabitacionCama(this, tipoCama, cantidad);
+        camas.add(thc);
+    }
+
+    public List<String> getNombresCamas() {
+        if (camas.isEmpty()) return new java.util.ArrayList<>();
+        return camas.stream()
+            .map(hc -> hc.getCantidad() + "x " + hc.getTipoCama().getNombre())
+            .collect(java.util.stream.Collectors.toList());
+    }
+
+    public int getTotalCamas() {
+        return camas.stream()
+            .mapToInt(TipoHabitacionCama::getCantidad)
+            .sum();
     }
 }
