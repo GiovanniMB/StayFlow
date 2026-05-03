@@ -1,5 +1,25 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
+import java.awt.image.BufferedImage;
+import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import javax.imageio.ImageIO;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
+import com.StayFlow.service.interfaces.IHabitacionService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
 import com.StayFlow.dto.request.CamaRequestDTO;
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
@@ -8,26 +28,21 @@ import com.StayFlow.dto.response.TipoHabitacionResponseDTO;
 import com.StayFlow.exception.BusinessException;
 import com.StayFlow.exception.ResourceNotFoundException;
 import com.StayFlow.mapper.HabitacionMapper;
-import com.StayFlow.model.*;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
+import com.StayFlow.model.CategoriaFoto;
+import com.StayFlow.model.FotoHabitacion;
+import com.StayFlow.model.Habitacion;
 import com.StayFlow.model.LogSistema.Accion;
-import com.StayFlow.Repository.*;
-import com.StayFlow.Service.Interfaces.IHabitacionService;
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.multipart.MultipartFile;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
-import java.util.List;
-import java.math.BigDecimal;
-import java.util.ArrayList;
+import com.StayFlow.model.Propiedad;
+import com.StayFlow.model.Servicio;
+import com.StayFlow.model.TipoCama;
+import com.StayFlow.model.TipoHabitacion;
+import com.StayFlow.repository.CategoriaFotoRepository;
+import com.StayFlow.repository.FotoHabitacionRepository;
+import com.StayFlow.repository.HabitacionRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.ServicioRepository;
+import com.StayFlow.repository.TipoCamaRepository;
+import com.StayFlow.repository.TipoHabitacionRepository;
 
 @Service
 public class HabitacionServiceImpl implements IHabitacionService {

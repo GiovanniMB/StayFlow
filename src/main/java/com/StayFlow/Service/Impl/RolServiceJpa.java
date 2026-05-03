@@ -1,13 +1,13 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.StayFlow.service.interfaces.IRolService;
 import com.StayFlow.model.Rol;
-import com.StayFlow.Repository.RolRepository;
-import com.StayFlow.Service.Interfaces.IRolService;
+import com.StayFlow.repository.RolRepository;
 
 @Service
 public class RolServiceJpa implements IRolService 

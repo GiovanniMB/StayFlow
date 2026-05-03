@@ -1,8 +1,9 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
-import com.StayFlow.model.Direccion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.StayFlow.model.Direccion;
 
 /*Repositorio para la entidad Direccion*/
 

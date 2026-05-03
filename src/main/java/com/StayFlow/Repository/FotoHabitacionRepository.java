@@ -1,10 +1,11 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
-import com.StayFlow.model.FotoHabitacion;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import com.StayFlow.model.FotoHabitacion;
 
 @Repository
 public interface FotoHabitacionRepository extends JpaRepository<FotoHabitacion, Integer> {

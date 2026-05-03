@@ -1,9 +1,7 @@
 package com.StayFlow.security;
 
-import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.UsuarioRepository;
+import java.util.stream.Collectors;
 
-import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -11,7 +9,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
+import com.StayFlow.model.Usuario;
+import com.StayFlow.repository.UsuarioRepository;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Service
 @Schema(description = "Servicio que carga los detalles del usuario para Spring Security")

@@ -1,12 +1,13 @@
-package com.StayFlow.Repository;
-
-import com.StayFlow.model.Reserva;
-import com.StayFlow.model.Reserva.EstadoReserva;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+package com.StayFlow.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.StayFlow.model.Reserva;
+import com.StayFlow.model.Reserva.EstadoReserva;
 
 @Repository
 public interface ReservaRepository extends JpaRepository<Reserva, Integer> {

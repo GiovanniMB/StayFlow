@@ -1,10 +1,11 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
-import java.time.LocalDate;
-import java.util.List;
 
 public interface IReservaService {
 

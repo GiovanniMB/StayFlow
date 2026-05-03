@@ -1,10 +1,10 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+
+import java.util.List;
 
 import com.StayFlow.dto.response.CatalogoResponseDTO;
 import com.StayFlow.dto.response.ServicioResponseDTO;
 import com.StayFlow.dto.response.TipoCamaResponseDTO;
-
-import java.util.List;
 
 public interface ICatalogoService {
     List<CatalogoResponseDTO> obtenerTodosLosEstados();

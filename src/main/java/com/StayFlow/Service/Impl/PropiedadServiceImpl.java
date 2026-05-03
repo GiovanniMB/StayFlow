@@ -1,5 +1,16 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.StayFlow.service.interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IPropiedadService;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
 import com.StayFlow.exception.BusinessException;
@@ -7,28 +18,17 @@ import com.StayFlow.exception.ResourceNotFoundException;
 import com.StayFlow.mapper.PropiedadMapper;
 import com.StayFlow.model.Colonia;
 import com.StayFlow.model.Direccion;
-import com.StayFlow.model.Propiedad;
-import com.StayFlow.model.Usuario; 
-import com.StayFlow.model.Rol; 
-import org.springframework.security.core.context.SecurityContextHolder; 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.StayFlow.model.Servicio;
 import com.StayFlow.model.LogSistema.Accion;
-import com.StayFlow.Repository.ColoniaRepository;
-import com.StayFlow.Repository.DireccionRepository;
-import com.StayFlow.Repository.PropiedadRepository;
-import com.StayFlow.Repository.RolRepository;
-import com.StayFlow.Repository.ServicioRepository;
-import com.StayFlow.Repository.UsuarioRepository;
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
-import com.StayFlow.Service.Interfaces.IPropiedadService;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import com.StayFlow.model.Propiedad;
+import com.StayFlow.model.Rol;
+import com.StayFlow.model.Servicio;
+import com.StayFlow.model.Usuario;
+import com.StayFlow.repository.ColoniaRepository;
+import com.StayFlow.repository.DireccionRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.RolRepository;
+import com.StayFlow.repository.ServicioRepository;
+import com.StayFlow.repository.UsuarioRepository;
 
 @Service
 public class PropiedadServiceImpl implements IPropiedadService {

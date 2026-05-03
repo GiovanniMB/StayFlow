@@ -1,11 +1,12 @@
-package com.StayFlow.Repository;
-
-import com.StayFlow.model.BloqueoHabitacion;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+package com.StayFlow.repository;
 
 import java.time.LocalDate;
 import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.StayFlow.model.BloqueoHabitacion;
 
 @Repository
 public interface BloqueoHabitacionRepository extends JpaRepository<BloqueoHabitacion, Integer> {

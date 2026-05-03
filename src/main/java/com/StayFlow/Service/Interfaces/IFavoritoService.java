@@ -1,7 +1,8 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+
+import java.util.List;
 
 import com.StayFlow.dto.response.PropiedadResponseDTO;
-import java.util.List;
 
 public interface IFavoritoService {
     // Retorna true si se agregó a favoritos, false si se eliminó

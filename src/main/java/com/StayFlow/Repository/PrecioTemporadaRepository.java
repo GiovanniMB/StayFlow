@@ -1,13 +1,14 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
-import com.StayFlow.model.PrecioTemporada;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.util.List;
+import com.StayFlow.model.PrecioTemporada;
 
 @Repository
 public interface PrecioTemporadaRepository extends JpaRepository<PrecioTemporada, Integer> {

@@ -5,7 +5,7 @@ import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.HabitacionResponseDTO;
 import com.StayFlow.dto.response.TipoHabitacionResponseDTO;
-import com.StayFlow.Service.Interfaces.IHabitacionService;
+import com.StayFlow.service.interfaces.IHabitacionService;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,8 +1,9 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+
+import java.util.List;
 
 import com.StayFlow.dto.request.PrecioTemporadaRequestDTO;
 import com.StayFlow.dto.response.PrecioTemporadaResponseDTO;
-import java.util.List;
 
 public interface IPrecioTemporadaService {
     PrecioTemporadaResponseDTO crearTemporada(PrecioTemporadaRequestDTO request);

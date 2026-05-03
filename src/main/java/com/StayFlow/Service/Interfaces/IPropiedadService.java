@@ -1,11 +1,9 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+import java.time.LocalDate;
+import java.util.List;
 
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
-
-import java.time.LocalDate;
-
-import java.util.List;
 
 public interface IPropiedadService {
     PropiedadResponseDTO crearPropiedad(PropiedadRequestDTO request);

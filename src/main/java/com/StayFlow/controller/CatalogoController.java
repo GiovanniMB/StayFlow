@@ -1,6 +1,6 @@
 package com.StayFlow.controller;
 
-import com.StayFlow.Service.Interfaces.ICatalogoService;
+import com.StayFlow.service.interfaces.ICatalogoService;
 import com.StayFlow.dto.response.CatalogoResponseDTO;
 import com.StayFlow.dto.response.ServicioResponseDTO;
 import com.StayFlow.dto.response.TipoCamaResponseDTO;

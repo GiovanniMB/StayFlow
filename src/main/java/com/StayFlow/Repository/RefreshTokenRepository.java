@@ -1,16 +1,18 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
-import com.StayFlow.model.RefreshToken;
-import com.StayFlow.model.Usuario;
-import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
+import com.StayFlow.model.RefreshToken;
+import com.StayFlow.model.Usuario;
+
+import io.swagger.v3.oas.annotations.media.Schema;
 
 @Repository
 @Schema(description = "Repositorio para operaciones de refresh tokens")

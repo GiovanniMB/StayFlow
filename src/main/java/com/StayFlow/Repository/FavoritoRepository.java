@@ -1,13 +1,14 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import com.StayFlow.model.Favorito;
 import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Usuario;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface FavoritoRepository extends JpaRepository<Favorito, Integer> {

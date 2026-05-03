@@ -1,12 +1,13 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
+
+import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
 import com.StayFlow.dto.response.HabitacionResponseDTO;
 import com.StayFlow.dto.response.TipoHabitacionResponseDTO;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface IHabitacionService {
     
