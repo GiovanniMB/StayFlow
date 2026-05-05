@@ -22,6 +22,7 @@ public class SecurityConstants {
             "/swagger-ui.html",
             "/api-docs/**",
             "/v3/api-docs/**",
+            "/api/test/**",
 
             // Endpoints públicos temporales para pruebas del módulo de reservas
             "/api/reservas",
