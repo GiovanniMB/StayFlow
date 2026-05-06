@@ -1,5 +1,6 @@
 package com.StayFlow.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -13,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -61,6 +63,15 @@ public class Propiedad extends AuditoriaBase {
     )
     @Schema(description = "Lista de servicios generales que ofrece esta propiedad")
     private List<Servicio> servicios;
+
+    @OneToMany(mappedBy = "propiedad")
+    private List<FotoHabitacion> fotos;
+
+    @Column(name = "precioNoche", precision = 10, scale = 2)
+    private BigDecimal precioNoche;
+
+    @OneToMany(mappedBy = "propiedad")
+    private List<TipoHabitacion> tiposHabitacion;
 
     // Constructores
     public Propiedad() {}
@@ -138,11 +149,35 @@ public class Propiedad extends AuditoriaBase {
         this.servicios = servicios;
     }
 
+    public List<TipoHabitacion> getTiposHabitacion() {
+        return tiposHabitacion;
+    }
+
+    public void setTiposHabitacion(List<TipoHabitacion> tiposHabitacion) {
+        this.tiposHabitacion = tiposHabitacion;
+    }
+
     // Método de utilidad
     public void incrementarContadorReservas() {
         if (this.contadorReservas == null) {
             this.contadorReservas = 0;
         }
         this.contadorReservas++;
+    }
+
+    public List<FotoHabitacion> getFotos() { 
+        return fotos; 
+    }
+
+    public void setFotos(List<FotoHabitacion> fotos) { 
+        this.fotos = fotos; 
+    }
+
+    public BigDecimal getPrecioNoche() {
+        return precioNoche;
+    }
+
+    public void setPrecioNoche(BigDecimal precioNoche) {
+        this.precioNoche = precioNoche;
     }
 }

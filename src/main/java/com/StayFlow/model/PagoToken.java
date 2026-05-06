@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "pago_token")
-@Schema(description = "Tokens de pago almacenados para usuarios que guardan sus métodos de pago para futuras transacciones (cumple con PCI DSS)")
+@Schema(description = "Tokens de pago almacenados para usuarios")
 public class PagoToken {
 
     @Id
@@ -21,35 +21,36 @@ public class PagoToken {
 
     @ManyToOne
     @JoinColumn(name = "idMetodoPago", nullable = false)
-    @Schema(description = "Método de pago asociado (tarjeta, paypal, etc.)")
+    @Schema(description = "Método de pago asociado")
     private MetodoPago metodoPago;
 
     @ManyToOne
     @JoinColumn(name = "idTipoTarjeta", nullable = false)
-    @Schema(description = "Tipo de tarjeta (Visa, Mastercard, Amex, etc.) - aplica solo para tarjetas")
+    @Schema(description = "Tipo de tarjeta")
     private TipoTarjeta tipoTarjeta;
 
-    @Schema(description = "Token proporcionado por el gateway de pagos (Stripe, PayPal, etc.)", example = "pm_123456789", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Column(nullable = false, length = 255)
+    @Column(name = "token_gateway", nullable = false, length = 255)
+    @Schema(description = "Token proporcionado por el gateway de pagos")
     private String tokenGateway;
 
-    @Schema(description = "Últimos 4 dígitos de la tarjeta (para mostrar al usuario)", example = "4242", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Column(nullable = false, length = 4)
+    @Column(name = "ultimosDigitos", nullable = false, length = 4)  // 🔥 SIN guión bajo
+    @Schema(description = "Últimos 4 dígitos de la tarjeta")
     private String ultimosDigitos;
 
-    @Schema(description = "Nombre del titular de la tarjeta", example = "Juan Perez")
-    @Column(length = 100)
+    @Column(name = "nombreTitular", length = 100)  // 🔥 SIN guión bajo
+    @Schema(description = "Nombre del titular de la tarjeta")
     private String nombreTitular;
 
-    @Schema(description = "Fecha de expiración de la tarjeta (MM/YYYY)", example = "12/2025")
-    @Column(length = 7)
+    @Column(name = "fechaExpiracion", length = 7)  // 🔥 SIN guión bajo
+    @Schema(description = "Fecha de expiración de la tarjeta (MM/YYYY)")
     private String fechaExpiracion;
 
-    @Schema(description = "Indica si el token está activo y puede ser usado para pagos", example = "true")
+    @Column(name = "activo")
+    @Schema(description = "Indica si el token está activo")
     private boolean activo = true;
 
-    @Schema(description = "Fecha y hora de creación del token", example = "2024-12-20T10:30:00")
-    @Column(nullable = false)
+    @Column(name = "fechaCreacion", nullable = false)  // 🔥 SIN guión bajo, como está en BD
+    @Schema(description = "Fecha y hora de creación del token")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
     // Constructores
@@ -69,7 +70,7 @@ public class PagoToken {
         this.activo = true;
     }
 
-    // Getters y Setters
+    // Getters y Setters (mantén los que ya tienes)
     public Integer getIdPagoToken() {
         return idPagoToken;
     }

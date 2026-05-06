@@ -2,13 +2,10 @@ package com.StayFlow.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "habitacion")
-@Schema(description = "Representa una habitación física específica dentro de una propiedad")
+@Schema(description = "Representa una habitación física (ficha de inventario) dentro de una propiedad")
 public class Habitacion extends AuditoriaBase {
 
     @Id
@@ -26,8 +23,8 @@ public class Habitacion extends AuditoriaBase {
     @Schema(description = "Categoría o tipo de la habitación")
     private TipoHabitacion tipoHabitacion;
 
-    @Schema(description = "Número identificador de la habitación", example = "101", requiredMode = Schema.RequiredMode.REQUIRED)
-    @Column(nullable = false, length = 10)
+    @Schema(description = "Número identificador de la puerta", example = "101", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Column(nullable = false, length = 100)
     private String numeroHabitacion;
 
     @Enumerated(EnumType.STRING)
@@ -35,18 +32,12 @@ public class Habitacion extends AuditoriaBase {
     @Column(columnDefinition = "enum('disponible','mantenimiento','ocupada') default 'disponible'")
     private EstadoHabitacion estado = EstadoHabitacion.disponible;
 
-    @OneToMany(mappedBy = "habitacion", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-    @Schema(description = "Lista de camas en esta habitación con sus cantidades")
-    private List<HabitacionTipoCama> habitacionTipoCamas = new ArrayList<>();
-
     public enum EstadoHabitacion {
         disponible, mantenimiento, ocupada
     }
 
-    // Constructores
     public Habitacion() {}
 
-    // Getters y Setters
     public Integer getIdHabitacion() { return idHabitacion; }
     public void setIdHabitacion(Integer idHabitacion) { this.idHabitacion = idHabitacion; }
     
@@ -61,28 +52,4 @@ public class Habitacion extends AuditoriaBase {
     
     public EstadoHabitacion getEstado() { return estado; }
     public void setEstado(EstadoHabitacion estado) { this.estado = estado; }
-    
-    public List<HabitacionTipoCama> getHabitacionTipoCamas() { return habitacionTipoCamas; }
-    public void setHabitacionTipoCamas(List<HabitacionTipoCama> habitacionTipoCamas) { 
-        this.habitacionTipoCamas = habitacionTipoCamas; 
-    }
-
-    // Métodos de utilidad
-    public void addCama(TipoCama tipoCama, int cantidad) {
-        HabitacionTipoCama htc = new HabitacionTipoCama(this, tipoCama, cantidad);
-        habitacionTipoCamas.add(htc);
-    }
-
-    public List<String> getNombresCamas() {
-        if (habitacionTipoCamas.isEmpty()) return new ArrayList<>();
-        return habitacionTipoCamas.stream()
-            .map(hc -> hc.getCantidad() + "x " + hc.getTipoCama().getNombre())
-            .collect(Collectors.toList());
-    }
-
-    public int getTotalCamas() {
-        return habitacionTipoCamas.stream()
-            .mapToInt(HabitacionTipoCama::getCantidad)
-            .sum();
-    }
 }
