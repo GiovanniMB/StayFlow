@@ -1,4 +1,4 @@
-package com.StayFlow.service.impl;
+package com.StayFlow.Service.Impl;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,13 +19,14 @@ import com.StayFlow.model.Pago;
 import com.StayFlow.model.PagoInfo;
 import com.StayFlow.model.PagoToken;
 import com.StayFlow.model.Reserva;
-import com.StayFlow.repository.EstadoPagoRepository;
-import com.StayFlow.repository.MetodoPagoRepository;
-import com.StayFlow.repository.PagoInfoRepository;
-import com.StayFlow.repository.PagoRepository;
-import com.StayFlow.repository.ReservaRepository;
-import com.StayFlow.service.interfaces.IPagoService;
-import com.StayFlow.service.interfaces.IPagoTokenService;
+import com.StayFlow.model.Usuario;
+import com.StayFlow.Repository.EstadoPagoRepository;
+import com.StayFlow.Repository.MetodoPagoRepository;
+import com.StayFlow.Repository.PagoInfoRepository;
+import com.StayFlow.Repository.PagoRepository;
+import com.StayFlow.Repository.ReservaRepository;
+import com.StayFlow.Service.Interfaces.IPagoService;
+import com.StayFlow.Service.Interfaces.IPagoTokenService;
 
 @Service
 public class PagoServiceImpl implements IPagoService {
@@ -47,6 +48,11 @@ public class PagoServiceImpl implements IPagoService {
     
     @Autowired
     private IPagoTokenService pagoTokenService;
+
+    @Autowired
+    private com.StayFlow.Service.EmailService emailService;
+
+    
 
     @Override
     @Transactional
@@ -103,6 +109,10 @@ public class PagoServiceImpl implements IPagoService {
                 pagoInfoRepository.save(info);
             }
         }
+        // DISPARAR CORREOS SI EL PAGO FUE EXITOSO ---
+        if (estadoInicial.getNombre().equals("completado")) {
+            confirmarReservaYEnviarCorreos(reserva);
+        }
         
         // 7. Construir respuesta
         PagoResponseDTO response = new PagoResponseDTO();
@@ -118,6 +128,9 @@ public class PagoServiceImpl implements IPagoService {
         response.setUltimosDigitos(gatewayResponse.get("ultimosDigitos"));
         
         return response;
+
+
+
     }
     
     private Map<String, String> procesarConGateway(PagoRequestDTO request, MetodoPago metodo, Integer idUsuario) {
@@ -162,6 +175,8 @@ public PagoResponseDTO confirmarTransferencia(Integer idPago) {
     EstadoPago completado = estadoPagoRepository.findByNombre("completado")
         .orElseThrow(() -> new PaymentException("Estado no encontrado"));
     pago.setEstadoPago(completado);
+
+    confirmarReservaYEnviarCorreos(pago.getReserva());
     
     return convertToDTO(pagoRepository.save(pago));
 }
@@ -340,4 +355,48 @@ private PagoResponseDTO convertToDTO(Pago pago) {
     dto.setFechaPago(pago.getFechaPago().toString());
     return dto;
 }
+
+private void confirmarReservaYEnviarCorreos(Reserva reserva) {
+        // 1. Cambiamos el estado de la reserva a confirmada
+        reserva.setEstadoReserva(Reserva.EstadoReserva.confirmada);
+        reservaRepository.save(reserva);
+
+        // 2. Enviamos los correos
+        try {
+            Usuario cliente = reserva.getCliente();
+            
+            // OJO AQUÍ: Verifica si en tu clase Propiedad el dueño se obtiene con getPropietario(), getUsuario() o getArrendador()
+            Usuario anfitrion = reserva.getHabitacion().getPropiedad().getDueno(); 
+
+            // --- Correo para el Cliente ---
+            String asuntoCliente = "¡Tu reserva en StayFlow está confirmada!";
+            String mensajeCliente = "Hola " + cliente.getNombreCompleto() + ",\n\n" +
+                    "Tu pago ha sido procesado con éxito y tu reserva está confirmada.\n\n" +
+                    "Detalles de tu estancia:\n" +
+                    "- Habitación: " + reserva.getHabitacion().getNumeroHabitacion() + "\n" +
+                    "- Entrada: " + reserva.getFechaEntrada() + "\n" +
+                    "- Salida: " + reserva.getFechaSalida() + "\n" +
+                    "- Monto Total Pagado: $" + reserva.getMontoTotal() + " MXN\n\n" +
+                    "¡Gracias por confiar en StayFlow!";
+            emailService.enviarCorreo(cliente.getEmail(), asuntoCliente, mensajeCliente);
+
+            // --- Correo para el Dueño/Anfitrión ---
+            if (anfitrion != null) {
+                String asuntoAnfitrion = "¡Nueva reserva confirmada en tu propiedad!";
+                String mensajeAnfitrion = "Hola " + anfitrion.getNombreCompleto() + ",\n\n" +
+                        "¡Excelentes noticias! Tienes una nueva reserva pagada y confirmada.\n\n" +
+                        "Detalles:\n" +
+                        "- Huésped: " + cliente.getNombreCompleto() + "\n" +
+                        "- Habitación: " + reserva.getHabitacion().getNumeroHabitacion() + "\n" +
+                        "- Entrada: " + reserva.getFechaEntrada() + "\n" +
+                        "- Salida: " + reserva.getFechaSalida() + "\n\n" +
+                        "¡Prepárate para recibir a tu huésped!";
+                emailService.enviarCorreo(anfitrion.getEmail(), asuntoAnfitrion, mensajeAnfitrion);
+            }
+        } catch (Exception e) {
+            // Si el correo falla, no detenemos la transacción del pago, solo registramos el error
+            System.err.println("Error al enviar correos de confirmación: " + e.getMessage());
+        }
+    }
+
 }

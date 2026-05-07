@@ -1,4 +1,4 @@
-package com.StayFlow.repository;
+package com.StayFlow.Repository;
 
 import java.time.LocalDate;
 import java.util.List;

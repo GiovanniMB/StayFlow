@@ -4,7 +4,7 @@ import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
-import com.StayFlow.service.interfaces.IReservaService;
+import com.StayFlow.Service.Interfaces.IReservaService;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;

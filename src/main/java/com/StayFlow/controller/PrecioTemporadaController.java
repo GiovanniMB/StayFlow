@@ -2,7 +2,7 @@ package com.StayFlow.controller;
 
 import com.StayFlow.dto.request.PrecioTemporadaRequestDTO;
 import com.StayFlow.dto.response.PrecioTemporadaResponseDTO;
-import com.StayFlow.service.interfaces.IPrecioTemporadaService;
+import com.StayFlow.Service.Interfaces.IPrecioTemporadaService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

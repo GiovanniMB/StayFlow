@@ -1,4 +1,4 @@
-package com.StayFlow.service.interfaces;
+package com.StayFlow.Service.Interfaces;
 
 import java.util.List;
 

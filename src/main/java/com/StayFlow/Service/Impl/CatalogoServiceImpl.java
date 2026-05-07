@@ -1,12 +1,12 @@
-package com.StayFlow.service.impl;
+package com.StayFlow.Service.Impl;
 
-import com.StayFlow.repository.CategoriaFotoRepository;
-import com.StayFlow.repository.ColoniaRepository;
-import com.StayFlow.repository.EstadoRepository;
-import com.StayFlow.repository.MunicipioRepository;
-import com.StayFlow.repository.ServicioRepository;
-import com.StayFlow.repository.TipoCamaRepository;
-import com.StayFlow.service.interfaces.ICatalogoService;
+import com.StayFlow.Repository.CategoriaFotoRepository;
+import com.StayFlow.Repository.ColoniaRepository;
+import com.StayFlow.Repository.EstadoRepository;
+import com.StayFlow.Repository.MunicipioRepository;
+import com.StayFlow.Repository.ServicioRepository;
+import com.StayFlow.Repository.TipoCamaRepository;
+import com.StayFlow.Service.Interfaces.ICatalogoService;
 import com.StayFlow.dto.response.CatalogoResponseDTO;
 import com.StayFlow.dto.response.ServicioResponseDTO;
 import com.StayFlow.dto.response.TipoCamaResponseDTO;

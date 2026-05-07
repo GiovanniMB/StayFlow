@@ -1,4 +1,4 @@
-package com.StayFlow.service;
+package com.StayFlow.Service;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -57,6 +57,22 @@ public class EmailService {
             throw new RuntimeException("Error al enviar email de recuperación", e);
         }
     }
+
+    public void enviarCorreo(String destinatario, String asunto, String mensaje) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
+            
+            helper.setTo(destinatario);
+            helper.setSubject(asunto);
+            helper.setText(mensaje, false); // false indica que es texto plano, no HTML
+            
+            mailSender.send(message);
+        } catch (MessagingException e) {
+            System.err.println("Error al enviar el correo: " + e.getMessage());
+        }
+    }
+
 
     private String construirHTMLConfirmacion(String nombre, String urlConfirmacion) {
         return "<!DOCTYPE html>\n" +
