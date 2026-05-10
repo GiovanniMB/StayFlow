@@ -25,4 +25,7 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     // Buscar todas las reservas realizadas por un cliente.
     // Esto servirá para el endpoint "mis reservas" o historial del usuario.
     List<Reserva> findByCliente_IdUsuario(Integer idUsuario);
+
+    // Busca todas las reservas asociadas a una habitación específica
+    List<Reserva> findByHabitacion_IdHabitacion(Integer idHabitacion);
 }

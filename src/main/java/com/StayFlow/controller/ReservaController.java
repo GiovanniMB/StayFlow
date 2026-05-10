@@ -89,4 +89,16 @@ public class ReservaController {
         
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/habitaciones/{idHabitacion}/reservas")
+    public ResponseEntity<ApiResponseDTO<List<ReservaResponseDTO>>> obtenerReservasPorHabitacion(@PathVariable Integer idHabitacion) {
+    List<ReservaResponseDTO> reservas = reservaService.obtenerReservasPorHabitacion(idHabitacion);
+    
+    ApiResponseDTO<List<ReservaResponseDTO>> response = new ApiResponseDTO<>();
+    response.setSuccess(true);
+    response.setMessage("Reservas de la habitación obtenidas exitosamente");
+    response.setData(reservas);
+    
+    return ResponseEntity.ok(response);
+}
 }

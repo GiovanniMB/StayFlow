@@ -23,4 +23,6 @@ public interface IReservaService {
     ReservaResponseDTO registrarCheckIn(Integer idReserva);
     
     ReservaResponseDTO registrarCheckOut(Integer idReserva);
+
+    List<ReservaResponseDTO> obtenerReservasPorHabitacion(Integer idHabitacion);
 }

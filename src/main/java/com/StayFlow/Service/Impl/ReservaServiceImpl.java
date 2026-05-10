@@ -217,4 +217,17 @@ public class ReservaServiceImpl implements IReservaService {
         if (reserva.getEstadoReserva() != null) dto.setEstadoReserva(reserva.getEstadoReserva().name());
         return dto;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDTO> obtenerReservasPorHabitacion(Integer idHabitacion) {
+        // Obtenemos las reservas usando el repositorio
+        List<Reserva> reservas = reservaRepository.findByHabitacion_IdHabitacion(idHabitacion);
+        
+        // Filtramos las que no estén canceladas y convertimos a DTO
+        return reservas.stream()
+                .filter(r -> r.getEstadoReserva() != EstadoReserva.cancelada) 
+                .map(this::toReservaResponseDTO) 
+                .collect(Collectors.toList());
+    }
 }
