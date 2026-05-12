@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import com.StayFlow.dto.response.PropiedadResponseDTO;
 import com.StayFlow.exception.ResourceNotFoundException;
@@ -6,10 +6,10 @@ import com.StayFlow.mapper.PropiedadMapper;
 import com.StayFlow.model.Favorito;
 import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.FavoritoRepository;
-import com.StayFlow.Repository.PropiedadRepository;
-import com.StayFlow.Repository.UsuarioRepository;
-import com.StayFlow.Service.Interfaces.IFavoritoService;
+import com.StayFlow.repository.FavoritoRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.service.interfaces.IFavoritoService;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

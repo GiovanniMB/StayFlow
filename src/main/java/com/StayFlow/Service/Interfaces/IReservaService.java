@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 
 import java.time.LocalDate;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,11 +14,11 @@ import com.StayFlow.model.MetodoPago;
 import com.StayFlow.model.PagoToken;
 import com.StayFlow.model.TipoTarjeta;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.MetodoPagoRepository;
-import com.StayFlow.Repository.PagoTokenRepository;
-import com.StayFlow.Repository.TipoTarjetaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
-import com.StayFlow.Service.Interfaces.IPagoTokenService;
+import com.StayFlow.repository.MetodoPagoRepository;
+import com.StayFlow.repository.PagoTokenRepository;
+import com.StayFlow.repository.TipoTarjetaRepository;
+import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.service.interfaces.IPagoTokenService;
 
 @Service
 public class PagoTokenServiceImpl implements IPagoTokenService {

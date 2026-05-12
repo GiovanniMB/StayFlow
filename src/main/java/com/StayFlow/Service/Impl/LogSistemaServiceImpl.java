@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.util.Optional;
 
@@ -6,12 +6,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
 import com.StayFlow.model.LogSistema;
 import com.StayFlow.model.LogSistema.Accion;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.LogSistemaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.repository.LogSistemaRepository;
+import com.StayFlow.repository.UsuarioRepository;
 // Servicio para registrar logs de auditoría en el sistema. Se encarga de guardar cada acción relevante (INSERT, UPDATE, DELETE_LOGICO) con información del usuario que la realizó, la tabla afectada y el ID del registro modificado.
 @Service
 public class LogSistemaServiceImpl implements ILogSistemaService {

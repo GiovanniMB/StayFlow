@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.Service.Interfaces.IReservaService;
+import com.StayFlow.service.interfaces.IReservaService;
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
@@ -20,11 +20,11 @@ import com.StayFlow.model.Reserva;
 import com.StayFlow.model.Reserva.EstadoReserva;
 import com.StayFlow.model.TipoHabitacion;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.BloqueoHabitacionRepository;
-import com.StayFlow.Repository.HabitacionRepository;
-import com.StayFlow.Repository.PrecioTemporadaRepository;
-import com.StayFlow.Repository.ReservaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.repository.BloqueoHabitacionRepository;
+import com.StayFlow.repository.HabitacionRepository;
+import com.StayFlow.repository.PrecioTemporadaRepository;
+import com.StayFlow.repository.ReservaRepository;
+import com.StayFlow.repository.UsuarioRepository;
 
 @Service
 public class ReservaServiceImpl implements IReservaService {

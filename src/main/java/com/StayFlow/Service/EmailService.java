@@ -1,4 +1,4 @@
-package com.StayFlow.Service;
+package com.StayFlow.service;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;

@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.StayFlow.Service.Interfaces.IHabitacionService;
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IHabitacionService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
 import com.StayFlow.dto.request.CamaRequestDTO;
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
@@ -36,13 +36,13 @@ import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Servicio;
 import com.StayFlow.model.TipoCama;
 import com.StayFlow.model.TipoHabitacion;
-import com.StayFlow.Repository.CategoriaFotoRepository;
-import com.StayFlow.Repository.FotoHabitacionRepository;
-import com.StayFlow.Repository.HabitacionRepository;
-import com.StayFlow.Repository.PropiedadRepository;
-import com.StayFlow.Repository.ServicioRepository;
-import com.StayFlow.Repository.TipoCamaRepository;
-import com.StayFlow.Repository.TipoHabitacionRepository;
+import com.StayFlow.repository.CategoriaFotoRepository;
+import com.StayFlow.repository.FotoHabitacionRepository;
+import com.StayFlow.repository.HabitacionRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.ServicioRepository;
+import com.StayFlow.repository.TipoCamaRepository;
+import com.StayFlow.repository.TipoHabitacionRepository;
 
 @Service
 public class HabitacionServiceImpl implements IHabitacionService {

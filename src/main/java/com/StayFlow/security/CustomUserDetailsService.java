@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.repository.UsuarioRepository;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

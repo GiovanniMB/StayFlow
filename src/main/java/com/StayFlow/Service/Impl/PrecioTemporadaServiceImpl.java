@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -6,15 +6,15 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.Service.Interfaces.IPrecioTemporadaService;
+import com.StayFlow.service.interfaces.IPrecioTemporadaService;
 import com.StayFlow.dto.request.PrecioTemporadaRequestDTO;
 import com.StayFlow.dto.response.PrecioTemporadaResponseDTO;
 import com.StayFlow.exception.BusinessException;
 import com.StayFlow.exception.ResourceNotFoundException;
 import com.StayFlow.model.PrecioTemporada;
 import com.StayFlow.model.TipoHabitacion;
-import com.StayFlow.Repository.PrecioTemporadaRepository;
-import com.StayFlow.Repository.TipoHabitacionRepository;
+import com.StayFlow.repository.PrecioTemporadaRepository;
+import com.StayFlow.repository.TipoHabitacionRepository;
 
 @Service
 public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {

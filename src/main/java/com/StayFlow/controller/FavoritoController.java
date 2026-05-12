@@ -1,7 +1,7 @@
 package com.StayFlow.controller;
 
 import com.StayFlow.dto.response.PropiedadResponseDTO;
-import com.StayFlow.Service.Interfaces.IFavoritoService;
+import com.StayFlow.service.interfaces.IFavoritoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
