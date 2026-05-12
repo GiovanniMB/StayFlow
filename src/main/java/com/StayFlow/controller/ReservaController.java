@@ -10,6 +10,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.StayFlow.dto.response.CancelacionReservaResponseDTO;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -63,16 +64,16 @@ public class ReservaController {
     }
 
     @PutMapping("/reservas/{idReserva}/cancelar")
-    public ResponseEntity<ApiResponseDTO<ReservaResponseDTO>> cancelarReserva(@PathVariable Integer idReserva) {
-        ReservaResponseDTO reservaCancelada = reservaService.cancelarReserva(idReserva);
-        
-        ApiResponseDTO<ReservaResponseDTO> response = new ApiResponseDTO<>();
-        response.setSuccess(true);
-        response.setMessage("Reserva cancelada exitosamente");
-        response.setData(reservaCancelada);
-        
-        return ResponseEntity.ok(response);
-    }
+    public ResponseEntity<ApiResponseDTO<CancelacionReservaResponseDTO>> cancelarReserva(@PathVariable Integer idReserva) {
+    CancelacionReservaResponseDTO cancelacion = reservaService.cancelarReservaConPenalizacion(idReserva);
+
+    ApiResponseDTO<CancelacionReservaResponseDTO> response = new ApiResponseDTO<>();
+    response.setSuccess(true);
+    response.setMessage("Reserva cancelada exitosamente");
+    response.setData(cancelacion);
+
+    return ResponseEntity.ok(response);
+}
 
     @GetMapping("/habitaciones/{idHabitacion}/disponibilidad")
     public ResponseEntity<ApiResponseDTO<DisponibilidadResponseDTO>> verificarDisponibilidad(
