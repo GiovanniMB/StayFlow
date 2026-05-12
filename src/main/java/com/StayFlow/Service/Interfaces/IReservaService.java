@@ -6,6 +6,7 @@ import java.util.List;
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
+import com.StayFlow.dto.response.CancelacionReservaResponseDTO;
 
 public interface IReservaService {
 
@@ -25,4 +26,10 @@ public interface IReservaService {
     ReservaResponseDTO registrarCheckOut(Integer idReserva);
 
     List<ReservaResponseDTO> obtenerReservasPorHabitacion(Integer idHabitacion);
+
+    List<ReservaResponseDTO> obtenerReservasPorPropiedad(Integer idPropiedad);
+
+    List<ReservaResponseDTO> obtenerReservasPorAnfitrion(Integer idAnfitrion);
+    
+    CancelacionReservaResponseDTO cancelarReservaConPenalizacion(Integer idReserva);
 }

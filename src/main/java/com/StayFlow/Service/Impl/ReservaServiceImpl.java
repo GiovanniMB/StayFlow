@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.StayFlow.Service.Interfaces.IReservaService;
 import com.StayFlow.dto.request.ReservaRequestDTO;
+import com.StayFlow.dto.response.CancelacionReservaResponseDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
 import com.StayFlow.exception.BusinessException;
@@ -230,4 +231,29 @@ public class ReservaServiceImpl implements IReservaService {
                 .map(this::toReservaResponseDTO) 
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDTO> obtenerReservasPorPropiedad(Integer idPropiedad) {
+        // Obtenemos todas las reservas de la propiedad
+        List<Reserva> reservas = reservaRepository.findByPropiedadId(idPropiedad);
+        
+        // Filtramos y mapeamos a DTO (ignorando canceladas si así lo deseas, o mandando todas para el historial)
+        return reservas.stream()
+                .map(this::toReservaResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDTO> obtenerReservasPorAnfitrion(Integer idAnfitrion) {
+        List<Reserva> reservas = reservaRepository.findByAnfitrionId(idAnfitrion);
+        return reservas.stream().map(this::toReservaResponseDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public CancelacionReservaResponseDTO cancelarReservaConPenalizacion(Integer idReserva) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'cancelarReservaConPenalizacion'");
+    } 
 }
