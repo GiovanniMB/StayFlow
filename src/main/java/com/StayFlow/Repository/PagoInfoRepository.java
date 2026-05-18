@@ -1,4 +1,4 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
 import java.util.List;
 

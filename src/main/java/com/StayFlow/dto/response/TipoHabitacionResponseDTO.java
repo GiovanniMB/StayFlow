@@ -32,12 +32,21 @@ public class TipoHabitacionResponseDTO {
     @Schema(description = "Lista de fotografías asociadas a la categoría de habitación")
     private List<FotoResponseDTO> fotos;
 
+    @Schema(description = "Total de camas sumadas", example = "2")
+    private Integer totalCamas;
+
+    @Schema(description = "Lista descriptiva de las camas", example = "[\"1 King size\", \"2 Individuales\"]")
+    private List<String> detalleCamas;
+
+    @Schema(description = "Amenidades extra que no están en la lista de servicios estándar", example = "Vista al mar, Balcón privado")
+    private String amenidadesExtra;
+
     // --- Constructor vacío ---
     public TipoHabitacionResponseDTO() {
     }
 
     // --- Constructor con parámetros (¡Actualizado con fotos!) ---
-    public TipoHabitacionResponseDTO(Integer idTipoHabitacion, Integer idPropiedad, String nombreTipo, Integer capacidad, BigDecimal precioBaseNoche, boolean tieneBanoPrivado, List<ServicioResponseDTO> servicios, List<FotoResponseDTO> fotos) {
+    public TipoHabitacionResponseDTO(Integer idTipoHabitacion, Integer idPropiedad, String nombreTipo, Integer capacidad, BigDecimal precioBaseNoche, boolean tieneBanoPrivado, List<ServicioResponseDTO> servicios, List<FotoResponseDTO> fotos, Integer totalCamas, List<String> detalleCamas, String amenidadesExtra) {
         this.idTipoHabitacion = idTipoHabitacion;
         this.idPropiedad = idPropiedad;
         this.nombreTipo = nombreTipo;
@@ -46,6 +55,9 @@ public class TipoHabitacionResponseDTO {
         this.tieneBanoPrivado = tieneBanoPrivado;
         this.servicios = servicios;
         this.fotos = fotos;
+        this.totalCamas = totalCamas;
+        this.detalleCamas = detalleCamas;
+        this.amenidadesExtra = amenidadesExtra;
     }
 
     // --- Getters y Setters ---
@@ -113,5 +125,25 @@ public class TipoHabitacionResponseDTO {
 
     public void setFotos(List<FotoResponseDTO> fotos) {
         this.fotos = fotos;
+    }
+
+    public Integer getTotalCamas() { 
+        return totalCamas; 
+    }
+    public void setTotalCamas(Integer totalCamas) { 
+        this.totalCamas = totalCamas; 
+    }
+    public List<String> getDetalleCamas() { 
+        return detalleCamas; 
+    }
+    public void setDetalleCamas(List<String> detalleCamas) { 
+        this.detalleCamas = detalleCamas; 
+    }
+
+    public String getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+    public void setAmenidadesExtra(String amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
     }
 }

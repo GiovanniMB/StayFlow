@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.Impl;
 
 import java.awt.image.BufferedImage;
 import java.math.BigDecimal;
@@ -18,8 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.StayFlow.Service.Interfaces.IHabitacionService;
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IHabitacionService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
 import com.StayFlow.dto.request.CamaRequestDTO;
 import com.StayFlow.dto.request.HabitacionRequestDTO;
 import com.StayFlow.dto.request.TipoHabitacionRequestDTO;
@@ -36,13 +36,13 @@ import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Servicio;
 import com.StayFlow.model.TipoCama;
 import com.StayFlow.model.TipoHabitacion;
-import com.StayFlow.Repository.CategoriaFotoRepository;
-import com.StayFlow.Repository.FotoHabitacionRepository;
-import com.StayFlow.Repository.HabitacionRepository;
-import com.StayFlow.Repository.PropiedadRepository;
-import com.StayFlow.Repository.ServicioRepository;
-import com.StayFlow.Repository.TipoCamaRepository;
-import com.StayFlow.Repository.TipoHabitacionRepository;
+import com.StayFlow.repository.CategoriaFotoRepository;
+import com.StayFlow.repository.FotoHabitacionRepository;
+import com.StayFlow.repository.HabitacionRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.ServicioRepository;
+import com.StayFlow.repository.TipoCamaRepository;
+import com.StayFlow.repository.TipoHabitacionRepository;
 
 @Service
 public class HabitacionServiceImpl implements IHabitacionService {
@@ -94,7 +94,15 @@ public class HabitacionServiceImpl implements IHabitacionService {
         }
         
         nuevoTipo.setPropiedad(propiedad);
-        nuevoTipo.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
+        // Asignamos solo los servicios oficiales del catálogo
+        nuevoTipo.setServicios(procesarServicios(request.getIdServicios()));
+        
+        // Empacamos los personalizados como una simple lista de texto separada por comas
+        if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
+            nuevoTipo.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
+        } else {
+            nuevoTipo.setAmenidadesExtra(null);
+        }
         
         procesarCamas(nuevoTipo, request.getCamas());
 
@@ -129,7 +137,15 @@ public class HabitacionServiceImpl implements IHabitacionService {
         
         tipoExistente.setPrecioBaseNoche(propiedad.isSeRentaPorHabitaciones() ? request.getPrecioBaseNoche() : BigDecimal.ZERO);
         tipoExistente.setTieneBanoPrivado(request.getTieneBanoPrivado());
-        tipoExistente.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
+        // Asignamos solo los servicios oficiales del catálogo actualizados
+        tipoExistente.setServicios(procesarServicios(request.getIdServicios()));
+        
+        // Actualizamos los personalizados como texto
+        if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
+            tipoExistente.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
+        } else {
+            tipoExistente.setAmenidadesExtra(null);
+        }
 
         tipoExistente.getCamas().clear();
         procesarCamas(tipoExistente, request.getCamas());
@@ -321,34 +337,14 @@ public class HabitacionServiceImpl implements IHabitacionService {
         }
     }
 
-    private List<Servicio> procesarServicios(List<Integer> idServicios, List<String> nuevosServicios) {
+    private List<Servicio> procesarServicios(List<Integer> idServicios) {
         List<Servicio> serviciosFinales = new ArrayList<>();
-
         if (idServicios != null && !idServicios.isEmpty()) {
             List<Servicio> serviciosEncontrados = servicioRepository.findAllById(idServicios);
             if (serviciosEncontrados.size() != idServicios.size()) {
                 throw new BusinessException("Uno o más servicios proporcionados no existen en el catálogo.");
             }
             serviciosFinales.addAll(serviciosEncontrados);
-        }
-
-        if (nuevosServicios != null && !nuevosServicios.isEmpty()) {
-            for (String nombreNuevo : nuevosServicios) {
-                String nombreLimpio = nombreNuevo.trim();
-                if (!nombreLimpio.isEmpty()) {
-                    Servicio servicio = servicioRepository.findByNombreServicioIgnoreCase(nombreLimpio)
-                            .orElseGet(() -> {
-                                Servicio nuevo = new Servicio();
-                                String nombreCapitalizado = nombreLimpio.substring(0, 1).toUpperCase() + nombreLimpio.substring(1).toLowerCase();
-                                nuevo.setNombreServicio(nombreCapitalizado);
-                                return servicioRepository.save(nuevo);
-                            });
-                    
-                    if (!serviciosFinales.contains(servicio)) {
-                        serviciosFinales.add(servicio);
-                    }
-                }
-            }
         }
         return serviciosFinales;
     }

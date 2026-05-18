@@ -34,18 +34,24 @@ public class PropiedadResponseDTO {
     @Schema(description = "Precio base por noche de la propiedad", example = "1200.50")
     private BigDecimal precioNoche;
     
+    @Schema(description = "Estado actual de la propiedad", example = "PUBLICADA")
+    private String estadoPropiedad;
+
     @Schema(description = "Lista de servicios generales de la propiedad (Wifi, Alberca, etc.)")
     private List<ServicioResponseDTO> servicios;
 
     @Schema(description = "Lista de fotos generales de la propiedad")
     private List<FotoResponseDTO> fotosGenerales;
 
+    @Schema(description = "Amenidades extra que no están en la lista de servicios estándar", example = "Vista al mar, Balcón privado")
+    private String amenidadesExtra;
+
     // --- Constructor vacío ---
     public PropiedadResponseDTO() {
     }
 
     // --- Constructor con parámetros actualizado ---
-    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios) {
+    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios, String amenidadesExtra) {
         this.idPropiedad = idPropiedad;
         this.idDueno = idDueno;
         this.nombreComercial = nombreComercial;
@@ -56,6 +62,7 @@ public class PropiedadResponseDTO {
         this.descripcion = descripcion;
         this.precioNoche = precioNoche; // Asignación del nuevo campo
         this.servicios = servicios;
+        this.amenidadesExtra = amenidadesExtra;
     }
 
     // --- Getters y Setters ---
@@ -147,5 +154,21 @@ public class PropiedadResponseDTO {
 
     public void setFotosGenerales(List<FotoResponseDTO> fotosGenerales) {
         this.fotosGenerales = fotosGenerales;
+    }
+
+    public String getEstadoPropiedad() {
+        return estadoPropiedad;
+    }
+
+    public void setEstadoPropiedad(String estadoPropiedad) {
+        this.estadoPropiedad = estadoPropiedad;
+    }
+
+    public String getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+
+    public void setAmenidadesExtra(String amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
     }
 }

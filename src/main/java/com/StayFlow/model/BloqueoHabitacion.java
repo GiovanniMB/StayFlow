@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Entity
 @Table(name = "bloqueohabitacion")
-@Schema(description = "Registra periodos donde una habitación no está disponible para reserva (mantenimiento, reparaciones, etc.)")
+@Schema(description = "Registra periodos donde una propiedad, categoría o habitación física no está disponible (mantenimiento, reparaciones, etc.)")
 public class BloqueoHabitacion extends AuditoriaBase {
 
     @Id
@@ -14,10 +14,26 @@ public class BloqueoHabitacion extends AuditoriaBase {
     @Schema(description = "ID único del bloqueo", example = "1")
     private Integer idBloqueoHabitacion;
 
-    @ManyToOne
-    @JoinColumn(name = "idHabitacion")
-    @Schema(description = "Habitación que se encuentra bloqueada")
+    // Niveles de bloqueo (Todos pueden ser nulos, pero al menos uno debe tener valor al guardar)
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idPropiedad", nullable = true)
+    @Schema(description = "Propiedad entera que se encuentra bloqueada")
+    private Propiedad propiedad;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idTipoHabitacion", nullable = true)
+    @Schema(description = "Categoría entera que se encuentra bloqueada (Ej. Todas las Suites)")
+    private TipoHabitacion tipoHabitacion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "idHabitacion", nullable = true)
+    @Schema(description = "Habitación física específica que se encuentra bloqueada")
     private Habitacion habitacion;
+
+    
+
+    //Datos del bloqueo
 
     @Schema(description = "Fecha de inicio del bloqueo", example = "2024-12-20", requiredMode = Schema.RequiredMode.REQUIRED)
     @Column(nullable = false)
@@ -27,57 +43,31 @@ public class BloqueoHabitacion extends AuditoriaBase {
     @Column(nullable = false)
     private LocalDate fechaFin;
 
-    @Schema(description = "Motivo del bloqueo", example = "Mantenimiento programado - reparación de aire acondicionado")
+    @Schema(description = "Motivo del bloqueo", example = "Mantenimiento programado - reparación de tubería")
     private String motivo;
 
-    // Constructores
+    //Constructores
     public BloqueoHabitacion() {}
 
-    public BloqueoHabitacion(Habitacion habitacion, LocalDate fechaInicio, LocalDate fechaFin, String motivo) {
-        this.habitacion = habitacion;
-        this.fechaInicio = fechaInicio;
-        this.fechaFin = fechaFin;
-        this.motivo = motivo;
-    }
+    //Getters y Setters
+    public Integer getIdBloqueoHabitacion() { return idBloqueoHabitacion; }
+    public void setIdBloqueoHabitacion(Integer idBloqueoHabitacion) { this.idBloqueoHabitacion = idBloqueoHabitacion; }
 
-    // Getters y Setters
-    public Integer getIdBloqueoHabitacion() {
-        return idBloqueoHabitacion;
-    }
+    public Propiedad getPropiedad() { return propiedad; }
+    public void setPropiedad(Propiedad propiedad) { this.propiedad = propiedad; }
 
-    public void setIdBloqueoHabitacion(Integer idBloqueoHabitacion) {
-        this.idBloqueoHabitacion = idBloqueoHabitacion;
-    }
+    public TipoHabitacion getTipoHabitacion() { return tipoHabitacion; }
+    public void setTipoHabitacion(TipoHabitacion tipoHabitacion) { this.tipoHabitacion = tipoHabitacion; }
 
-    public Habitacion getHabitacion() {
-        return habitacion;
-    }
+    public Habitacion getHabitacion() { return habitacion; }
+    public void setHabitacion(Habitacion habitacion) { this.habitacion = habitacion; }
 
-    public void setHabitacion(Habitacion habitacion) {
-        this.habitacion = habitacion;
-    }
+    public LocalDate getFechaInicio() { return fechaInicio; }
+    public void setFechaInicio(LocalDate fechaInicio) { this.fechaInicio = fechaInicio; }
 
-    public LocalDate getFechaInicio() {
-        return fechaInicio;
-    }
+    public LocalDate getFechaFin() { return fechaFin; }
+    public void setFechaFin(LocalDate fechaFin) { this.fechaFin = fechaFin; }
 
-    public void setFechaInicio(LocalDate fechaInicio) {
-        this.fechaInicio = fechaInicio;
-    }
-
-    public LocalDate getFechaFin() {
-        return fechaFin;
-    }
-
-    public void setFechaFin(LocalDate fechaFin) {
-        this.fechaFin = fechaFin;
-    }
-
-    public String getMotivo() {
-        return motivo;
-    }
-
-    public void setMotivo(String motivo) {
-        this.motivo = motivo;
-    }
+    public String getMotivo() { return motivo; }
+    public void setMotivo(String motivo) { this.motivo = motivo; }
 }

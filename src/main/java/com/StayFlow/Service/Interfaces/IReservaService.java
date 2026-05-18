@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,4 +25,6 @@ public interface IReservaService {
     ReservaResponseDTO registrarCheckOut(Integer idReserva);
 
     List<ReservaResponseDTO> obtenerReservasPorHabitacion(Integer idHabitacion);
+
+    List<ReservaResponseDTO> obtenerReservasPorPropiedad(Integer idPropiedad);
 }

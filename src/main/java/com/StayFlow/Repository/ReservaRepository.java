@@ -1,4 +1,4 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -28,4 +28,6 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
 
     // Busca todas las reservas asociadas a una habitación específica
     List<Reserva> findByHabitacion_IdHabitacion(Integer idHabitacion);
+    // Busca todas las reservas asociadas a una propiedad específica (a través de la relación con habitación)
+    List<Reserva> findByHabitacion_TipoHabitacion_Propiedad_IdPropiedad(Integer idPropiedad);
 }

@@ -14,13 +14,15 @@ public class ReservaResponseDTO {
     private LocalDate fechaSalida;
     private BigDecimal montoTotal;
     private String estadoReserva;
+    
+    // UI Fields (Para renderizado de tarjetas en frontend)
+    private Integer idPropiedad;
+    private String nombrePropiedad;
+    private String imagenPortada;
 
-    // Constructor vacío
-    public ReservaResponseDTO() {
-    }
+    public ReservaResponseDTO() {}
 
-    // Constructor completo
-    public ReservaResponseDTO(Integer idReserva, Integer idHabitacion, String numeroHabitacion, Integer idCliente, String nombreCliente, LocalDate fechaEntrada, LocalDate fechaSalida, BigDecimal montoTotal, String estadoReserva) {
+    public ReservaResponseDTO(Integer idReserva, Integer idHabitacion, String numeroHabitacion, Integer idCliente, String nombreCliente, LocalDate fechaEntrada, LocalDate fechaSalida, BigDecimal montoTotal, String estadoReserva, Integer idPropiedad, String nombrePropiedad, String imagenPortada) {
         this.idReserva = idReserva;
         this.idHabitacion = idHabitacion;
         this.numeroHabitacion = numeroHabitacion;
@@ -30,79 +32,46 @@ public class ReservaResponseDTO {
         this.fechaSalida = fechaSalida;
         this.montoTotal = montoTotal;
         this.estadoReserva = estadoReserva;
+        this.idPropiedad = idPropiedad;
+        this.nombrePropiedad = nombrePropiedad;
+        this.imagenPortada = imagenPortada;
     }
 
-    // --- TODOS LOS GETTERS Y SETTERS ---
+    // Getters y Setters
 
-    public Integer getIdReserva() {
-        return idReserva;
-    }
+    public Integer getIdReserva() { return idReserva; }
+    public void setIdReserva(Integer idReserva) { this.idReserva = idReserva; }
 
-    public void setIdReserva(Integer idReserva) {
-        this.idReserva = idReserva;
-    }
+    public Integer getIdHabitacion() { return idHabitacion; }
+    public void setIdHabitacion(Integer idHabitacion) { this.idHabitacion = idHabitacion; }
 
-    public Integer getIdHabitacion() {
-        return idHabitacion;
-    }
+    public String getNumeroHabitacion() { return numeroHabitacion; }
+    public void setNumeroHabitacion(String numeroHabitacion) { this.numeroHabitacion = numeroHabitacion; }
 
-    public void setIdHabitacion(Integer idHabitacion) {
-        this.idHabitacion = idHabitacion;
-    }
+    public Integer getIdCliente() { return idCliente; }
+    public void setIdCliente(Integer idCliente) { this.idCliente = idCliente; }
 
-    public String getNumeroHabitacion() {
-        return numeroHabitacion;
-    }
+    public String getNombreCliente() { return nombreCliente; }
+    public void setNombreCliente(String nombreCliente) { this.nombreCliente = nombreCliente; }
 
-    public void setNumeroHabitacion(String numeroHabitacion) {
-        this.numeroHabitacion = numeroHabitacion;
-    }
+    public LocalDate getFechaEntrada() { return fechaEntrada; }
+    public void setFechaEntrada(LocalDate fechaEntrada) { this.fechaEntrada = fechaEntrada; }
 
-    public Integer getIdCliente() {
-        return idCliente;
-    }
+    public LocalDate getFechaSalida() { return fechaSalida; }
+    public void setFechaSalida(LocalDate fechaSalida) { this.fechaSalida = fechaSalida; }
 
-    public void setIdCliente(Integer idCliente) {
-        this.idCliente = idCliente;
-    }
+    public BigDecimal getMontoTotal() { return montoTotal; }
+    public void setMontoTotal(BigDecimal montoTotal) { this.montoTotal = montoTotal; }
 
-    public String getNombreCliente() {
-        return nombreCliente;
-    }
+    public String getEstadoReserva() { return estadoReserva; }
+    public void setEstadoReserva(String estadoReserva) { this.estadoReserva = estadoReserva; }
 
-    public void setNombreCliente(String nombreCliente) {
-        this.nombreCliente = nombreCliente;
-    }
+    public Integer getIdPropiedad() { return idPropiedad; }
+    public void setIdPropiedad(Integer idPropiedad) { this.idPropiedad = idPropiedad; }
 
-    public LocalDate getFechaEntrada() {
-        return fechaEntrada;
-    }
+    public String getNombrePropiedad() { return nombrePropiedad; }
+    public void setNombrePropiedad(String nombrePropiedad) { this.nombrePropiedad = nombrePropiedad; }
 
-    public void setFechaEntrada(LocalDate fechaEntrada) {
-        this.fechaEntrada = fechaEntrada;
-    }
-
-    public LocalDate getFechaSalida() {
-        return fechaSalida;
-    }
-
-    public void setFechaSalida(LocalDate fechaSalida) {
-        this.fechaSalida = fechaSalida;
-    }
-
-    public BigDecimal getMontoTotal() {
-        return montoTotal;
-    }
-
-    public void setMontoTotal(BigDecimal montoTotal) {
-        this.montoTotal = montoTotal;
-    }
-
-    public String getEstadoReserva() {
-        return estadoReserva;
-    }
-
-    public void setEstadoReserva(String estadoReserva) {
-        this.estadoReserva = estadoReserva;
-    }
+    public String getImagenPortada() { return imagenPortada; }
+    public void setImagenPortada(String imagenPortada) { this.imagenPortada = imagenPortada; }
 }

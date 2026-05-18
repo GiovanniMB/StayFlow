@@ -3,7 +3,7 @@ package com.StayFlow.controller;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
-import com.StayFlow.Service.Interfaces.IPropiedadService;
+import com.StayFlow.service.interfaces.IPropiedadService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -56,6 +56,17 @@ public class PropiedadController {
         return ResponseEntity.ok(ApiResponseDTO.success("Propiedades recuperadas exitosamente", propiedades));
     }
 
+    // Endpoint para obtener propiedades por ID de anfitrión
+    @GetMapping("/anfitrion/{idAnfitrion}")
+    @Operation(summary = "Obtener propiedades de un anfitrión específico")
+    @ApiResponse(responseCode = "200", description = "Propiedades del anfitrión recuperadas exitosamente")
+    public ResponseEntity<ApiResponseDTO<List<PropiedadResponseDTO>>> obtenerPropiedadesPorAnfitrion(
+            @Parameter(description = "ID del anfitrión", example = "1") @PathVariable Integer idAnfitrion) {
+        
+        List<PropiedadResponseDTO> propiedades = propiedadService.obtenerPropiedadesPorAnfitrion(idAnfitrion);
+        return ResponseEntity.ok(ApiResponseDTO.success("Propiedades del anfitrión recuperadas", propiedades));
+    }
+
     // Endpoint para obtener una propiedad por su ID
     @GetMapping("/{id}")
     @Operation(summary = "Obtener una propiedad por su ID")
@@ -103,8 +114,7 @@ public class PropiedadController {
     @Operation(summary = "Obtener el catálogo público (Escaparate para huéspedes)")
     @ApiResponse(responseCode = "200", description = "Catálogo de propiedades recuperado exitosamente")
     public ResponseEntity<ApiResponseDTO<List<PropiedadResponseDTO>>> obtenerCatalogoPublico() {
-        // Por ahora reutilizamos tu lógica existente que trae las propiedades activas
-        List<PropiedadResponseDTO> catalogo = propiedadService.obtenerTodas();
+        List<PropiedadResponseDTO> catalogo = propiedadService.obtenerCatalogoPublico();
         return ResponseEntity.ok(ApiResponseDTO.success("Catálogo recuperado exitosamente", catalogo));
     }
 

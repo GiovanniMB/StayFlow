@@ -6,6 +6,8 @@ import java.util.List;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -72,6 +74,20 @@ public class Propiedad extends AuditoriaBase {
 
     @OneToMany(mappedBy = "propiedad")
     private List<TipoHabitacion> tiposHabitacion;
+
+    public enum EstadoPropiedad {
+        BORRADOR,   // Incompleta (sin fotos/cuartos), no visible al público
+        PUBLICADA,  // Lista y visible en el catálogo
+        OCULTA      // Pausada manualmente por el anfitrión
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_propiedad", nullable = true) 
+    private EstadoPropiedad estadoPropiedad = EstadoPropiedad.PUBLICADA; 
+
+    @Schema(description = "Amenidades extra personalizadas escritas por el usuario")
+    @Column(columnDefinition = "TEXT")
+    private String amenidadesExtra;
 
     // Constructores
     public Propiedad() {}
@@ -179,5 +195,20 @@ public class Propiedad extends AuditoriaBase {
 
     public void setPrecioNoche(BigDecimal precioNoche) {
         this.precioNoche = precioNoche;
+    }
+
+    public EstadoPropiedad getEstadoPropiedad() {
+        return estadoPropiedad;
+    }
+
+    public void setEstadoPropiedad(EstadoPropiedad estadoPropiedad) {
+        this.estadoPropiedad = estadoPropiedad;
+    }
+
+    public String getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+    public void setAmenidadesExtra(String amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
     }
 }

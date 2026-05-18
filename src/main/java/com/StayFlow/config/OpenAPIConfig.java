@@ -28,7 +28,7 @@ public class OpenAPIConfig {
                     .name("StayFlow Team")
                     .email("stayflow271@gmail.com")))
             .servers(List.of(
-                new Server().url("http://localhost:8081").description("Servidor de desarrollo")
+                new Server().url("http://localhost:8080").description("Servidor de desarrollo")
             ))
             .addSecurityItem(new SecurityRequirement().addList("BearerAuth"))
             .components(new Components()

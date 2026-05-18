@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 
 import com.StayFlow.model.LogSistema.Accion;
 

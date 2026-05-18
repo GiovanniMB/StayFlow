@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.Impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -9,8 +9,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.Service.Interfaces.ILogSistemaService;
-import com.StayFlow.Service.Interfaces.IPropiedadService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IPropiedadService;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
 import com.StayFlow.exception.BusinessException;
@@ -23,12 +23,12 @@ import com.StayFlow.model.Propiedad;
 import com.StayFlow.model.Rol;
 import com.StayFlow.model.Servicio;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.ColoniaRepository;
-import com.StayFlow.Repository.DireccionRepository;
-import com.StayFlow.Repository.PropiedadRepository;
-import com.StayFlow.Repository.RolRepository;
-import com.StayFlow.Repository.ServicioRepository;
-import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.repository.ColoniaRepository;
+import com.StayFlow.repository.DireccionRepository;
+import com.StayFlow.repository.PropiedadRepository;
+import com.StayFlow.repository.RolRepository;
+import com.StayFlow.repository.ServicioRepository;
+import com.StayFlow.repository.UsuarioRepository;
 
 @Service
 public class PropiedadServiceImpl implements IPropiedadService {
@@ -77,8 +77,15 @@ public class PropiedadServiceImpl implements IPropiedadService {
                     .orElseThrow(() -> new ResourceNotFoundException("Colonia", "id", idColonia));
             
             propiedad.getDireccion().setColonia(colonia);
-            propiedad.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
-            
+            // Asignamos solo los servicios oficiales del catálogo
+        propiedad.setServicios(procesarServicios(request.getIdServicios()));
+        
+        // Empacamos los personalizados como una simple lista de texto separada por comas
+        if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
+            propiedad.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
+        } else {
+            propiedad.setAmenidadesExtra(null);
+        }
             Direccion direccionGuardada = direccionRepository.save(propiedad.getDireccion());
             propiedad.setDireccion(direccionGuardada);
         }
@@ -159,7 +166,15 @@ public class PropiedadServiceImpl implements IPropiedadService {
             }
         }
 
-       propiedadExistente.setServicios(procesarServicios(request.getIdServicios(), request.getNuevosServicios()));
+       // Asignamos solo los servicios oficiales del catálogo
+        propiedadExistente.setServicios(procesarServicios(request.getIdServicios()));
+        
+        // Empacamos los personalizados como una simple lista de texto separada por comas
+        if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
+            propiedadExistente.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
+        } else {
+            propiedadExistente.setAmenidadesExtra(null);
+        }
 
         Propiedad propiedadActualizada = propiedadRepository.save(propiedadExistente);
         
@@ -189,34 +204,14 @@ public class PropiedadServiceImpl implements IPropiedadService {
                 .orElseThrow(() -> new ResourceNotFoundException("Propiedad", "idPropiedad", idPropiedad));
     }
 
-    private List<Servicio> procesarServicios(List<Integer> idServicios, List<String> nuevosServicios) {
+    private List<Servicio> procesarServicios(List<Integer> idServicios) {
         List<Servicio> serviciosFinales = new ArrayList<>();
-
         if (idServicios != null && !idServicios.isEmpty()) {
             List<Servicio> serviciosEncontrados = servicioRepository.findAllById(idServicios);
             if (serviciosEncontrados.size() != idServicios.size()) {
                 throw new BusinessException("Uno o más servicios proporcionados no existen en el catálogo.");
             }
             serviciosFinales.addAll(serviciosEncontrados);
-        }
-
-        if (nuevosServicios != null && !nuevosServicios.isEmpty()) {
-            for (String nombreNuevo : nuevosServicios) {
-                String nombreLimpio = nombreNuevo.trim();
-                if (!nombreLimpio.isEmpty()) {
-                    Servicio servicio = servicioRepository.findByNombreServicioIgnoreCase(nombreLimpio)
-                            .orElseGet(() -> {
-                                Servicio nuevo = new Servicio();
-                                String nombreCapitalizado = nombreLimpio.substring(0, 1).toUpperCase() + nombreLimpio.substring(1).toLowerCase();
-                                nuevo.setNombreServicio(nombreCapitalizado);
-                                return servicioRepository.save(nuevo);
-                            });
-                    
-                    if (!serviciosFinales.contains(servicio)) {
-                        serviciosFinales.add(servicio);
-                    }
-                }
-            }
         }
         return serviciosFinales;
     }
@@ -243,4 +238,21 @@ public class PropiedadServiceImpl implements IPropiedadService {
         // 3. Convertir la lista de Entidades a DTOs para el Frontend
         return propiedadMapper.toResponseDTOList(propiedadesDisponibles);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PropiedadResponseDTO> obtenerPropiedadesPorAnfitrion(Integer idAnfitrion) {
+        List<Propiedad> propiedades = propiedadRepository.findByDuenoIdUsuarioAndEstaEliminadoFalse(idAnfitrion);
+        return propiedadMapper.toResponseDTOList(propiedades);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<PropiedadResponseDTO> obtenerCatalogoPublico() {
+        // Llamada al método del repositorio que trae solo propiedades con fotos y habitaciones, sin importar fechas
+        List<Propiedad> propiedades = propiedadRepository.findPropiedadesPublicasCompletas();
+        return propiedadMapper.toResponseDTOList(propiedades);
+    }
+
+    
 }

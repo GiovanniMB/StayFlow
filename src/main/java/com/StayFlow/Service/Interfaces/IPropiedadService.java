@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Interfaces;
+package com.StayFlow.service.interfaces;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -11,6 +11,8 @@ public interface IPropiedadService {
     PropiedadResponseDTO obtenerPorId(Integer idPropiedad);
     PropiedadResponseDTO actualizarPropiedad(Integer idPropiedad, PropiedadRequestDTO request);
     void eliminarPropiedad(Integer idPropiedad);
-    // Nuevo método para buscar disponibilidad
+    //método para buscar disponibilidad
     List<PropiedadResponseDTO> obtenerPropiedadesDisponibles(LocalDate fechaEntrada, LocalDate fechaSalida);
+    List<PropiedadResponseDTO> obtenerPropiedadesPorAnfitrion(Integer idAnfitrion);
+    List<PropiedadResponseDTO> obtenerCatalogoPublico();
 }

@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.Impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -8,23 +8,27 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.Service.Interfaces.IReservaService;
+import com.StayFlow.service.interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IReservaService;
 import com.StayFlow.dto.request.ReservaRequestDTO;
 import com.StayFlow.dto.response.DisponibilidadResponseDTO;
 import com.StayFlow.dto.response.ReservaResponseDTO;
 import com.StayFlow.exception.BusinessException;
 import com.StayFlow.exception.ResourceNotFoundException;
+import com.StayFlow.model.BloqueoHabitacion;
 import com.StayFlow.model.Habitacion;
 import com.StayFlow.model.PrecioTemporada;
 import com.StayFlow.model.Reserva;
 import com.StayFlow.model.Reserva.EstadoReserva;
 import com.StayFlow.model.TipoHabitacion;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.BloqueoHabitacionRepository;
-import com.StayFlow.Repository.HabitacionRepository;
-import com.StayFlow.Repository.PrecioTemporadaRepository;
-import com.StayFlow.Repository.ReservaRepository;
-import com.StayFlow.Repository.UsuarioRepository;
+import com.StayFlow.repository.BloqueoHabitacionRepository;
+import com.StayFlow.repository.HabitacionRepository;
+import com.StayFlow.repository.PrecioTemporadaRepository;
+import com.StayFlow.repository.ReservaRepository;
+import com.StayFlow.repository.UsuarioRepository;
+import com.StayFlow.mapper.ReservaMapper;
+
 
 @Service
 public class ReservaServiceImpl implements IReservaService {
@@ -34,17 +38,23 @@ public class ReservaServiceImpl implements IReservaService {
     private final PrecioTemporadaRepository precioTemporadaRepository;
     private final HabitacionRepository habitacionRepository;
     private final UsuarioRepository usuarioRepository;
+    private final ILogSistemaService logSistemaService;
+    private final ReservaMapper reservaMapper;          
 
     public ReservaServiceImpl(ReservaRepository reservaRepository,
-                              BloqueoHabitacionRepository bloqueoHabitacionRepository,
-                              PrecioTemporadaRepository precioTemporadaRepository,
                               HabitacionRepository habitacionRepository,
-                              UsuarioRepository usuarioRepository) {
+                              PrecioTemporadaRepository precioTemporadaRepository,
+                              BloqueoHabitacionRepository bloqueoHabitacionRepository,
+                              UsuarioRepository usuarioRepository,
+                              ILogSistemaService logSistemaService, 
+                              ReservaMapper reservaMapper) {        
         this.reservaRepository = reservaRepository;
-        this.bloqueoHabitacionRepository = bloqueoHabitacionRepository;
-        this.precioTemporadaRepository = precioTemporadaRepository;
         this.habitacionRepository = habitacionRepository;
+        this.precioTemporadaRepository = precioTemporadaRepository;
+        this.bloqueoHabitacionRepository = bloqueoHabitacionRepository;
         this.usuarioRepository = usuarioRepository;
+        this.logSistemaService = logSistemaService;
+        this.reservaMapper = reservaMapper;         
     }
 
     @Override
@@ -77,7 +87,14 @@ public class ReservaServiceImpl implements IReservaService {
         reserva.setMontoTotal(montoTotal);
         reserva.setEstadoReserva(EstadoReserva.pendiente);
 
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        // Guarda en la Base de Datos
+        Reserva reservaGuardada = reservaRepository.save(reserva);
+
+        //Marca la habitación como reservada (opcional, dependiendo de la lógica de negocio)
+        logSistemaService.registrarLog("reserva", reservaGuardada.getIdReserva(), com.StayFlow.model.LogSistema.Accion.INSERT);
+
+        // Devuelve la respuesta usando el mapper
+        return reservaMapper.toResponseDTO(reservaGuardada);
     }
 
     @Override
@@ -96,7 +113,7 @@ public class ReservaServiceImpl implements IReservaService {
         habitacion.setEstado(Habitacion.EstadoHabitacion.ocupada);
 
         habitacionRepository.save(habitacion);
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        return reservaMapper.toResponseDTO(reservaRepository.save(reserva));
     }
 
     @Override
@@ -115,7 +132,7 @@ public class ReservaServiceImpl implements IReservaService {
         habitacion.setEstado(Habitacion.EstadoHabitacion.disponible);
 
         habitacionRepository.save(habitacion);
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        return reservaMapper.toResponseDTO(reservaRepository.save(reserva));
     }
 
     @Override
@@ -123,7 +140,7 @@ public class ReservaServiceImpl implements IReservaService {
     public ReservaResponseDTO obtenerReservaPorId(Integer idReserva) {
         Reserva reserva = reservaRepository.findById(idReserva)
                 .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada con id: " + idReserva));
-        return toReservaResponseDTO(reserva);
+        return reservaMapper.toResponseDTO(reserva);
     }
 
     @Override
@@ -133,7 +150,7 @@ public class ReservaServiceImpl implements IReservaService {
             throw new ResourceNotFoundException("Cliente no encontrado.");
         }
         return reservaRepository.findByCliente_IdUsuario(idCliente).stream()
-                .map(this::toReservaResponseDTO)
+                .map(reservaMapper::toResponseDTO)
                 .collect(Collectors.toList());
     }
 
@@ -148,7 +165,7 @@ public class ReservaServiceImpl implements IReservaService {
         }
 
         reserva.setEstadoReserva(EstadoReserva.cancelada);
-        return toReservaResponseDTO(reservaRepository.save(reserva));
+        return reservaMapper.toResponseDTO(reservaRepository.save(reserva));
     }
 
     @Override
@@ -166,7 +183,7 @@ public class ReservaServiceImpl implements IReservaService {
         }
     }
 
-    // --- MÉTODOS AUXILIARES ---
+    //Metodos auxiliares privados para validaciones, cálculos y conversiones
 
     private void validarFechas(LocalDate fechaEntrada, LocalDate fechaSalida) {
         if (fechaEntrada == null || fechaSalida == null) throw new BusinessException("Fechas inválidas.");
@@ -175,11 +192,27 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     private void validarDisponibilidadInterna(Integer idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
-        // REGLA: Bloqueos de Habitación
-        if (!bloqueoHabitacionRepository.findByHabitacion_IdHabitacionAndFechaInicioLessThanAndFechaFinGreaterThan(idHabitacion, fechaSalida, fechaEntrada).isEmpty()) {
-            throw new BusinessException("La habitación tiene un bloqueo activo en esas fechas.");
+        // 1. Extraemos la habitación para conocer su jerarquía (a qué Categoría y Propiedad pertenece)
+        Habitacion habitacion = habitacionRepository.findById(idHabitacion)
+                .orElseThrow(() -> new ResourceNotFoundException("Habitación no encontrada."));
+
+        Integer idTipo = habitacion.getTipoHabitacion().getIdTipoHabitacion();
+        Integer idPropiedad = habitacion.getPropiedad().getIdPropiedad();
+
+        // 2. GR agrego esta nueva regla: Bloqueos de Mantenimiento en 3 Niveles
+        List<BloqueoHabitacion> bloqueosConflictivos = bloqueoHabitacionRepository.findBloqueosConflictivos(
+                idHabitacion, 
+                idTipo, 
+                idPropiedad, 
+                fechaEntrada, 
+                fechaSalida
+        );
+
+        if (!bloqueosConflictivos.isEmpty()) {
+            throw new BusinessException("No es posible reservar. El alojamiento, categoría o cuarto físico se encuentra en mantenimiento durante esas fechas.");
         }
-        // Conflictos con otras reservas
+
+        // 3. Conflictos con otras reservas (Solo busca activas, no canceladas)
         if (!reservaRepository.findByHabitacion_IdHabitacionAndEstadoReservaNotAndFechaEntradaLessThanAndFechaSalidaGreaterThan(idHabitacion, EstadoReserva.cancelada, fechaSalida, fechaEntrada).isEmpty()) {
             throw new BusinessException("Ya existe una reserva para esas fechas.");
         }
@@ -200,34 +233,22 @@ public class ReservaServiceImpl implements IReservaService {
         return !precios.isEmpty() ? precios.get(0).getPrecioEspecial() : tipo.getPrecioBaseNoche();
     }
 
-    private ReservaResponseDTO toReservaResponseDTO(Reserva reserva) {
-        ReservaResponseDTO dto = new ReservaResponseDTO();
-        dto.setIdReserva(reserva.getIdReserva());
-        if (reserva.getHabitacion() != null) {
-            dto.setIdHabitacion(reserva.getHabitacion().getIdHabitacion());
-            dto.setNumeroHabitacion(reserva.getHabitacion().getNumeroHabitacion());
-        }
-        if (reserva.getCliente() != null) {
-            dto.setIdCliente(reserva.getCliente().getIdUsuario());
-            dto.setNombreCliente(reserva.getCliente().getNombre() + " " + reserva.getCliente().getApellidoPaterno());
-        }
-        dto.setFechaEntrada(reserva.getFechaEntrada());
-        dto.setFechaSalida(reserva.getFechaSalida());
-        dto.setMontoTotal(reserva.getMontoTotal());
-        if (reserva.getEstadoReserva() != null) dto.setEstadoReserva(reserva.getEstadoReserva().name());
-        return dto;
-    }
 
     @Override
     @Transactional(readOnly = true)
     public List<ReservaResponseDTO> obtenerReservasPorHabitacion(Integer idHabitacion) {
-        // Obtenemos las reservas usando el repositorio
+        // Obtiene las reservas usando el repositorio
         List<Reserva> reservas = reservaRepository.findByHabitacion_IdHabitacion(idHabitacion);
         
-        // Filtramos las que no estén canceladas y convertimos a DTO
-        return reservas.stream()
-                .filter(r -> r.getEstadoReserva() != EstadoReserva.cancelada) 
-                .map(this::toReservaResponseDTO) 
-                .collect(Collectors.toList());
+        // Convierte la lista de entidades a una lista de DTOs usando el mapper
+        return reservaMapper.toResponseDTOList(reservas);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<ReservaResponseDTO> obtenerReservasPorPropiedad(Integer idPropiedad) {
+        List<Reserva> reservas = reservaRepository.findByHabitacion_TipoHabitacion_Propiedad_IdPropiedad(idPropiedad);
+        return reservaMapper.toResponseDTOList(reservas);
+    }
+    
 }

@@ -1,4 +1,4 @@
-package com.StayFlow.Service.Impl;
+package com.StayFlow.service.Impl;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -20,13 +20,13 @@ import com.StayFlow.model.PagoInfo;
 import com.StayFlow.model.PagoToken;
 import com.StayFlow.model.Reserva;
 import com.StayFlow.model.Usuario;
-import com.StayFlow.Repository.EstadoPagoRepository;
-import com.StayFlow.Repository.MetodoPagoRepository;
-import com.StayFlow.Repository.PagoInfoRepository;
-import com.StayFlow.Repository.PagoRepository;
-import com.StayFlow.Repository.ReservaRepository;
-import com.StayFlow.Service.Interfaces.IPagoService;
-import com.StayFlow.Service.Interfaces.IPagoTokenService;
+import com.StayFlow.repository.EstadoPagoRepository;
+import com.StayFlow.repository.MetodoPagoRepository;
+import com.StayFlow.repository.PagoInfoRepository;
+import com.StayFlow.repository.PagoRepository;
+import com.StayFlow.repository.ReservaRepository;
+import com.StayFlow.service.interfaces.IPagoService;
+import com.StayFlow.service.interfaces.IPagoTokenService;
 
 @Service
 public class PagoServiceImpl implements IPagoService {
@@ -50,7 +50,7 @@ public class PagoServiceImpl implements IPagoService {
     private IPagoTokenService pagoTokenService;
 
     @Autowired
-    private com.StayFlow.Service.EmailService emailService;
+    private com.StayFlow.service.EmailService emailService;
 
     
 

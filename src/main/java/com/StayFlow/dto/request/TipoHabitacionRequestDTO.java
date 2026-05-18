@@ -1,8 +1,10 @@
 package com.StayFlow.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
@@ -36,7 +38,9 @@ public class TipoHabitacionRequestDTO {
     @Schema(description = "Lista de nombres de nuevos servicios personalizados", example = "[\"Desayuno vegano\", \"Cuna para bebé\"]")
     private List<String> nuevosServicios;
 
-    @Schema(description = "Lista de camas configuradas para este tipo de habitación")
+    @NotEmpty(message = "La categoría debe tener al menos una cama configurada")
+    @Valid
+    @Schema(description = "Lista de camas que conforman esta categoría")
     private List<CamaRequestDTO> camas;
 
     // --- Constructor vacío ---

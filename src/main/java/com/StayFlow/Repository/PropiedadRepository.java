@@ -1,4 +1,4 @@
-package com.StayFlow.Repository;
+package com.StayFlow.repository;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,13 +24,14 @@ public interface PropiedadRepository extends JpaRepository<Propiedad, Integer> {
     // Busca una propiedad por su ID, asegurándose de que no esté eliminada
     Optional<Propiedad> findByIdPropiedadAndEstaEliminadoFalse(Integer idPropiedad);
     
-    // List<Propiedad> findByDuenoIdUsuarioAndEstaEliminadoFalse(Integer idDueno);
+    List<Propiedad> findByDuenoIdUsuarioAndEstaEliminadoFalse(Integer idDueno);
 
     @Query("SELECT DISTINCT p FROM Propiedad p " +
            "JOIN p.tiposHabitacion th " + 
            "JOIN th.habitaciones h " +    
            "WHERE p.estaEliminado = false " +
            "AND h.estaEliminado = false " +
+           "AND EXISTS (SELECT f FROM FotoHabitacion f WHERE f.propiedad = p AND f.estaEliminado = false) " + 
            "AND NOT EXISTS (" +
            "   SELECT r FROM Reserva r " +
            "   WHERE r.habitacion = h " +
@@ -42,4 +43,13 @@ public interface PropiedadRepository extends JpaRepository<Propiedad, Integer> {
             @Param("fechaEntrada") LocalDate fechaEntrada, 
             @Param("fechaSalida") LocalDate fechaSalida
     );
+
+    // Consulta para la página principal pública (Sin fechas, pero que exige fotos y cuartos)
+    @Query("SELECT DISTINCT p FROM Propiedad p " +
+           "JOIN p.tiposHabitacion th " + 
+           "JOIN th.habitaciones h " +    
+           "WHERE p.estaEliminado = false " +
+           "AND h.estaEliminado = false " +
+           "AND EXISTS (SELECT f FROM FotoHabitacion f WHERE f.propiedad = p AND f.estaEliminado = false)")
+    List<Propiedad> findPropiedadesPublicasCompletas();
 }

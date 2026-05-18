@@ -28,6 +28,7 @@ public class SecurityConstants {
             "/api/reservas",
             "/api/reservas/**",
             "/api/clientes/*/reservas",
-            "/api/habitaciones/*/disponibilidad"
+            "/api/habitaciones/*/disponibilidad",
+            
     };
 }

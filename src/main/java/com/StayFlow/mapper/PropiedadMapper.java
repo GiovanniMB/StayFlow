@@ -58,15 +58,19 @@ public class PropiedadMapper {
         response.setContadorReservas(propiedad.getContadorReservas());
         response.setDescripcion(propiedad.getDescripcion());
         response.setPrecioNoche(propiedad.getPrecioNoche());
-
+        // Agregar estado de propiedad al DTO de respuesta
+        if (propiedad.getEstadoPropiedad() != null) {
+            response.setEstadoPropiedad(propiedad.getEstadoPropiedad().name());
+        }
+        // Mapear ID del dueño si existe
         if (propiedad.getDueno() != null) {
             response.setIdDueno(propiedad.getDueno().getIdUsuario());
         }
-
+        // Mapear dirección si existe
         if (propiedad.getDireccion() != null) {
             response.setDireccion(toDireccionResponseDTO(propiedad.getDireccion()));
         }
-
+        // Mapear servicios y fotos si existen
         if (propiedad.getServicios() != null && !propiedad.getServicios().isEmpty()) {
             response.setServicios(propiedad.getServicios().stream()
                 .map(this::toServicioResponseDTO)
@@ -79,7 +83,23 @@ public class PropiedadMapper {
                 .map(this::toFotoResponseDTO)
                 .collect(Collectors.toList()));
         }
-                
+
+       response.setAmenidadesExtra(propiedad.getAmenidadesExtra());
+
+        // 🔥 REGLA ESTRICTA DE BORRADOR PARA EL ANFITRIÓN 🔥
+        boolean tieneFotos = propiedad.getFotos() != null && !propiedad.getFotos().isEmpty();
+        boolean tieneHabitaciones = propiedad.getTiposHabitacion() != null && !propiedad.getTiposHabitacion().isEmpty();
+
+        // Si el estado original de BD viene nulo, lo aseguramos
+        if (propiedad.getEstadoPropiedad() != null) {
+            response.setEstadoPropiedad(propiedad.getEstadoPropiedad().name());
+        }
+
+        // Si falta foto, o si es hotel y no le han configurado cuartos, lo forzamos visualmente a BORRADOR
+        if (!tieneFotos || (propiedad.isSeRentaPorHabitaciones() && !tieneHabitaciones)) {
+            response.setEstadoPropiedad("BORRADOR"); 
+        }
+
         return response;
     }
 

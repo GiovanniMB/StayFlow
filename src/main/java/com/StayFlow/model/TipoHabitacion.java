@@ -68,6 +68,11 @@ public class TipoHabitacion extends AuditoriaBase {
     @OneToMany(mappedBy = "tipoHabitacion")
     private List<Habitacion> habitaciones;
 
+    @Schema(description = "Amenidades extra personalizadas escritas por el usuario")
+    @Column(columnDefinition = "TEXT")
+    private String amenidadesExtra;
+
+
     // Constructores
     public TipoHabitacion() {}
 
@@ -173,5 +178,12 @@ public class TipoHabitacion extends AuditoriaBase {
         return camas.stream()
             .mapToInt(TipoHabitacionCama::getCantidad)
             .sum();
+    }
+
+    public String getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+    public void setAmenidadesExtra(String amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
     }
 }
