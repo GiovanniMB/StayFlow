@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,62 +29,54 @@ import com.StayFlow.service.interfaces.IPagoTokenService;
 @Service
 public class PagoServiceImpl implements IPagoService {
 
-    @Autowired
-    private PagoRepository pagoRepository;
-    
-    @Autowired
-    private PagoInfoRepository pagoInfoRepository;
-    
-    @Autowired
-    private EstadoPagoRepository estadoPagoRepository;
-    
-    @Autowired
-    private MetodoPagoRepository metodoPagoRepository;
-    
-    @Autowired
-    private ReservaRepository reservaRepository;
-    
-    @Autowired
-    private IPagoTokenService pagoTokenService;
+    private final PagoRepository pagoRepository;
+    private final PagoInfoRepository pagoInfoRepository;
+    private final EstadoPagoRepository estadoPagoRepository;
+    private final MetodoPagoRepository metodoPagoRepository;
+    private final ReservaRepository reservaRepository;
+    private final IPagoTokenService pagoTokenService;
+    private final com.StayFlow.service.EmailService emailService;
 
-    @Autowired
-    private com.StayFlow.service.EmailService emailService;
-
-    
+    public PagoServiceImpl(PagoRepository pagoRepository,
+                           PagoInfoRepository pagoInfoRepository,
+                           EstadoPagoRepository estadoPagoRepository,
+                           MetodoPagoRepository metodoPagoRepository,
+                           ReservaRepository reservaRepository,
+                           IPagoTokenService pagoTokenService,
+                           com.StayFlow.service.EmailService emailService) {
+        this.pagoRepository = pagoRepository;
+        this.pagoInfoRepository = pagoInfoRepository;
+        this.estadoPagoRepository = estadoPagoRepository;
+        this.metodoPagoRepository = metodoPagoRepository;
+        this.reservaRepository = reservaRepository;
+        this.pagoTokenService = pagoTokenService;
+        this.emailService = emailService;
+    }
 
     @Override
     @Transactional
     public PagoResponseDTO procesarPago(PagoRequestDTO request, Integer idUsuario) {
-        // 1. Validar reserva
         Reserva reserva = reservaRepository.findById(request.getIdReserva())
             .orElseThrow(() -> new PaymentException("Reserva no encontrada"));
         
-        // Validar que el usuario sea el dueño de la reserva
         if (!reserva.getCliente().getIdUsuario().equals(idUsuario)) {
             throw new PaymentException("No autorizado para pagar esta reserva");
         }
         
-        // Validar que la reserva no esté cancelada
         if (reserva.getEstadoReserva() == Reserva.EstadoReserva.cancelada) {
             throw new PaymentException("No se puede pagar una reserva cancelada");
         }
         
-        // Validar que no haya un pago completado previo
         if (pagoRepository.findByReserva_IdReservaAndEstaEliminadoFalse(request.getIdReserva()).isPresent()) {
             throw new PaymentException("Esta reserva ya tiene un pago registrado");
         }
         
-        // 2. Validar método de pago
         MetodoPago metodo = metodoPagoRepository.findById(request.getIdMetodoPago())
             .orElseThrow(() -> new PaymentException("Método de pago inválido"));
         
-        // 3. Procesar con gateway según método
         Map<String, String> gatewayResponse = procesarConGateway(request, metodo, idUsuario);
-        
-        // 4. Determinar estado inicial del pago
         EstadoPago estadoInicial = determinarEstadoInicial(gatewayResponse.get("status"));
         
-        // 5. Crear pago
         Pago pago = new Pago();
         pago.setReserva(reserva);
         pago.setMetodoPago(metodo);
@@ -99,7 +89,6 @@ public class PagoServiceImpl implements IPagoService {
         
         Pago savedPago = pagoRepository.save(pago);
         
-        // 6. Guardar información adicional del gateway
         for (Map.Entry<String, String> entry : gatewayResponse.entrySet()) {
             if (!"status".equals(entry.getKey())) {
                 PagoInfo info = new PagoInfo();
@@ -109,12 +98,12 @@ public class PagoServiceImpl implements IPagoService {
                 pagoInfoRepository.save(info);
             }
         }
-        // DISPARAR CORREOS SI EL PAGO FUE EXITOSO ---
+        
+        // Dispara correos de confirmación solo si el pago fue exitoso y se marcó como completado
         if (estadoInicial.getNombre().equals("completado")) {
             confirmarReservaYEnviarCorreos(reserva);
         }
         
-        // 7. Construir respuesta
         PagoResponseDTO response = new PagoResponseDTO();
         response.setIdPago(savedPago.getIdPago());
         response.setIdReserva(reserva.getIdReserva());
@@ -128,9 +117,6 @@ public class PagoServiceImpl implements IPagoService {
         response.setUltimosDigitos(gatewayResponse.get("ultimosDigitos"));
         
         return response;
-
-
-
     }
     
     private Map<String, String> procesarConGateway(PagoRequestDTO request, MetodoPago metodo, Integer idUsuario) {
@@ -154,69 +140,71 @@ public class PagoServiceImpl implements IPagoService {
             default:
                 throw new PaymentException("Método de pago no implementado: " + metodo.getNombre());
         }
-        
         return response;
     }
 
     @Override
-@Transactional
-public PagoResponseDTO confirmarTransferencia(Integer idPago) {
-    Pago pago = pagoRepository.findById(idPago)
-        .orElseThrow(() -> new PaymentException("Pago no encontrado"));
-    
-    if (!pago.getMetodoPago().getNombre().equals("transferencia")) {
-        throw new PaymentException("Solo se pueden confirmar pagos por transferencia");
-    }
-    
-    if (!pago.getEstadoPago().getNombre().equals("pendiente")) {
-        throw new PaymentException("El pago no está pendiente");
-    }
-    
-    EstadoPago completado = estadoPagoRepository.findByNombre("completado")
-        .orElseThrow(() -> new PaymentException("Estado no encontrado"));
-    pago.setEstadoPago(completado);
+    @Transactional
+    public PagoResponseDTO confirmarTransferencia(Integer idPago) {
+        Pago pago = pagoRepository.findById(idPago).orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        if (!pago.getMetodoPago().getNombre().equals("transferencia")) throw new PaymentException("Solo se pueden confirmar pagos por transferencia");
+        if (!pago.getEstadoPago().getNombre().equals("pendiente")) throw new PaymentException("El pago no está pendiente");
+        
+        EstadoPago completado = estadoPagoRepository.findByNombre("completado").orElseThrow(() -> new PaymentException("Estado no encontrado"));
+        pago.setEstadoPago(completado);
 
-    confirmarReservaYEnviarCorreos(pago.getReserva());
-    
-    return convertToDTO(pagoRepository.save(pago));
-}
-
-@Override
-@Transactional
-public PagoResponseDTO reembolsarPago(Integer idPago, String motivo) {
-    Pago pago = pagoRepository.findById(idPago)
-        .orElseThrow(() -> new PaymentException("Pago no encontrado"));
-    
-    if (!pago.getEstadoPago().getNombre().equals("completado")) {
-        throw new PaymentException("Solo se pueden reembolsar pagos completados");
+        confirmarReservaYEnviarCorreos(pago.getReserva());
+        return convertToDTO(pagoRepository.save(pago));
     }
-    
-    // Guardar motivo del reembolso en pago_info
-    PagoInfo info = new PagoInfo();
-    info.setPago(pago);
-    info.setClave("motivo_reembolso");
-    info.setValor(motivo);
-    pagoInfoRepository.save(info);
-    
-    EstadoPago reembolsado = estadoPagoRepository.findByNombre("reembolsado")
-        .orElseThrow(() -> new PaymentException("Estado no encontrado"));
-    pago.setEstadoPago(reembolsado);
-    
-    return convertToDTO(pagoRepository.save(pago));
-}
+
+    @Override
+    @Transactional
+    public PagoResponseDTO reembolsarPago(Integer idPago, String motivo) {
+        Pago pago = pagoRepository.findById(idPago).orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        if (!pago.getEstadoPago().getNombre().equals("completado")) throw new PaymentException("Solo se pueden reembolsar pagos completados");
+        
+        PagoInfo info = new PagoInfo();
+        info.setPago(pago);
+        info.setClave("motivo_reembolso");
+        info.setValor(motivo);
+        pagoInfoRepository.save(info);
+        
+        EstadoPago reembolsado = estadoPagoRepository.findByNombre("reembolsado").orElseThrow(() -> new PaymentException("Estado no encontrado"));
+        pago.setEstadoPago(reembolsado);
+        return convertToDTO(pagoRepository.save(pago));
+    }
+
+    @Override
+    @Transactional
+    public PagoResponseDTO reembolsarPorReserva(Integer idReserva, java.math.BigDecimal montoReembolso) {
+        Pago pago = pagoRepository.findByReserva_IdReservaAndEstaEliminadoFalse(idReserva)
+            .orElseThrow(() -> new PaymentException("No se encontró un pago completado para esta reserva."));
+
+        if (!pago.getEstadoPago().getNombre().equals("completado")) {
+            throw new PaymentException("Solo se pueden reembolsar pagos que estén completados.");
+        }
+
+        PagoInfo info = new PagoInfo();
+        info.setPago(pago);
+        info.setClave("monto_reembolsado");
+        info.setValor(montoReembolso.toString());
+        pagoInfoRepository.save(info);
+
+        EstadoPago estadoReembolsado = estadoPagoRepository.findByNombre("reembolsado").orElseThrow(() -> new PaymentException("Estado 'reembolsado' no encontrado."));
+        pago.setEstadoPago(estadoReembolsado);
+
+        return convertToDTO(pagoRepository.save(pago));
+    }
     
     private Map<String, String> procesarTarjeta(PagoRequestDTO request, Integer idUsuario) {
         Map<String, String> response = new HashMap<>();
-        
         if (request.getIdPagoToken() != null) {
-            // Usar token guardado
             PagoToken token = pagoTokenService.validarYObtenerToken(request.getIdPagoToken(), idUsuario);
             response.put("status", "EXITOSO");
             response.put("transactionId", "TXN-" + System.currentTimeMillis());
             response.put("mensaje", "Pago con tarjeta tokenizada exitoso");
             response.put("ultimosDigitos", token.getUltimosDigitos());
         } else if (request.getTokenGateway() != null && !request.getTokenGateway().isEmpty()) {
-            // Token temporal del frontend
             response.put("status", "EXITOSO");
             response.put("transactionId", "TXN-" + System.currentTimeMillis());
             response.put("mensaje", "Pago con tarjeta exitoso");
@@ -224,15 +212,12 @@ public PagoResponseDTO reembolsarPago(Integer idPago, String motivo) {
         } else {
             throw new PaymentException("Se requiere token de pago o tarjeta guardada para pagar con tarjeta");
         }
-        
         return response;
     }
     
     private Map<String, String> procesarPaypal(PagoRequestDTO request) {
         Map<String, String> response = new HashMap<>();
-        if (request.getTokenGateway() == null || request.getTokenGateway().isEmpty()) {
-            throw new PaymentException("Se requiere token de PayPal");
-        }
+        if (request.getTokenGateway() == null || request.getTokenGateway().isEmpty()) throw new PaymentException("Se requiere token de PayPal");
         response.put("status", "EXITOSO");
         response.put("transactionId", "PP-" + System.currentTimeMillis());
         response.put("mensaje", "Pago con PayPal exitoso");
@@ -241,162 +226,117 @@ public PagoResponseDTO reembolsarPago(Integer idPago, String motivo) {
     }
     
     private EstadoPago determinarEstadoInicial(String statusGateway) {
-        if ("EXITOSO".equals(statusGateway)) {
-            return estadoPagoRepository.findByNombre("completado")
-                .orElseThrow(() -> new PaymentException("Estado 'completado' no encontrado en catálogo"));
-        } else if ("PENDIENTE".equals(statusGateway)) {
-            return estadoPagoRepository.findByNombre("pendiente")
-                .orElseThrow(() -> new PaymentException("Estado 'pendiente' no encontrado en catálogo"));
-        } else {
-            return estadoPagoRepository.findByNombre("fallido")
-                .orElseThrow(() -> new PaymentException("Estado 'fallido' no encontrado en catálogo"));
-        }
+        if ("EXITOSO".equals(statusGateway)) return estadoPagoRepository.findByNombre("completado").orElseThrow(() -> new PaymentException("Error"));
+        else if ("PENDIENTE".equals(statusGateway)) return estadoPagoRepository.findByNombre("pendiente").orElseThrow(() -> new PaymentException("Error"));
+        else return estadoPagoRepository.findByNombre("fallido").orElseThrow(() -> new PaymentException("Error"));
     }
     
     @Override
     @Transactional(readOnly = true)
     public PagoResponseDTO obtenerEstadoPago(Integer idPago, Integer idUsuario) {
-        Pago pago = pagoRepository.findById(idPago)
-            .orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        Pago pago = pagoRepository.findById(idPago).orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        if (!pago.getReserva().getCliente().getIdUsuario().equals(idUsuario)) throw new PaymentException("No autorizado");
         
-        if (!pago.getReserva().getCliente().getIdUsuario().equals(idUsuario)) {
-            throw new PaymentException("No autorizado para ver este pago");
-        }
-        
-        PagoResponseDTO response = new PagoResponseDTO();
-        response.setIdPago(pago.getIdPago());
-        response.setIdReserva(pago.getReserva().getIdReserva());
-        response.setMetodoPago(pago.getMetodoPago().getNombre());
-        response.setEstadoPago(pago.getEstadoPago().getNombre());
-        response.setMonto(pago.getMonto());
-        response.setMoneda(pago.getMoneda());
-        response.setFechaPago(pago.getFechaPago().toString());
-        
+        PagoResponseDTO response = convertToDTO(pago);
         pagoInfoRepository.findByPago_IdPago(idPago).stream()
-            .filter(info -> "ultimosDigitos".equals(info.getClave()))
-            .findFirst()
-            .ifPresent(info -> response.setUltimosDigitos(info.getValor()));
-        
+            .filter(info -> "ultimosDigitos".equals(info.getClave())).findFirst().ifPresent(info -> response.setUltimosDigitos(info.getValor()));
         return response;
     }
     
     @Override
     @Transactional(readOnly = true)
     public List<PagoResponseDTO> obtenerPagosPorUsuario(Integer idUsuario) {
-        return pagoRepository.findByReserva_Cliente_IdUsuario(idUsuario)
-            .stream()
-            .map(pago -> {
-                PagoResponseDTO dto = new PagoResponseDTO();
-                dto.setIdPago(pago.getIdPago());
-                dto.setIdReserva(pago.getReserva().getIdReserva());
-                dto.setMetodoPago(pago.getMetodoPago().getNombre());
-                dto.setEstadoPago(pago.getEstadoPago().getNombre());
-                dto.setMonto(pago.getMonto());
-                dto.setMoneda(pago.getMoneda());
-                dto.setFechaPago(pago.getFechaPago().toString());
-                return dto;
-            })
-            .collect(Collectors.toList());
+        return pagoRepository.findByReserva_Cliente_IdUsuario(idUsuario).stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
     @Override
-@Transactional
-public PagoResponseDTO marcarComoFallido(Integer idPago, String motivo) {
-    Pago pago = pagoRepository.findById(idPago)
-        .orElseThrow(() -> new PaymentException("Pago no encontrado"));
-    
-    if (pago.getEstadoPago().getNombre().equals("completado")) {
-        throw new PaymentException("No se puede marcar como fallido un pago ya completado");
+    @Transactional
+    public PagoResponseDTO marcarComoFallido(Integer idPago, String motivo) {
+        Pago pago = pagoRepository.findById(idPago).orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        if (pago.getEstadoPago().getNombre().equals("completado")) throw new PaymentException("No se puede marcar como fallido un pago ya completado");
+        
+        PagoInfo info = new PagoInfo();
+        info.setPago(pago);
+        info.setClave("motivo_fallo");
+        info.setValor(motivo);
+        pagoInfoRepository.save(info);
+        
+        EstadoPago fallido = estadoPagoRepository.findByNombre("fallido").orElseThrow(() -> new PaymentException("Error"));
+        pago.setEstadoPago(fallido);
+        return convertToDTO(pagoRepository.save(pago));
     }
-    
-    // Guardar motivo
-    PagoInfo info = new PagoInfo();
-    info.setPago(pago);
-    info.setClave("motivo_fallo");
-    info.setValor(motivo);
-    pagoInfoRepository.save(info);
-    
-    EstadoPago fallido = estadoPagoRepository.findByNombre("fallido")
-        .orElseThrow(() -> new PaymentException("Estado 'fallido' no encontrado"));
-    pago.setEstadoPago(fallido);
-    
-    return convertToDTO(pagoRepository.save(pago));
-}
 
-@Override
-@Transactional
-public PagoResponseDTO marcarEnRevision(Integer idPago, String motivo) {
-    Pago pago = pagoRepository.findById(idPago)
-        .orElseThrow(() -> new PaymentException("Pago no encontrado"));
-    
-    // Guardar motivo
-    PagoInfo info = new PagoInfo();
-    info.setPago(pago);
-    info.setClave("motivo_revision");
-    info.setValor(motivo);
-    pagoInfoRepository.save(info);
-    
-    EstadoPago enRevision = estadoPagoRepository.findByNombre("en_revision")
-        .orElseThrow(() -> new PaymentException("Estado 'en_revision' no encontrado"));
-    pago.setEstadoPago(enRevision);
-    
-    return convertToDTO(pagoRepository.save(pago));
-}
+    @Override
+    @Transactional
+    public PagoResponseDTO marcarEnRevision(Integer idPago, String motivo) {
+        Pago pago = pagoRepository.findById(idPago).orElseThrow(() -> new PaymentException("Pago no encontrado"));
+        PagoInfo info = new PagoInfo();
+        info.setPago(pago);
+        info.setClave("motivo_revision");
+        info.setValor(motivo);
+        pagoInfoRepository.save(info);
+        
+        EstadoPago enRevision = estadoPagoRepository.findByNombre("en_revision").orElseThrow(() -> new PaymentException("Error"));
+        pago.setEstadoPago(enRevision);
+        return convertToDTO(pagoRepository.save(pago));
+    }
 
-// Método auxiliar para convertir Pago a DTO
-private PagoResponseDTO convertToDTO(Pago pago) {
-    PagoResponseDTO dto = new PagoResponseDTO();
-    dto.setIdPago(pago.getIdPago());
-    dto.setIdReserva(pago.getReserva().getIdReserva());
-    dto.setMetodoPago(pago.getMetodoPago().getNombre());
-    dto.setEstadoPago(pago.getEstadoPago().getNombre());
-    dto.setMonto(pago.getMonto());
-    dto.setMoneda(pago.getMoneda());
-    dto.setFechaPago(pago.getFechaPago().toString());
-    return dto;
-}
+    private PagoResponseDTO convertToDTO(Pago pago) {
+        PagoResponseDTO dto = new PagoResponseDTO();
+        dto.setIdPago(pago.getIdPago());
+        dto.setIdReserva(pago.getReserva().getIdReserva());
+        dto.setMetodoPago(pago.getMetodoPago().getNombre());
+        dto.setEstadoPago(pago.getEstadoPago().getNombre());
+        dto.setMonto(pago.getMonto());
+        dto.setMoneda(pago.getMoneda());
+        dto.setFechaPago(pago.getFechaPago().toString());
+        return dto;
+    }
 
-private void confirmarReservaYEnviarCorreos(Reserva reserva) {
-        // 1. Cambiamos el estado de la reserva a confirmada
+    // Logica con thymeleaf para enviar correos de confirmación de reserva al cliente y al anfitrión, con detalles dinámicos de la reserva y la propiedad. Se llama desde el método procesarPago solo si el pago fue exitoso.
+    private void confirmarReservaYEnviarCorreos(Reserva reserva) {
         reserva.setEstadoReserva(Reserva.EstadoReserva.confirmada);
         reservaRepository.save(reserva);
 
-        // 2. Enviamos los correos
         try {
             Usuario cliente = reserva.getCliente();
-            
-            // OJO AQUÍ: Verifica si en tu clase Propiedad el dueño se obtiene con getPropietario(), getUsuario() o getArrendador()
             Usuario anfitrion = reserva.getHabitacion().getPropiedad().getDueno(); 
 
-            // --- Correo para el Cliente ---
-            String asuntoCliente = "¡Tu reserva en StayFlow está confirmada!";
-            String mensajeCliente = "Hola " + cliente.getNombreCompleto() + ",\n\n" +
-                    "Tu pago ha sido procesado con éxito y tu reserva está confirmada.\n\n" +
-                    "Detalles de tu estancia:\n" +
-                    "- Habitación: " + reserva.getHabitacion().getNumeroHabitacion() + "\n" +
-                    "- Entrada: " + reserva.getFechaEntrada() + "\n" +
-                    "- Salida: " + reserva.getFechaSalida() + "\n" +
-                    "- Monto Total Pagado: $" + reserva.getMontoTotal() + " MXN\n\n" +
-                    "¡Gracias por confiar en StayFlow!";
-            emailService.enviarCorreo(cliente.getEmail(), asuntoCliente, mensajeCliente);
+            // Correo para el Cliente (Plantilla) 
+            Map<String, Object> varsCliente = new HashMap<>();
+            varsCliente.put("nombreCliente", cliente.getNombreCompleto());
+            varsCliente.put("nombrePropiedad", reserva.getHabitacion().getPropiedad().getNombreComercial());
+            varsCliente.put("habitacion", reserva.getHabitacion().getNumeroHabitacion());
+            varsCliente.put("fechaEntrada", reserva.getFechaEntrada().toString());
+            varsCliente.put("fechaSalida", reserva.getFechaSalida().toString());
+            varsCliente.put("montoTotal", reserva.getMontoTotal().toString());
+            
+            emailService.enviarCorreoTemplate(
+                cliente.getEmail(), 
+                "¡Tu reserva en StayFlow está confirmada!", 
+                "reserva-confirmada", 
+                varsCliente
+            );
 
-            // --- Correo para el Dueño/Anfitrión ---
+            // Correo para el Anfitrión (Plantilla)
             if (anfitrion != null) {
-                String asuntoAnfitrion = "¡Nueva reserva confirmada en tu propiedad!";
-                String mensajeAnfitrion = "Hola " + anfitrion.getNombreCompleto() + ",\n\n" +
-                        "¡Excelentes noticias! Tienes una nueva reserva pagada y confirmada.\n\n" +
-                        "Detalles:\n" +
-                        "- Huésped: " + cliente.getNombreCompleto() + "\n" +
-                        "- Habitación: " + reserva.getHabitacion().getNumeroHabitacion() + "\n" +
-                        "- Entrada: " + reserva.getFechaEntrada() + "\n" +
-                        "- Salida: " + reserva.getFechaSalida() + "\n\n" +
-                        "¡Prepárate para recibir a tu huésped!";
-                emailService.enviarCorreo(anfitrion.getEmail(), asuntoAnfitrion, mensajeAnfitrion);
+                Map<String, Object> varsAnfitrion = new HashMap<>();
+                varsAnfitrion.put("nombreAnfitrion", anfitrion.getNombreCompleto());
+                varsAnfitrion.put("nombreCliente", cliente.getNombreCompleto());
+                varsAnfitrion.put("nombrePropiedad", reserva.getHabitacion().getPropiedad().getNombreComercial());
+                varsAnfitrion.put("habitacion", reserva.getHabitacion().getNumeroHabitacion());
+                varsAnfitrion.put("fechaEntrada", reserva.getFechaEntrada().toString());
+                varsAnfitrion.put("fechaSalida", reserva.getFechaSalida().toString());
+                
+                emailService.enviarCorreoTemplate(
+                    anfitrion.getEmail(), 
+                    "¡Nueva reserva confirmada en tu propiedad!", 
+                    "reserva-host", 
+                    varsAnfitrion
+                );
             }
         } catch (Exception e) {
-            // Si el correo falla, no detenemos la transacción del pago, solo registramos el error
             System.err.println("Error al enviar correos de confirmación: " + e.getMessage());
         }
     }
-
 }

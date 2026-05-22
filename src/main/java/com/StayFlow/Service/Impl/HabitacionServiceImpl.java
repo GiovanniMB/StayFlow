@@ -94,10 +94,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
         }
         
         nuevoTipo.setPropiedad(propiedad);
-        // Asignamos solo los servicios oficiales del catálogo
+        // Asigna solo los servicios oficiales del catálogo
         nuevoTipo.setServicios(procesarServicios(request.getIdServicios()));
         
-        // Empacamos los personalizados como una simple lista de texto separada por comas
+        // Empaca los personalizados como una simple lista de texto separada por comas
         if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
             nuevoTipo.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
         } else {
@@ -137,10 +137,10 @@ public class HabitacionServiceImpl implements IHabitacionService {
         
         tipoExistente.setPrecioBaseNoche(propiedad.isSeRentaPorHabitaciones() ? request.getPrecioBaseNoche() : BigDecimal.ZERO);
         tipoExistente.setTieneBanoPrivado(request.getTieneBanoPrivado());
-        // Asignamos solo los servicios oficiales del catálogo actualizados
+        // Asigna solo los servicios oficiales del catálogo actualizados
         tipoExistente.setServicios(procesarServicios(request.getIdServicios()));
         
-        // Actualizamos los personalizados como texto
+        // Actualiza los personalizados como texto
         if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
             tipoExistente.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
         } else {

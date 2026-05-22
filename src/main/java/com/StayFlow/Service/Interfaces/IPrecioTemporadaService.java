@@ -10,4 +10,5 @@ public interface IPrecioTemporadaService {
     PrecioTemporadaResponseDTO actualizarTemporada(Integer id, PrecioTemporadaRequestDTO request);
     void eliminarTemporada(Integer id);
     List<PrecioTemporadaResponseDTO> listarTemporadasActivas();
+    List<PrecioTemporadaResponseDTO> listarTemporadasPorTipos(List<Integer> idsTipoHabitacion);
 }

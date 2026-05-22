@@ -13,6 +13,8 @@ import com.StayFlow.dto.response.ServicioResponseDTO;
 import com.StayFlow.model.FotoHabitacion;
 import com.StayFlow.dto.response.FotoResponseDTO;
 
+
+
 @Component
 public class PropiedadMapper {
 
@@ -25,10 +27,14 @@ public class PropiedadMapper {
         propiedad.setSeRentaPorHabitaciones(request.getSeRentaPorHabitaciones());
         propiedad.setDescripcion(request.getDescripcion());
         propiedad.setPrecioNoche(request.getPrecioNoche());
+        propiedad.setHoraCheckIn(request.getHoraCheckIn() != null ? request.getHoraCheckIn() : java.time.LocalTime.of(15, 0));
+        propiedad.setHoraCheckOut(request.getHoraCheckOut() != null ? request.getHoraCheckOut() : java.time.LocalTime.of(11, 0));
         
         if (request.getDireccion() != null) {
             propiedad.setDireccion(toDireccionEntity(request.getDireccion()));
         }
+
+        
         
         return propiedad;
     }
@@ -58,19 +64,19 @@ public class PropiedadMapper {
         response.setContadorReservas(propiedad.getContadorReservas());
         response.setDescripcion(propiedad.getDescripcion());
         response.setPrecioNoche(propiedad.getPrecioNoche());
-        // Agregar estado de propiedad al DTO de respuesta
+        // Agrega estado de propiedad al DTO de respuesta
         if (propiedad.getEstadoPropiedad() != null) {
             response.setEstadoPropiedad(propiedad.getEstadoPropiedad().name());
         }
-        // Mapear ID del dueño si existe
+        // Mapea ID del dueño si existe
         if (propiedad.getDueno() != null) {
             response.setIdDueno(propiedad.getDueno().getIdUsuario());
         }
-        // Mapear dirección si existe
+        // Mapea dirección si existe
         if (propiedad.getDireccion() != null) {
             response.setDireccion(toDireccionResponseDTO(propiedad.getDireccion()));
         }
-        // Mapear servicios y fotos si existen
+        // Mapea servicios y fotos si existen
         if (propiedad.getServicios() != null && !propiedad.getServicios().isEmpty()) {
             response.setServicios(propiedad.getServicios().stream()
                 .map(this::toServicioResponseDTO)
@@ -86,7 +92,7 @@ public class PropiedadMapper {
 
        response.setAmenidadesExtra(propiedad.getAmenidadesExtra());
 
-        // 🔥 REGLA ESTRICTA DE BORRADOR PARA EL ANFITRIÓN 🔥
+        // Regla estricta: Si no tiene fotos o si es hotel y no tiene habitaciones, forzamos el estado a BORRADOR para que no se muestre en búsquedas públicas
         boolean tieneFotos = propiedad.getFotos() != null && !propiedad.getFotos().isEmpty();
         boolean tieneHabitaciones = propiedad.getTiposHabitacion() != null && !propiedad.getTiposHabitacion().isEmpty();
 
@@ -99,6 +105,9 @@ public class PropiedadMapper {
         if (!tieneFotos || (propiedad.isSeRentaPorHabitaciones() && !tieneHabitaciones)) {
             response.setEstadoPropiedad("BORRADOR"); 
         }
+
+        response.setCalificacionPromedio(propiedad.getCalificacionPromedio() != null ? propiedad.getCalificacionPromedio() : 0.0);
+        response.setCantidadResenas(propiedad.getCantidadResenas() != null ? propiedad.getCantidadResenas() : 0);
 
         return response;
     }

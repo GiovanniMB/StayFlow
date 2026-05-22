@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
 import java.util.List;
-
+import java.time.LocalTime;
 // DTO para recibir los datos de una propiedad en las solicitudes de creación o actualización. Incluye validaciones para asegurar que se proporcionen los datos necesarios y que tengan el formato correcto. Además, incluye un objeto anidado para la dirección, que también se valida.
 @Schema(description = "Datos de entrada para registrar o actualizar una propiedad") // Descripción general del DTO para Swagger
 public class PropiedadRequestDTO {
@@ -29,7 +29,7 @@ public class PropiedadRequestDTO {
     @Schema(description = "Descripción de la propiedad", example = "Hermoso hotel céntrico")
     private String descripcion;
 
-    // 👇 Aquí agregamos la variable del precio que faltaba
+    // variable del precio por noche
     @NotNull(message = "El precio por noche es obligatorio")
     @Schema(description = "Precio base por noche de la propiedad", example = "1200.50")
     private BigDecimal precioNoche;
@@ -45,6 +45,12 @@ public class PropiedadRequestDTO {
 
     @Schema(description = "Lista de nombres de nuevos servicios personalizados para la propiedad", example = "[\"Caja fuerte\", \"Asador\"]")
     private List<String> nuevosServicios;
+    //check in y check out
+    @Schema(description = "Hora a partir de la cual el huésped puede hacer check-in", example = "15:00:00")
+    private LocalTime horaCheckIn;
+
+    @Schema(description = "Hora límite para que el huésped haga check-out", example = "11:00:00")
+    private LocalTime horaCheckOut;
 
     // --- Constructor vacío ---
     public PropiedadRequestDTO() {
@@ -128,6 +134,21 @@ public class PropiedadRequestDTO {
         this.nuevosServicios = nuevosServicios;
     }
 
+    public LocalTime getHoraCheckIn() {
+        return horaCheckIn;
+    }
+
+    public void setHoraCheckIn(LocalTime horaCheckIn) {
+        this.horaCheckIn = horaCheckIn;
+    }
+
+    public LocalTime getHoraCheckOut() {
+        return horaCheckOut;
+    }
+
+    public void setHoraCheckOut(LocalTime horaCheckOut) {
+        this.horaCheckOut = horaCheckOut;
+    }
 
 
 }

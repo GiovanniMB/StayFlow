@@ -9,6 +9,6 @@ import com.StayFlow.model.CategoriaFoto;
 
 @Repository
 public interface CategoriaFotoRepository extends JpaRepository<CategoriaFoto, Integer> {
-    // Buscar categorías por tipo macro (interior/exterior) que no estén eliminadas
+    // Busca categorías por tipo macro (interior/exterior) que no estén eliminadas
     List<CategoriaFoto> findByTipoMacroAndEstaEliminadoFalse(CategoriaFoto.TipoMacro tipoMacro);
 }

@@ -19,6 +19,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
+import java.time.LocalTime;
+
 @Entity
 @Table(name = "propiedad")
 @Schema(description = "Representa una propiedad u hotel registrado en el sistema")
@@ -88,6 +90,22 @@ public class Propiedad extends AuditoriaBase {
     @Schema(description = "Amenidades extra personalizadas escritas por el usuario")
     @Column(columnDefinition = "TEXT")
     private String amenidadesExtra;
+
+    @Schema(description = "Hora a partir de la cual el huésped puede hacer check-in", example = "15:00:00")
+    @Column(columnDefinition = "TIME DEFAULT '15:00:00'")
+    private LocalTime horaCheckIn;
+
+    @Schema(description = "Hora límite para que el huésped haga check-out", example = "11:00:00")
+    @Column(columnDefinition = "TIME DEFAULT '11:00:00'")
+    private LocalTime horaCheckOut;
+
+    @Schema(description = "Calificación promedio de la propiedad", example = "4.5")
+    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double calificacionPromedio = 0.0;
+
+    @Schema(description = "Cantidad total de reseñas recibidas", example = "25")
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer cantidadResenas = 0;
 
     // Constructores
     public Propiedad() {}
@@ -210,5 +228,37 @@ public class Propiedad extends AuditoriaBase {
     }
     public void setAmenidadesExtra(String amenidadesExtra) {
         this.amenidadesExtra = amenidadesExtra;
+    }
+
+    public LocalTime getHoraCheckIn() {
+        return horaCheckIn;
+    }
+
+    public void setHoraCheckIn(LocalTime horaCheckIn) {
+        this.horaCheckIn = horaCheckIn;
+    }
+
+    public LocalTime getHoraCheckOut() {
+        return horaCheckOut;
+    }
+
+    public void setHoraCheckOut(LocalTime horaCheckOut) {
+        this.horaCheckOut = horaCheckOut;
+    }
+
+    public Double getCalificacionPromedio() {
+        return calificacionPromedio;
+    }
+
+    public void setCalificacionPromedio(Double calificacionPromedio) {
+        this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public Integer getCantidadResenas() {
+        return cantidadResenas;
+    }
+
+    public void setCantidadResenas(Integer cantidadResenas) {
+        this.cantidadResenas = cantidadResenas;
     }
 }

@@ -29,7 +29,7 @@ public interface BloqueoHabitacionRepository extends JpaRepository<BloqueoHabita
             @Param("fechaEntrada") LocalDate fechaEntrada,
             @Param("fechaSalida") LocalDate fechaSalida);
 
-    // 2. 🔥 LA CURA A LA AMNESIA: LEFT JOINS EXPLÍCITOS PARA EVITAR QUE SE BORREN FILAS 🔥
+    // 2. Left join para obtener bloqueos activos por propiedad
     @Query("SELECT b FROM BloqueoHabitacion b " +
            "LEFT JOIN b.propiedad p " +
            "LEFT JOIN b.tipoHabitacion th " +

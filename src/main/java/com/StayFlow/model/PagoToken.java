@@ -33,15 +33,15 @@ public class PagoToken {
     @Schema(description = "Token proporcionado por el gateway de pagos")
     private String tokenGateway;
 
-    @Column(name = "ultimosDigitos", nullable = false, length = 4)  // 🔥 SIN guión bajo
+    @Column(name = "ultimosDigitos", nullable = false, length = 4) 
     @Schema(description = "Últimos 4 dígitos de la tarjeta")
     private String ultimosDigitos;
 
-    @Column(name = "nombreTitular", length = 100)  // 🔥 SIN guión bajo
+    @Column(name = "nombreTitular", length = 100) 
     @Schema(description = "Nombre del titular de la tarjeta")
     private String nombreTitular;
 
-    @Column(name = "fechaExpiracion", length = 7)  // 🔥 SIN guión bajo
+    @Column(name = "fechaExpiracion", length = 7) 
     @Schema(description = "Fecha de expiración de la tarjeta (MM/YYYY)")
     private String fechaExpiracion;
 
@@ -49,7 +49,7 @@ public class PagoToken {
     @Schema(description = "Indica si el token está activo")
     private boolean activo = true;
 
-    @Column(name = "fechaCreacion", nullable = false)  // 🔥 SIN guión bajo, como está en BD
+    @Column(name = "fechaCreacion", nullable = false) 
     @Schema(description = "Fecha y hora de creación del token")
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
@@ -70,7 +70,7 @@ public class PagoToken {
         this.activo = true;
     }
 
-    // Getters y Setters (mantén los que ya tienes)
+    // Getters y Setters 
     public Integer getIdPagoToken() {
         return idPagoToken;
     }

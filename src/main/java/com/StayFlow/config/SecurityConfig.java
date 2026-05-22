@@ -39,12 +39,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            //Conectamos la configuración CORS global
+            //Conecta la configuración CORS global
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(PUBLIC_URLS).permitAll()
-                // Permitimos las peticiones OPTIONS (Pre-flight de React) sin token
+                // Permite las peticiones OPTIONS (Pre-flight de React) sin token
                 .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() 
                 .anyRequest().authenticated()
             )
@@ -53,7 +53,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    // AÑADIMOS ESTE BEAN PARA DECIRLE A SPRING QUIÉN PUEDE ENTRAR
+    // Se agrega este bean para configurar CORS globalmente, permitiendo el acceso desde el puerto de React
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

@@ -46,14 +46,16 @@ public class HabitacionMapper {
                     .map(this::toServicioResponseDTO)
                     .collect(Collectors.toList()));
         }
+        
 
         if (entity.getFotos() != null) {
             dto.setFotos(entity.getFotos().stream()
+                    .filter(foto -> !foto.isEstaEliminado()) 
                     .map(this::toFotoResponseDTO)
                     .collect(Collectors.toList()));
         }
 
-        // Empacamos las camas para la CATEGORÍA
+        // Empaca las camas para la CATEGORÍA
         if (entity.getCamas() != null && !entity.getCamas().isEmpty()) {
             int totalCamas = 0;
             List<String> listaCamas = new java.util.ArrayList<>();
@@ -94,7 +96,7 @@ public class HabitacionMapper {
             if (entity.getTipoHabitacion().getCamas() != null && !entity.getTipoHabitacion().getCamas().isEmpty()) {
                 int totalCamas = 0;
                 
-                // 🔥 CORRECCIÓN: Usamos una Lista en lugar de un String 🔥
+                //  Usa una Lista en lugar de un String para el detalle de camas, ya que cada tipo de cama es un elemento distinto
                 List<String> listaCamas = new ArrayList<>();
 
                 for (TipoHabitacionCama relacionCama : entity.getTipoHabitacion().getCamas()) {
@@ -102,15 +104,15 @@ public class HabitacionMapper {
                     
                     String nombreCama = relacionCama.getTipoCama().getNombre(); 
                     
-                    // Agregamos cada tipo de cama como un elemento de la lista (Ej. "1 King size")
+                    // Agrega cada tipo de cama como un elemento de la lista (Ej. "1 King size")
                     listaCamas.add(relacionCama.getCantidad() + " " + nombreCama);
                 }
 
                 dto.setTotalCamas(totalCamas);
-                dto.setDetalleCamas(listaCamas); // Ahora sí, pasamos una Lista a una Lista
+                dto.setDetalleCamas(listaCamas); // pasamos una Lista a una Lista por lo que no es necesario convertirla a String
             } else {
                 dto.setTotalCamas(0);
-                // Si no hay camas, devolvemos una lista con un solo mensaje
+                // Si no hay camas, devuelve una lista con un solo mensaje
                 dto.setDetalleCamas(List.of("Sin camas configuradas")); 
             }
         }

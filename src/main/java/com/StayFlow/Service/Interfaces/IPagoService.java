@@ -13,6 +13,8 @@ public interface IPagoService {
     
     List<PagoResponseDTO> obtenerPagosPorUsuario(Integer idUsuario);
 
+    PagoResponseDTO reembolsarPorReserva(Integer idReserva, java.math.BigDecimal montoReembolso);
+
     PagoResponseDTO confirmarTransferencia(Integer idPago);
 PagoResponseDTO marcarComoFallido(Integer idPago, String motivo);
 PagoResponseDTO reembolsarPago(Integer idPago, String motivo);

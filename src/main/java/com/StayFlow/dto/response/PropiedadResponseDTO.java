@@ -2,6 +2,7 @@ package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal; // Importación necesaria para el precio
+import java.time.LocalTime;
 import java.util.List;
 
 @Schema(description = "Datos de salida de una propiedad")
@@ -30,7 +31,7 @@ public class PropiedadResponseDTO {
     @Schema(description = "Descripción narrativa del lugar redactada por el anfitrión", example = "Un lugar mágico en el centro...")
     private String descripcion;
 
-    // 👇 Nueva variable agregada para mostrar el precio
+    //Variable para el precio por noche, que es un dato crucial para los usuarios al momento de elegir una propiedad
     @Schema(description = "Precio base por noche de la propiedad", example = "1200.50")
     private BigDecimal precioNoche;
     
@@ -46,6 +47,19 @@ public class PropiedadResponseDTO {
     @Schema(description = "Amenidades extra que no están en la lista de servicios estándar", example = "Vista al mar, Balcón privado")
     private String amenidadesExtra;
 
+    //check in y check out
+    @Schema(description = "Hora a partir de la cual el huésped puede hacer check-in", example = "15:00:00")
+    private LocalTime horaCheckIn;
+
+    @Schema(description = "Hora límite para que el huésped haga check-out", example = "11:00:00")
+    private LocalTime horaCheckOut;
+
+    @Schema(description = "Calificación promedio de la propiedad basada en las reseñas", example = "4.5")
+    private Double calificacionPromedio;
+
+    @Schema(description = "Cantidad total de reseñas que tiene la propiedad", example = "25")
+    private Integer cantidadResenas;
+
     // --- Constructor vacío ---
     public PropiedadResponseDTO() {
     }
@@ -60,7 +74,7 @@ public class PropiedadResponseDTO {
         this.seRentaPorHabitaciones = seRentaPorHabitaciones;
         this.contadorReservas = contadorReservas;
         this.descripcion = descripcion;
-        this.precioNoche = precioNoche; // Asignación del nuevo campo
+        this.precioNoche = precioNoche; 
         this.servicios = servicios;
         this.amenidadesExtra = amenidadesExtra;
     }
@@ -131,7 +145,6 @@ public class PropiedadResponseDTO {
         this.descripcion = descripcion;
     }
 
-    // 👇 Nuevos métodos Getter y Setter
     public BigDecimal getPrecioNoche() {
         return precioNoche;
     }
@@ -170,5 +183,37 @@ public class PropiedadResponseDTO {
 
     public void setAmenidadesExtra(String amenidadesExtra) {
         this.amenidadesExtra = amenidadesExtra;
+    }
+
+    public LocalTime getHoraCheckIn() {
+        return horaCheckIn;
+    }
+
+    public void setHoraCheckIn(LocalTime horaCheckIn) {
+        this.horaCheckIn = horaCheckIn;
+    }
+
+    public LocalTime getHoraCheckOut() {
+        return horaCheckOut;
+    }
+
+    public void setHoraCheckOut(LocalTime horaCheckOut) {
+        this.horaCheckOut = horaCheckOut;
+    }
+
+    public Double getCalificacionPromedio() {
+        return calificacionPromedio;
+    }
+
+    public void setCalificacionPromedio(Double calificacionPromedio) {
+        this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public Integer getCantidadResenas() {
+        return cantidadResenas;
+    }
+
+    public void setCantidadResenas(Integer cantidadResenas) {
+        this.cantidadResenas = cantidadResenas;
     }
 }

@@ -9,7 +9,7 @@ import com.StayFlow.model.FotoHabitacion;
 
 @Repository
 public interface FotoHabitacionRepository extends JpaRepository<FotoHabitacion, Integer> {
-    // Buscar las fotos asociadas a un tipo de habitación específico
+    // Busca las fotos asociadas a un tipo de habitación específico
     List<FotoHabitacion> findByTipoHabitacionIdTipoHabitacionAndEstaEliminadoFalse(Integer idTipoHabitacion);
     
 }

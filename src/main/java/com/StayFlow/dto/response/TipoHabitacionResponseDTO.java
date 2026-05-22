@@ -28,7 +28,7 @@ public class TipoHabitacionResponseDTO {
     @Schema(description = "Lista de amenidades incluidas en la habitación")
     private List<ServicioResponseDTO> servicios;
 
-    // 👇 Aquí está la nueva variable para las fotos
+    // Variable para almacenar las fotos asociadas a esta categoría de habitación, lo cual es crucial para que los usuarios puedan visualizar el tipo de habitación que están reservando.
     @Schema(description = "Lista de fotografías asociadas a la categoría de habitación")
     private List<FotoResponseDTO> fotos;
 

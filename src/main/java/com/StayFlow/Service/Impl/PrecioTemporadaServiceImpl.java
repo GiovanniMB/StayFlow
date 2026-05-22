@@ -1,8 +1,6 @@
 package com.StayFlow.service.Impl;
 
 import java.util.List;
-import java.util.stream.Collectors;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,6 +9,7 @@ import com.StayFlow.dto.request.PrecioTemporadaRequestDTO;
 import com.StayFlow.dto.response.PrecioTemporadaResponseDTO;
 import com.StayFlow.exception.BusinessException;
 import com.StayFlow.exception.ResourceNotFoundException;
+import com.StayFlow.mapper.PrecioTemporadaMapper;
 import com.StayFlow.model.PrecioTemporada;
 import com.StayFlow.model.TipoHabitacion;
 import com.StayFlow.repository.PrecioTemporadaRepository;
@@ -21,10 +20,14 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
 
     private final PrecioTemporadaRepository precioTemporadaRepository;
     private final TipoHabitacionRepository tipoHabitacionRepository;
+    private final PrecioTemporadaMapper precioTemporadaMapper; 
 
-    public PrecioTemporadaServiceImpl(PrecioTemporadaRepository precioTemporadaRepository, TipoHabitacionRepository tipoHabitacionRepository) {
+    public PrecioTemporadaServiceImpl(PrecioTemporadaRepository precioTemporadaRepository, 
+                                      TipoHabitacionRepository tipoHabitacionRepository,
+                                      PrecioTemporadaMapper precioTemporadaMapper) {
         this.precioTemporadaRepository = precioTemporadaRepository;
         this.tipoHabitacionRepository = tipoHabitacionRepository;
+        this.precioTemporadaMapper = precioTemporadaMapper;
     }
 
     @Override
@@ -41,9 +44,8 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
         temporada.setFechaInicio(request.getFechaInicio());
         temporada.setFechaFin(request.getFechaFin());
         temporada.setPrecioEspecial(request.getPrecioEspecial());
-        // Se asume que AuditoriaBase maneja estaEliminado = false por defecto
 
-        return toDTO(precioTemporadaRepository.save(temporada));
+        return precioTemporadaMapper.toResponseDTO(precioTemporadaRepository.save(temporada));
     }
 
     @Override
@@ -67,7 +69,7 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
         temporada.setFechaFin(request.getFechaFin());
         temporada.setPrecioEspecial(request.getPrecioEspecial());
 
-        return toDTO(precioTemporadaRepository.save(temporada));
+        return precioTemporadaMapper.toResponseDTO(precioTemporadaRepository.save(temporada));
     }
 
     @Override
@@ -76,7 +78,6 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
         PrecioTemporada temporada = precioTemporadaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Temporada no encontrada."));
         
-        // Aplicando Borrado Lógico
         temporada.setEstaEliminado(true);
         precioTemporadaRepository.save(temporada);
     }
@@ -84,12 +85,15 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
     @Override
     @Transactional(readOnly = true)
     public List<PrecioTemporadaResponseDTO> listarTemporadasActivas() {
-        return precioTemporadaRepository.findByEstaEliminadoFalse().stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+        return precioTemporadaMapper.toResponseDTOList(precioTemporadaRepository.findByEstaEliminadoFalse());
     }
 
-    // --- Validaciones y Mappers ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<PrecioTemporadaResponseDTO> listarTemporadasPorTipos(List<Integer> ids) {
+        return precioTemporadaMapper.toResponseDTOList(precioTemporadaRepository.findByTipoHabitacion_IdTipoHabitacionInAndEstaEliminadoFalse(ids));
+    }
+
 
     private void validarFechas(PrecioTemporadaRequestDTO request) {
         if (!request.getFechaInicio().isBefore(request.getFechaFin()) && !request.getFechaInicio().isEqual(request.getFechaFin())) {
@@ -102,18 +106,5 @@ public class PrecioTemporadaServiceImpl implements IPrecioTemporadaService {
         if (!conflictos.isEmpty()) {
             throw new BusinessException("Las fechas se solapan con otra temporada ya existente para este tipo de habitación.");
         }
-    }
-
-    private PrecioTemporadaResponseDTO toDTO(PrecioTemporada temporada) {
-        PrecioTemporadaResponseDTO dto = new PrecioTemporadaResponseDTO();
-        dto.setIdPrecioTemporada(temporada.getIdPrecioTemporada());
-        dto.setFechaInicio(temporada.getFechaInicio());
-        dto.setFechaFin(temporada.getFechaFin());
-        dto.setPrecioEspecial(temporada.getPrecioEspecial());
-        if (temporada.getTipoHabitacion() != null) {
-            dto.setIdTipoHabitacion(temporada.getTipoHabitacion().getIdTipoHabitacion());
-            dto.setNombreTipoHabitacion(temporada.getTipoHabitacion().getNombreTipo());
-        }
-        return dto;
     }
 }

@@ -13,7 +13,7 @@ import com.StayFlow.model.PrecioTemporada;
 @Repository
 public interface PrecioTemporadaRepository extends JpaRepository<PrecioTemporada, Integer> {
 
-    // El método que ya usas en ReservaServiceImpl
+    // El método que tambien se usa en ReservaServiceImpl
     List<PrecioTemporada> findByTipoHabitacion_IdTipoHabitacionAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqualAndEstaEliminadoFalse(
             Integer idTipoHabitacion, LocalDate fechaFin, LocalDate fechaInicio);
 
@@ -25,6 +25,8 @@ public interface PrecioTemporadaRepository extends JpaRepository<PrecioTemporada
             @Param("fin") LocalDate fin, 
             @Param("idIgnorar") Integer idIgnorar);
             
-    // Listar todos los que no están eliminados
+    // Lista todos los que no están eliminados
     List<PrecioTemporada> findByEstaEliminadoFalse();
+
+    List<PrecioTemporada> findByTipoHabitacion_IdTipoHabitacionInAndEstaEliminadoFalse(List<Integer> idsTipoHabitacion);
 }

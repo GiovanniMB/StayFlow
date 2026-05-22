@@ -27,7 +27,7 @@ public class TestPagoController {
     @PostMapping("/tokens")
     public ResponseEntity<Map<String, Object>> guardarToken(
             @RequestBody PagoTokenRequestDTO request,
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true, sin defaultValue
+            @RequestParam(required = true) Integer idUsuario) { 
         
         PagoTokenResponseDTO response = pagoTokenService.guardarToken(request, idUsuario);
         
@@ -40,7 +40,7 @@ public class TestPagoController {
 
     @GetMapping("/tokens")
     public ResponseEntity<Map<String, Object>> listarTokens(
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true
+            @RequestParam(required = true) Integer idUsuario) {  
         
         List<PagoTokenResponseDTO> tokens = pagoTokenService.listarTokensUsuario(idUsuario);
         
@@ -54,7 +54,7 @@ public class TestPagoController {
     @DeleteMapping("/tokens/{idToken}")
     public ResponseEntity<Map<String, Object>> eliminarToken(
             @PathVariable Integer idToken,
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true
+            @RequestParam(required = true) Integer idUsuario) {  
         
         pagoTokenService.eliminarToken(idToken, idUsuario);
         
@@ -67,7 +67,7 @@ public class TestPagoController {
     @PostMapping("/procesar")
     public ResponseEntity<Map<String, Object>> procesarPago(
             @RequestBody PagoRequestDTO request,
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true
+            @RequestParam(required = true) Integer idUsuario) {  
         
         PagoResponseDTO response = pagoService.procesarPago(request, idUsuario);
         
@@ -81,7 +81,7 @@ public class TestPagoController {
     @GetMapping("/{idPago}/estado")
     public ResponseEntity<Map<String, Object>> obtenerEstado(
             @PathVariable Integer idPago,
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true
+            @RequestParam(required = true) Integer idUsuario) { 
         
         PagoResponseDTO response = pagoService.obtenerEstadoPago(idPago, idUsuario);
         
@@ -93,7 +93,7 @@ public class TestPagoController {
 
     @GetMapping("/mis-pagos")
     public ResponseEntity<Map<String, Object>> misPagos(
-            @RequestParam(required = true) Integer idUsuario) {  // 🔥 CAMBIADO: required = true
+            @RequestParam(required = true) Integer idUsuario) {  
         
         List<PagoResponseDTO> pagos = pagoService.obtenerPagosPorUsuario(idUsuario);
         

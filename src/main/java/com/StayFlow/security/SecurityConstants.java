@@ -23,12 +23,9 @@ public class SecurityConstants {
             "/api-docs/**",
             "/v3/api-docs/**",
             "/api/test/**",
-
-            // Endpoints públicos temporales para pruebas del módulo de reservas
-            "/api/reservas",
-            "/api/reservas/**",
-            "/api/clientes/*/reservas",
-            "/api/habitaciones/*/disponibilidad",
+            "/api/propiedades/**",
+            "/api/catalogos/**",
+            "/ws/**"
             
     };
 }

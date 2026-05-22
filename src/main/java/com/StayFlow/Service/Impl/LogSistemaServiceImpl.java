@@ -27,11 +27,11 @@ public class LogSistemaServiceImpl implements ILogSistemaService {
     @Override
     public void registrarLog(String tablaAfectada, Integer idRegistroAfectado, Accion accion) {
         try {
-            // 1. Obtener la autenticación actual del SecurityContext
+            // 1. Obtiene la autenticación actual del SecurityContext
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             Usuario usuarioAccion = null;
 
-            // 2. Extraer el email si el usuario está autenticado
+            // 2. Extrae el email si el usuario está autenticado
             if (authentication != null && authentication.isAuthenticated() && !authentication.getName().equals("anonymousUser")) {
                 String email = authentication.getName();
                 Optional<Usuario> usuarioOpt = usuarioRepository.findByEmail(email);
@@ -40,7 +40,7 @@ public class LogSistemaServiceImpl implements ILogSistemaService {
                 }
             }
 
-            // 3. Crear y armar la entidad del Log (la fecha se pone sola en el modelo)
+            // 3. Crea y arma la entidad del Log (la fecha se pone sola en el modelo)
             LogSistema log = new LogSistema();
             log.setTablaAfectada(tablaAfectada);
             log.setIdRegistroAfectado(idRegistroAfectado);

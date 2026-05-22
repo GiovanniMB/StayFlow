@@ -1,38 +1,39 @@
 package com.StayFlow.service;
 
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import java.util.Map;
 
 @Service
 public class EmailService {
 
     private final JavaMailSender mailSender;
+    private final TemplateEngine templateEngine;
 
- 
-
-    public EmailService(JavaMailSender mailSender) {
+    public EmailService(JavaMailSender mailSender, TemplateEngine templateEngine) {
         this.mailSender = mailSender;
+        this.templateEngine = templateEngine;
     }
+
+    // Metodos para enviar correos de confirmación de cuenta y recuperación de contraseña, con HTML personalizado y soporte para templates Thymeleaf
 
     public void enviarCodigoConfirmacion(String destinatario, String nombre, String codigo) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
             helper.setTo(destinatario);
             helper.setSubject("StayFlow - Confirma tu cuenta");
-            
             String urlConfirmacion = "http://localhost:5173/confirmar-email?codigo=" + codigo;
-            
             String htmlContent = construirHTMLConfirmacion(nombre, urlConfirmacion);
             helper.setText(htmlContent, true);
-            
             mailSender.send(message);
-            
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar email de confirmación", e);
         }
@@ -42,17 +43,12 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            
             helper.setTo(destinatario);
             helper.setSubject("StayFlow - Recuperación de contraseña");
-            
             String urlRecuperacion = "http://localhost:5173/reset-password?codigo=" + codigo;
-            
             String htmlContent = construirHTMLRecuperacion(nombre, urlRecuperacion);
             helper.setText(htmlContent, true);
-            
             mailSender.send(message);
-            
         } catch (MessagingException e) {
             throw new RuntimeException("Error al enviar email de recuperación", e);
         }
@@ -62,18 +58,45 @@ public class EmailService {
         try {
             MimeMessage message = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, false, "UTF-8");
-            
             helper.setTo(destinatario);
             helper.setSubject(asunto);
-            helper.setText(mensaje, false); // false indica que es texto plano, no HTML
-            
+            helper.setText(mensaje, false);
             mailSender.send(message);
         } catch (MessagingException e) {
             System.err.println("Error al enviar el correo: " + e.getMessage());
         }
     }
 
+    // Thymeleaf: Método para enviar correos usando templates HTML con variables dinámicas
+    public void enviarCorreoTemplate(String destinatario, String asunto, String templateName, Map<String, Object> variables) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            // true indica que es multipart (soporta HTML e imágenes incrustadas)
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            
+            helper.setTo(destinatario);
+            helper.setSubject(asunto);
 
+            // Carga las variables dinámicas en el contexto de Thymeleaf
+            Context context = new Context();
+            context.setVariables(variables);
+            
+            // Procesa el HTML
+            String html = templateEngine.process(templateName, context);      
+            helper.setText(html, true);
+
+            // Incrusta el logo dinámicamente como un recurso CID (Content-ID)
+            ClassPathResource image = new ClassPathResource("static/images/logo.png");
+            helper.addInline("logoImage", image);
+
+            mailSender.send(message);
+            
+        } catch (Exception e) {
+            System.err.println("Error al enviar el correo con template: " + e.getMessage());
+        }
+    }
+
+    // Cuerpo de los métodos de envío de correos para confirmar email y recuperación de contraseña (No usamos las templates para mostrarlo en la exposición, pero se mantienen por si queremos migrar a templates en el futuro)
     private String construirHTMLConfirmacion(String nombre, String urlConfirmacion) {
         return "<!DOCTYPE html>\n" +
                "<html>\n" +

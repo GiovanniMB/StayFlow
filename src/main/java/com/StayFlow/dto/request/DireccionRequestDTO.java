@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
-
+//Esto fue util en las pruebas de swagger ya que en el front no se ingresan directamente los ids
 // DTO para recibir los datos de la dirección de una propiedad en las solicitudes de creación o actualización. Incluye validaciones para asegurar que se proporcionen los datos necesarios y que tengan el formato correcto.
 @Schema(description = "Datos de entrada para la dirección de una propiedad") // Descripción general del DTO para Swagger
 public class DireccionRequestDTO {

@@ -4,11 +4,14 @@ import com.StayFlow.dto.request.PagoRequestDTO;
 import com.StayFlow.dto.request.PagoTokenRequestDTO;
 import com.StayFlow.dto.response.PagoResponseDTO;
 import com.StayFlow.dto.response.PagoTokenResponseDTO;
+import com.StayFlow.dto.response.TipoTarjetaResponseDTO;
 import com.StayFlow.exception.PaymentException;
 import com.StayFlow.model.Usuario;
 import com.StayFlow.repository.UsuarioRepository;
 import com.StayFlow.service.interfaces.IPagoService;
 import com.StayFlow.service.interfaces.IPagoTokenService;
+import com.StayFlow.service.interfaces.ITipoTarjetaService;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -34,7 +37,10 @@ public class PagoController {
     private IPagoTokenService pagoTokenService;
     
     @Autowired
-    private UsuarioRepository usuarioRepository;  
+    private UsuarioRepository usuarioRepository; 
+    
+    @Autowired
+    private ITipoTarjetaService tipoTarjetaService;
 
     private Integer extractUserId(UserDetails userDetails) {
         String email = userDetails.getUsername();
@@ -194,6 +200,41 @@ public ResponseEntity<Map<String, Object>> marcarEnRevision(
     result.put("success", true);
     result.put("message", "Pago marcado en revisión");
     result.put("data", response);
+    return ResponseEntity.ok(result);
+}
+
+@GetMapping("/tipos-tarjeta")
+@Operation(summary = "Obtener todos los tipos de tarjeta disponibles")
+public ResponseEntity<Map<String, Object>> obtenerTiposTarjeta() {
+    List<TipoTarjetaResponseDTO> tipos = tipoTarjetaService.obtenerTodosLosTiposTarjeta();
+    
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", true);
+    result.put("data", tipos);
+    return ResponseEntity.ok(result);
+}
+
+@GetMapping("/tipos-tarjeta/{id}")
+@Operation(summary = "Obtener tipo de tarjeta por ID")
+public ResponseEntity<Map<String, Object>> obtenerTipoTarjetaPorId(
+        @PathVariable Integer id) {
+    TipoTarjetaResponseDTO tipo = tipoTarjetaService.obtenerTipoTarjetaPorId(id);
+    
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", true);
+    result.put("data", tipo);
+    return ResponseEntity.ok(result);
+}
+
+@GetMapping("/tipos-tarjeta/codigo/{codigo}")
+@Operation(summary = "Obtener tipo de tarjeta por código")
+public ResponseEntity<Map<String, Object>> obtenerTipoTarjetaPorCodigo(
+        @PathVariable String codigo) {
+    TipoTarjetaResponseDTO tipo = tipoTarjetaService.obtenerTipoTarjetaPorCodigo(codigo);
+    
+    Map<String, Object> result = new HashMap<>();
+    result.put("success", true);
+    result.put("data", tipo);
     return ResponseEntity.ok(result);
 }
 }

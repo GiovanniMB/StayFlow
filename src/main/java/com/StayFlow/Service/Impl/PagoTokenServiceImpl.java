@@ -47,7 +47,7 @@ public class PagoTokenServiceImpl implements IPagoTokenService {
         TipoTarjeta tipoTarjeta = tipoTarjetaRepository.findById(request.getIdTipoTarjeta())
             .orElseThrow(() -> new PaymentException("Tipo de tarjeta inválido"));
         
-        // Verificar si este token ya existe para este usuario
+        // Verifica si este token ya existe para este usuario
         if (pagoTokenRepository.existsByUsuario_IdUsuarioAndTokenGatewayAndActivoTrue(idUsuario, request.getTokenGateway())) {
             throw new PaymentException("Este método de pago ya está registrado");
         }

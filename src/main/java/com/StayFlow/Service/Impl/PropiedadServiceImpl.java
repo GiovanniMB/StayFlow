@@ -77,10 +77,10 @@ public class PropiedadServiceImpl implements IPropiedadService {
                     .orElseThrow(() -> new ResourceNotFoundException("Colonia", "id", idColonia));
             
             propiedad.getDireccion().setColonia(colonia);
-            // Asignamos solo los servicios oficiales del catálogo
+            // Asigna solo los servicios oficiales del catálogo
         propiedad.setServicios(procesarServicios(request.getIdServicios()));
         
-        // Empacamos los personalizados como una simple lista de texto separada por comas
+        // Empaca los personalizados como una simple lista de texto separada por comas
         if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
             propiedad.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
         } else {
@@ -166,14 +166,21 @@ public class PropiedadServiceImpl implements IPropiedadService {
             }
         }
 
-       // Asignamos solo los servicios oficiales del catálogo
+       // Asigna solo los servicios oficiales del catálogo
         propiedadExistente.setServicios(procesarServicios(request.getIdServicios()));
         
-        // Empacamos los personalizados como una simple lista de texto separada por comas
+        // Empaca los personalizados como una simple lista de texto separada por comas
         if (request.getNuevosServicios() != null && !request.getNuevosServicios().isEmpty()) {
             propiedadExistente.setAmenidadesExtra(String.join(", ", request.getNuevosServicios()));
         } else {
             propiedadExistente.setAmenidadesExtra(null);
+        }
+
+        if (request.getHoraCheckIn() != null) {
+            propiedadExistente.setHoraCheckIn(request.getHoraCheckIn());
+        }
+        if (request.getHoraCheckOut() != null) {
+            propiedadExistente.setHoraCheckOut(request.getHoraCheckOut());
         }
 
         Propiedad propiedadActualizada = propiedadRepository.save(propiedadExistente);
@@ -231,11 +238,11 @@ public class PropiedadServiceImpl implements IPropiedadService {
             throw new BusinessException("La fecha de salida debe ser estrictamente posterior a la fecha de entrada.");
         }
 
-        // 2. Ejecutar tu Súper Query OTA
-        // Llama al método que agregamos en PropiedadRepository
+        // 2. Ejecuta el Query OTA
+        // Llama al método en PropiedadRepository
         List<Propiedad> propiedadesDisponibles = propiedadRepository.findDisponiblesByFechas(fechaEntrada, fechaSalida);
 
-        // 3. Convertir la lista de Entidades a DTOs para el Frontend
+        // 3. Convierte la lista de Entidades a DTOs para el Frontend
         return propiedadMapper.toResponseDTOList(propiedadesDisponibles);
     }
 

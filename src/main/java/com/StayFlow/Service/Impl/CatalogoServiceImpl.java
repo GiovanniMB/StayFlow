@@ -29,7 +29,7 @@ public class CatalogoServiceImpl implements ICatalogoService {
     private final TipoCamaRepository tipoCamaRepository;
     private final CategoriaFotoRepository categoriaFotoRepository;
 
-    // Inyectamos la dependencia pasándola como parámetro en el constructor
+    // Inyecta la dependencia pasándola como parámetro en el constructor
     public CatalogoServiceImpl(EstadoRepository estadoRepository, 
                                MunicipioRepository municipioRepository, 
                                ColoniaRepository coloniaRepository,

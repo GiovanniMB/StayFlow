@@ -3,6 +3,8 @@ package com.StayFlow.controller;
 import com.StayFlow.dto.request.PrecioTemporadaRequestDTO;
 import com.StayFlow.dto.response.PrecioTemporadaResponseDTO;
 import com.StayFlow.service.interfaces.IPrecioTemporadaService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/temporadas")
-@CrossOrigin(origins = "*") 
+@Tag(name = "Precios por Temporada", description = "Controlador para gestionar precios por temporadas")
 public class PrecioTemporadaController {
 
     private final IPrecioTemporadaService precioTemporadaService;
@@ -41,5 +43,9 @@ public class PrecioTemporadaController {
     @GetMapping("/listar")
     public ResponseEntity<List<PrecioTemporadaResponseDTO>> listarTemporadas() {
         return ResponseEntity.ok(precioTemporadaService.listarTemporadasActivas());
+    }
+    @GetMapping("/listar-por-tipos")
+    public ResponseEntity<List<PrecioTemporadaResponseDTO>> listarPorTipos(@RequestParam List<Integer> ids) {
+        return ResponseEntity.ok(precioTemporadaService.listarTemporadasPorTipos(ids));
     }
 }

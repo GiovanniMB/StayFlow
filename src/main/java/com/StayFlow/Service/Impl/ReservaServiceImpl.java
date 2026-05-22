@@ -39,7 +39,8 @@ public class ReservaServiceImpl implements IReservaService {
     private final HabitacionRepository habitacionRepository;
     private final UsuarioRepository usuarioRepository;
     private final ILogSistemaService logSistemaService;
-    private final ReservaMapper reservaMapper;          
+    private final ReservaMapper reservaMapper;
+    private final com.StayFlow.service.interfaces.IPagoService pagoService;          
 
     public ReservaServiceImpl(ReservaRepository reservaRepository,
                               HabitacionRepository habitacionRepository,
@@ -47,7 +48,8 @@ public class ReservaServiceImpl implements IReservaService {
                               BloqueoHabitacionRepository bloqueoHabitacionRepository,
                               UsuarioRepository usuarioRepository,
                               ILogSistemaService logSistemaService, 
-                              ReservaMapper reservaMapper) {        
+                              ReservaMapper reservaMapper,
+                              com.StayFlow.service.interfaces.IPagoService pagoService) {      
         this.reservaRepository = reservaRepository;
         this.habitacionRepository = habitacionRepository;
         this.precioTemporadaRepository = precioTemporadaRepository;
@@ -55,6 +57,7 @@ public class ReservaServiceImpl implements IReservaService {
         this.usuarioRepository = usuarioRepository;
         this.logSistemaService = logSistemaService;
         this.reservaMapper = reservaMapper;         
+        this.pagoService = pagoService;
     }
 
     @Override
@@ -164,7 +167,43 @@ public class ReservaServiceImpl implements IReservaService {
             throw new BusinessException("La reserva ya está cancelada.");
         }
 
+        // Comprobacion en back end para la logica de los reembolsos segun la politica de cancelacion (Zona Verde, Amarilla, Roja)
+        long diasFaltantes = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), reserva.getFechaEntrada());
+        java.math.BigDecimal porcentajeReembolso;
+
+        if (diasFaltantes >= 5) {
+            porcentajeReembolso = new java.math.BigDecimal("1.00"); // 100% (Zona Verde)
+        } else if (diasFaltantes >= 2 && diasFaltantes <= 4) {
+            porcentajeReembolso = new java.math.BigDecimal("0.50"); // 50% (Zona Amarilla)
+        } else {
+            porcentajeReembolso = java.math.BigDecimal.ZERO;        // 0% (Zona Roja)
+        }
+
+       // Calcula el dinero real a devolver
+        java.math.BigDecimal montoAReembolsar = reserva.getMontoTotal().multiply(porcentajeReembolso);
+
+        // Procesamiento del reembolso (Solo si le toca dinero de vuelta)
+        if (montoAReembolsar.compareTo(java.math.BigDecimal.ZERO) > 0) {
+            try {
+                pagoService.reembolsarPorReserva(reserva.getIdReserva(), montoAReembolsar);
+                System.out.println("✅ Reembolso exitoso: Se devolvieron $" + montoAReembolsar + " MXN al cliente.");
+            } catch (Exception e) {
+                // Si el reembolso falla (ej. banco rechazado), detenemos la cancelación
+                throw new BusinessException("No se pudo procesar el reembolso en el banco: " + e.getMessage());
+            }
+        } else {
+            System.out.println("🛑 Cancelación en Zona Roja. No hay reembolso aplicable ($0.00).");
+        }
+
+        // Libera la habitación
+        Habitacion habitacion = reserva.getHabitacion();
+        habitacion.setEstado(Habitacion.EstadoHabitacion.disponible);
+        habitacionRepository.save(habitacion);
+
+        // Cancela la reserva
         reserva.setEstadoReserva(EstadoReserva.cancelada);
+        logSistemaService.registrarLog("reserva", reserva.getIdReserva(), com.StayFlow.model.LogSistema.Accion.UPDATE);
+
         return reservaMapper.toResponseDTO(reservaRepository.save(reserva));
     }
 
@@ -192,7 +231,7 @@ public class ReservaServiceImpl implements IReservaService {
     }
 
     private void validarDisponibilidadInterna(Integer idHabitacion, LocalDate fechaEntrada, LocalDate fechaSalida) {
-        // 1. Extraemos la habitación para conocer su jerarquía (a qué Categoría y Propiedad pertenece)
+        // 1. Extrae la habitación para conocer su jerarquía (a qué Categoría y Propiedad pertenece)
         Habitacion habitacion = habitacionRepository.findById(idHabitacion)
                 .orElseThrow(() -> new ResourceNotFoundException("Habitación no encontrada."));
 
@@ -251,4 +290,13 @@ public class ReservaServiceImpl implements IReservaService {
         return reservaMapper.toResponseDTOList(reservas);
     }
     
+    @Override
+    @Transactional
+    public void actualizarEstadoReserva(Integer idReserva, EstadoReserva nuevoEstado) {
+        Reserva reserva = reservaRepository.findById(idReserva)
+             .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
+
+        reserva.setEstadoReserva(nuevoEstado);
+        reservaRepository.save(reserva);
+ }
 }

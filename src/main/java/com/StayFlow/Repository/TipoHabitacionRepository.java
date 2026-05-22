@@ -11,9 +11,9 @@ import com.StayFlow.model.TipoHabitacion;
 @Repository
 public interface TipoHabitacionRepository extends JpaRepository<TipoHabitacion, Integer> {
 
-    // Buscar todas las categorías (tipos) de una propiedad específica
+    // Busca todas las categorías (tipos) de una propiedad específica
     List<TipoHabitacion> findByPropiedadIdPropiedadAndEstaEliminadoFalse(Integer idPropiedad);
 
-    // Buscar un tipo de habitación específico asegurando que no esté eliminado
+    // Busca un tipo de habitación específico asegurando que no esté eliminado
     Optional<TipoHabitacion> findByIdTipoHabitacionAndEstaEliminadoFalse(Integer idTipoHabitacion);
 }

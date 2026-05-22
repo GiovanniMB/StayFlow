@@ -5,42 +5,26 @@ import com.StayFlow.dto.response.ApiResponseDTO;
 import com.StayFlow.dto.response.MensajeChatResponseDTO;
 import com.StayFlow.service.interfaces.IMensajeChatService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.DestinationVariable;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reservas")
+@RequestMapping("/api/reservas") 
 public class MensajeChatController {
 
     private final IMensajeChatService chatService;
+    private final SimpMessagingTemplate messagingTemplate; 
 
-    public MensajeChatController(IMensajeChatService chatService) {
+    public MensajeChatController(IMensajeChatService chatService, SimpMessagingTemplate messagingTemplate) {
         this.chatService = chatService;
+        this.messagingTemplate = messagingTemplate;
     }
 
-    // Endpoint para enviar un mensaje
-    @PostMapping("/{idReserva}/mensajes")
-    public ResponseEntity<ApiResponseDTO<MensajeChatResponseDTO>> enviarMensaje(
-            @PathVariable Integer idReserva,
-            @Valid @RequestBody MensajeChatRequestDTO request) {
-        
-        // Asegura que el ID de la URL coincida con el del Body por seguridad
-        request.setIdReserva(idReserva);
-        
-        MensajeChatResponseDTO mensaje = chatService.enviarMensaje(request);
-        
-        ApiResponseDTO<MensajeChatResponseDTO> response = new ApiResponseDTO<>();
-        response.setSuccess(true);
-        response.setMessage("Mensaje enviado");
-        response.setData(mensaje);
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    // Endpoint para leer el historial
     @GetMapping("/{idReserva}/mensajes")
     public ResponseEntity<ApiResponseDTO<List<MensajeChatResponseDTO>>> obtenerHistorial(
             @PathVariable Integer idReserva) {
@@ -53,5 +37,13 @@ public class MensajeChatController {
         response.setData(historial);
         
         return ResponseEntity.ok(response);
+    }
+
+    // Túnel WebSocket (No tocar)
+    @MessageMapping("/chat/{idReserva}")
+    public void enviarMensajeWS(@DestinationVariable Integer idReserva, @Valid MensajeChatRequestDTO request) {
+        request.setIdReserva(idReserva);
+        MensajeChatResponseDTO mensajeGuardado = chatService.enviarMensaje(request);
+        messagingTemplate.convertAndSend("/topic/reserva/" + idReserva, mensajeGuardado);
     }
 }
