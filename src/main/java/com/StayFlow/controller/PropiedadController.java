@@ -137,4 +137,21 @@ public class PropiedadController {
         
         return ResponseEntity.ok(propiedadService.obtenerPropiedadesDisponibles(checkin, checkout));
     }
+
+    @GetMapping("/catalogo/buscar")
+    @Operation(summary = "Buscador avanzado paginado para el catálogo público")
+    public ResponseEntity<ApiResponseDTO<org.springframework.data.domain.Page<PropiedadResponseDTO>>> buscarCatalogo(
+            @RequestParam(required = false) String termino,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkin,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkout,
+            @RequestParam(required = false) List<Integer> servicios,
+            @RequestParam(required = false) java.math.BigDecimal precioMaximo,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        
+        org.springframework.data.domain.Page<PropiedadResponseDTO> resultado = 
+            propiedadService.buscarCatalogoPaginado(termino, checkin, checkout, servicios, precioMaximo, page, size);
+            
+        return ResponseEntity.ok(ApiResponseDTO.success("Búsqueda exitosa", resultado));
+    }
 }

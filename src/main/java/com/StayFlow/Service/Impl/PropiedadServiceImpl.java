@@ -29,6 +29,9 @@ import com.StayFlow.repository.PropiedadRepository;
 import com.StayFlow.repository.RolRepository;
 import com.StayFlow.repository.ServicioRepository;
 import com.StayFlow.repository.UsuarioRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import com.StayFlow.specification.PropiedadSpecification;
 
 @Service
 public class PropiedadServiceImpl implements IPropiedadService {
@@ -261,5 +264,20 @@ public class PropiedadServiceImpl implements IPropiedadService {
         return propiedadMapper.toResponseDTOList(propiedades);
     }
 
+
+    @Override
+    @Transactional(readOnly = true)
+    public org.springframework.data.domain.Page<PropiedadResponseDTO> buscarCatalogoPaginado(
+        String termino, LocalDate checkin, LocalDate checkout, List<Integer> servicios, java.math.BigDecimal precioMaximo, int page, int size) {
+        
+        Pageable pageable = PageRequest.of(page, size);
+        
+        // Ejecuta la búsqueda dinámica
+        org.springframework.data.domain.Page<Propiedad> propiedadesPaginadas = 
+            propiedadRepository.findAll(PropiedadSpecification.buscarConFiltros(termino, checkin, checkout, servicios, precioMaximo), pageable);
+
+        // Convierte el Page de Entidades a un Page de DTOs usando el mapper
+        return propiedadesPaginadas.map(propiedadMapper::toResponseDTO);
+    }
     
 }

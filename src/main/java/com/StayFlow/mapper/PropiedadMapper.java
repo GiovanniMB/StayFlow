@@ -7,6 +7,8 @@ import com.StayFlow.dto.response.PropiedadResponseDTO;
 import com.StayFlow.model.Direccion;
 import com.StayFlow.model.Propiedad;
 import org.springframework.stereotype.Component;
+
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.StayFlow.dto.response.ServicioResponseDTO;
@@ -108,6 +110,23 @@ public class PropiedadMapper {
 
         response.setCalificacionPromedio(propiedad.getCalificacionPromedio() != null ? propiedad.getCalificacionPromedio() : 0.0);
         response.setCantidadResenas(propiedad.getCantidadResenas() != null ? propiedad.getCantidadResenas() : 0);
+
+
+        // Calcular rango de precios si se renta por habitaciones
+        if (propiedad.isSeRentaPorHabitaciones() && propiedad.getTiposHabitacion() != null) {
+            BigDecimal min = null;
+            BigDecimal max = null;
+
+            for (com.StayFlow.model.TipoHabitacion th : propiedad.getTiposHabitacion()) {
+                if (!th.isEstaEliminado() && th.getPrecioBaseNoche() != null) {
+                    BigDecimal precio = th.getPrecioBaseNoche();
+                    if (min == null || precio.compareTo(min) < 0) min = precio;
+                    if (max == null || precio.compareTo(max) > 0) max = precio;
+                }
+            }
+            response.setPrecioMinimo(min);
+            response.setPrecioMaximo(max);
+        }
 
         return response;
     }

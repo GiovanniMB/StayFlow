@@ -15,4 +15,7 @@ public interface IPropiedadService {
     List<PropiedadResponseDTO> obtenerPropiedadesDisponibles(LocalDate fechaEntrada, LocalDate fechaSalida);
     List<PropiedadResponseDTO> obtenerPropiedadesPorAnfitrion(Integer idAnfitrion);
     List<PropiedadResponseDTO> obtenerCatalogoPublico();
+
+    org.springframework.data.domain.Page<PropiedadResponseDTO> buscarCatalogoPaginado(
+        String termino, LocalDate checkin, LocalDate checkout, List<Integer> servicios, java.math.BigDecimal precioMaximo, int page, int size);
 }

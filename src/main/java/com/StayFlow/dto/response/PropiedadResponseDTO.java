@@ -60,11 +60,17 @@ public class PropiedadResponseDTO {
     @Schema(description = "Cantidad total de reseñas que tiene la propiedad", example = "25")
     private Integer cantidadResenas;
 
-    // --- Constructor vacío ---
+    @Schema(description = "Precio mínimo de habitación (si aplica)", example = "500.00")
+    private BigDecimal precioMinimo;
+
+    @Schema(description = "Precio máximo de habitación (si aplica)", example = "1500.00")
+    private BigDecimal precioMaximo;
+
+    // Constructor vacío
     public PropiedadResponseDTO() {
     }
 
-    // --- Constructor con parámetros actualizado ---
+    // Constructor completo
     public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios, String amenidadesExtra) {
         this.idPropiedad = idPropiedad;
         this.idDueno = idDueno;
@@ -215,5 +221,21 @@ public class PropiedadResponseDTO {
 
     public void setCantidadResenas(Integer cantidadResenas) {
         this.cantidadResenas = cantidadResenas;
+    }
+
+    public BigDecimal getPrecioMinimo() {
+        return precioMinimo;
+    }
+
+    public void setPrecioMinimo(BigDecimal precioMinimo) {
+        this.precioMinimo = precioMinimo;
+    }
+
+    public BigDecimal getPrecioMaximo() {
+        return precioMaximo;
+    }
+
+    public void setPrecioMaximo(BigDecimal precioMaximo) {
+        this.precioMaximo = precioMaximo;
     }
 }

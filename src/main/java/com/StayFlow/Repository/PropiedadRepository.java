@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -16,7 +17,7 @@ import com.StayFlow.model.Propiedad;
  * Maneja las operaciones de base de datos heredando de JpaRepository.
  */
 @Repository
-public interface PropiedadRepository extends JpaRepository<Propiedad, Integer> {
+public interface PropiedadRepository extends JpaRepository<Propiedad, Integer>, JpaSpecificationExecutor<Propiedad> {
 
     // Devuelve todas las propiedades que NO han sido eliminadas lógicamente
     List<Propiedad> findByEstaEliminadoFalse();
