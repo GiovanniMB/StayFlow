@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.service.impl;
 
 import com.StayFlow.dto.request.MensajeChatRequestDTO;
 import com.StayFlow.dto.response.MensajeChatResponseDTO;

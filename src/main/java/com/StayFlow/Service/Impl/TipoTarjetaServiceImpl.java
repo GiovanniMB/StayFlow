@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.service.impl;
 
 import com.StayFlow.dto.response.TipoTarjetaResponseDTO;
 import com.StayFlow.exception.ResourceNotFoundException;

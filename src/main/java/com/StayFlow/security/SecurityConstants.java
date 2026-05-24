@@ -25,20 +25,11 @@ public class SecurityConstants {
     	    "/api-docs/**",
     	    "/v3/api-docs/**",
     	    "/uploads/**",
-    	    "/api/usuarios/cuenta/reactivar"
-    	};
-            "/api/usuarios/registro",
-            "/api/usuarios/login",
-            "/api/usuarios/confirmar-email",
-            "/api/usuarios/refresh-token",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/api-docs/**",
-            "/v3/api-docs/**",
-            "/api/test/**",
+    	    "/api/usuarios/cuenta/reactivar",
+              "/api/test/**",
             "/api/propiedades/**",
             "/api/catalogos/**",
             "/ws/**"
-            
-    };
+          
+    	};
 }

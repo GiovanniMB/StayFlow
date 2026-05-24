@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.service.impl;
 
 import com.StayFlow.repository.CategoriaFotoRepository;
 import com.StayFlow.repository.ColoniaRepository;

@@ -1,4 +1,4 @@
-package com.StayFlow.service.Impl;
+package com.StayFlow.service.impl;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
