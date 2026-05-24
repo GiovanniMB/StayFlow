@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 40px 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <tr>
+            <td style="text-align: center; padding: 30px 20px 20px; border-bottom: 1px solid #e5e7eb;">
+                <img src="cid:logoImage" alt="StayFlow Logo" style="max-width: 180px; height: auto;" />
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 30px; color: #374151;">
+                <h2 style="color: #10b981; margin-top: 0;">¡Dinero en camino! 💸</h2>
+                <p>Hola <strong th:text="${nombreAnfitrion}">Anfitrión</strong>,</p>
+                <p>¡Excelentes noticias! Tienes una nueva reserva confirmada y pagada en <strong th:text="${nombrePropiedad}">tu propiedad</strong>.</p>
+                
+                <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                    <p style="margin: 0 0 10px 0;"><strong>Huésped:</strong> <span th:text="${nombreCliente}">Juan Pérez</span></p>
+                    <p style="margin: 0 0 10px 0;"><strong>Habitación:</strong> <span th:text="${habitacion}">Suite 1</span></p>
+                    <p style="margin: 0 0 10px 0;"><strong>Entrada:</strong> <span th:text="${fechaEntrada}">2026-05-20</span></p>
+                    <p style="margin: 0 0 10px 0;"><strong>Salida:</strong> <span th:text="${fechaSalida}">2026-05-25</span></p>
+                </div>
+                
+                <p style="text-align: center; margin-top: 20px;"><strong>¡Prepárate para recibir a tu huésped y darle una excelente estancia!</strong></p>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; padding: 20px; font-size: 12px; color: #9ca3af; background-color: #f9fafb;">
+                <p style="margin: 0;">StayFlow - Panel de Anfitriones</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -15,9 +15,10 @@ import io.swagger.v3.oas.models.servers.Server;
 
 @Configuration
 public class OpenAPIConfig {
-
+    // Configuración de OpenAPI para la documentación de la API REST
     @Bean
     public OpenAPI customOpenAPI() {
+        // Configuración de la información general de la API, servidores y seguridad
         return new OpenAPI()
             .info(new Info()
                 .title("StayFlow API")
