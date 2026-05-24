@@ -1,10 +1,19 @@
 package com.StayFlow.controller;
 
+
 import static com.StayFlow.security.SecurityConstants.REFRESH_TOKEN_HEADER;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.StayFlow.dto.request.LoginRequestDTO;
 import com.StayFlow.dto.request.ReactivarCuentaRequestDTO;
@@ -41,6 +51,8 @@ public class UsuarioController {
     private final IUsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
     private final JwtUtil jwtUtil;
+    @Value("${upload.dir:uploads/avatars/}")
+    private String uploadDir;
 
     public UsuarioController(IUsuarioService usuarioService,
                              UsuarioRepository usuarioRepository,
@@ -117,7 +129,6 @@ public class UsuarioController {
     public ResponseEntity<ApiResponseDTO<UsuarioResponseDTO>> getPerfilAutenticado(
             @RequestHeader("Authorization") String token) {
         
-        // Extraer email del token
         String email = jwtUtil.extractEmail(token.substring(7));
         
         UsuarioResponseDTO data = usuarioService.getPerfilByEmail(email);
@@ -219,6 +230,114 @@ public class UsuarioController {
     public ResponseEntity<ApiResponseDTO<Void>> reactivarCuenta(@Valid @RequestBody ReactivarCuentaRequestDTO request) {
         usuarioService.reactivarCuenta(request);
         return ResponseEntity.ok(ApiResponseDTO.success("Cuenta reactivada exitosamente. Ya puedes iniciar sesión."));
+    }
+    
+    
+    
+    @PostMapping("/avatar")
+    @Operation(summary = "Subir imagen de perfil", 
+               description = "Permite al usuario subir una imagen de perfil. La imagen se guarda en el servidor y se actualiza el avatarUrl.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Imagen subida exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Archivo inválido o muy grande"),
+        @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<ApiResponseDTO<String>> subirAvatar(
+            @RequestHeader("Authorization") String token,
+            @RequestParam("file") MultipartFile file) {
+        
+
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(ApiResponseDTO.error("No se ha seleccionado ningún archivo", 400));
+        }
+        
+
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.startsWith("image/")) {
+            return ResponseEntity.badRequest().body(ApiResponseDTO.error("El archivo debe ser una imagen", 400));
+        }
+        
+
+        if (file.getSize() > 2 * 1024 * 1024) {
+            return ResponseEntity.badRequest().body(ApiResponseDTO.error("La imagen no debe superar los 2MB", 400));
+        }
+        
+        try {
+
+            Path uploadPath = Paths.get(uploadDir);
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+            
+
+            String extension = "";
+            String originalFilename = file.getOriginalFilename();
+            if (originalFilename != null && originalFilename.contains(".")) {
+                extension = originalFilename.substring(originalFilename.lastIndexOf("."));
+            }
+            String fileName = UUID.randomUUID().toString() + extension;
+            Path filePath = uploadPath.resolve(fileName);
+            
+
+            Files.copy(file.getInputStream(), filePath);
+            
+
+            String imageUrl = "/uploads/avatars/" + fileName;
+            
+
+            String email = jwtUtil.extractEmail(token.substring(7));
+            Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));
+            
+
+            String oldAvatar = usuario.getAvatarUrl();
+            if (oldAvatar != null && oldAvatar.contains("/uploads/avatars/")) {
+                String oldFileName = oldAvatar.substring(oldAvatar.lastIndexOf("/") + 1);
+                Path oldFilePath = uploadPath.resolve(oldFileName);
+                Files.deleteIfExists(oldFilePath);
+            }
+            
+            usuario.setAvatarUrl(imageUrl);
+            usuarioRepository.save(usuario);
+            
+            return ResponseEntity.ok(ApiResponseDTO.success("Imagen subida exitosamente", imageUrl));
+            
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiResponseDTO.error("Error al guardar la imagen", 500));
+        }
+    }
+    
+    
+    @DeleteMapping("/avatar")
+    @Operation(summary = "Eliminar imagen de perfil", 
+               description = "Elimina la imagen de perfil del usuario y restablece el avatarUrl a null")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Imagen eliminada exitosamente"),
+        @ApiResponse(responseCode = "401", description = "No autenticado")
+    })
+    public ResponseEntity<ApiResponseDTO<Void>> eliminarAvatar(@RequestHeader("Authorization") String token) {
+        String email = jwtUtil.extractEmail(token.substring(7));
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario", "email", email));
+        
+
+        String oldAvatar = usuario.getAvatarUrl();
+        if (oldAvatar != null && oldAvatar.contains("/uploads/avatars/")) {
+            try {
+                Path uploadPath = Paths.get(uploadDir);
+                String oldFileName = oldAvatar.substring(oldAvatar.lastIndexOf("/") + 1);
+                Path oldFilePath = uploadPath.resolve(oldFileName);
+                Files.deleteIfExists(oldFilePath);
+            } catch (IOException e) {
+                
+            }
+        }
+        
+        usuario.setAvatarUrl(null);
+        usuarioRepository.save(usuario);
+        
+        return ResponseEntity.ok(ApiResponseDTO.success("Avatar eliminado exitosamente"));
     }
 
 }
