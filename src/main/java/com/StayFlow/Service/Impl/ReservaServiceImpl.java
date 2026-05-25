@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.temporal.ChronoUnit;
+import com.StayFlow.model.Propiedad;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,7 +82,7 @@ public class ReservaServiceImpl implements IReservaService {
 
         validarDisponibilidadInterna(habitacion.getIdHabitacion(), request.getFechaEntrada(), request.getFechaSalida());
 
-        BigDecimal montoTotal = calcularMontoTotal(habitacion.getTipoHabitacion(), request.getFechaEntrada(), request.getFechaSalida());
+        BigDecimal montoTotal = calcularMontoTotal(habitacion, request.getFechaEntrada(), request.getFechaSalida());
 
         Reserva reserva = new Reserva();
         reserva.setHabitacion(habitacion);
@@ -257,20 +259,72 @@ public class ReservaServiceImpl implements IReservaService {
         }
     }
 
-    private BigDecimal calcularMontoTotal(TipoHabitacion tipo, LocalDate inicio, LocalDate fin) {
-        BigDecimal total = BigDecimal.ZERO;
-        LocalDate actual = inicio;
-        while (actual.isBefore(fin)) {
-            total = total.add(obtenerPrecioPorNoche(tipo, actual));
-            actual = actual.plusDays(1);
-        }
-        return total;
+    private BigDecimal calcularMontoTotal(Habitacion habitacion, LocalDate inicio, LocalDate fin) {
+    if (habitacion == null) {
+        throw new BusinessException("No se encontró la habitación para calcular el monto.");
     }
 
-    private BigDecimal obtenerPrecioPorNoche(TipoHabitacion tipo, LocalDate fecha) {
-        List<PrecioTemporada> precios = precioTemporadaRepository.findByTipoHabitacion_IdTipoHabitacionAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqualAndEstaEliminadoFalse(tipo.getIdTipoHabitacion(), fecha, fecha);
-        return !precios.isEmpty() ? precios.get(0).getPrecioEspecial() : tipo.getPrecioBaseNoche();
+    if (habitacion.getPropiedad() == null) {
+        throw new BusinessException("La habitación no tiene una propiedad asociada.");
     }
+
+    long noches = ChronoUnit.DAYS.between(inicio, fin);
+
+    if (noches <= 0) {
+        throw new BusinessException("La fecha de salida debe ser después de la entrada.");
+    }
+
+    BigDecimal total = BigDecimal.ZERO;
+    LocalDate actual = inicio;
+
+    while (actual.isBefore(fin)) {
+        total = total.add(obtenerPrecioPorNoche(habitacion, actual));
+        actual = actual.plusDays(1);
+    }
+
+    if (total.compareTo(BigDecimal.ZERO) <= 0) {
+        throw new BusinessException("No se pudo calcular un monto válido para la reserva.");
+    }
+
+    return total;
+}
+
+private BigDecimal obtenerPrecioPorNoche(Habitacion habitacion, LocalDate fecha) {
+    Propiedad propiedad = habitacion.getPropiedad();
+
+    if (!Boolean.TRUE.equals(propiedad.isSeRentaPorHabitaciones())) {
+        BigDecimal precioPropiedad = propiedad.getPrecioNoche();
+
+        if (precioPropiedad == null || precioPropiedad.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("La propiedad completa no tiene un precio por noche válido.");
+        }
+
+        return precioPropiedad;
+    }
+
+    TipoHabitacion tipo = habitacion.getTipoHabitacion();
+
+    if (tipo == null) {
+        throw new BusinessException("La habitación no tiene un tipo de habitación asociado.");
+    }
+
+    List<PrecioTemporada> precios = precioTemporadaRepository
+            .findByTipoHabitacion_IdTipoHabitacionAndFechaInicioLessThanEqualAndFechaFinGreaterThanEqualAndEstaEliminadoFalse(
+                    tipo.getIdTipoHabitacion(),
+                    fecha,
+                    fecha
+            );
+
+    if (!precios.isEmpty()) {
+        return precios.get(0).getPrecioEspecial();
+    }
+
+    if (tipo.getPrecioBaseNoche() == null || tipo.getPrecioBaseNoche().compareTo(BigDecimal.ZERO) <= 0) {
+        throw new BusinessException("El tipo de habitación no tiene un precio base válido.");
+    }
+
+    return tipo.getPrecioBaseNoche();
+}
 
 
     @Override
@@ -294,9 +348,16 @@ public class ReservaServiceImpl implements IReservaService {
     @Transactional
     public void actualizarEstadoReserva(Integer idReserva, EstadoReserva nuevoEstado) {
         Reserva reserva = reservaRepository.findById(idReserva)
-             .orElseThrow(() -> new ResourceNotFoundException("Reserva no encontrada"));
-
+             .orElseThrow(() -> new ResourceNotFoundException("Reserva", "id", idReserva));
+        
+        // Si el estado al que cambia es CHECK_IN, validamos que no sea antes de tiempo
+        if (nuevoEstado == EstadoReserva.check_in || "CHECK_IN".equals(nuevoEstado.name())) {
+            if (LocalDate.now().isBefore(reserva.getFechaEntrada())) {
+                throw new BusinessException("No es posible realizar el Check-In antes de la fecha de entrada (" + reserva.getFechaEntrada() + ").");
+            }
+        }
+        
         reserva.setEstadoReserva(nuevoEstado);
         reservaRepository.save(reserva);
- }
+    }
 }

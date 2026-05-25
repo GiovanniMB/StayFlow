@@ -21,6 +21,34 @@ public class PropiedadSpecification {
             predicates.add(cb.isFalse(root.get("estaEliminado")));
             predicates.add(cb.equal(root.get("estadoPropiedad"), Propiedad.EstadoPropiedad.PUBLICADA));
 
+            // Debe tener al menos una foto general activa
+            Subquery<Integer> subqueryFotos = query.subquery(Integer.class);
+            Root<com.StayFlow.model.FotoHabitacion> fotoRoot = subqueryFotos.from(com.StayFlow.model.FotoHabitacion.class);
+            subqueryFotos.select(cb.literal(1));
+            subqueryFotos.where(cb.and(
+                cb.equal(fotoRoot.get("propiedad"), root),
+                cb.isFalse(fotoRoot.get("estaEliminado")),
+                cb.isNull(fotoRoot.get("tipoHabitacion")) // Asegura que sea foto de la propiedad, no de un cuarto específico
+            ));
+            predicates.add(cb.exists(subqueryFotos));
+
+            // Si es hotel, DEBE tener al menos un tipo de habitación creado
+            Predicate esCasaCompleta = cb.isFalse(root.get("seRentaPorHabitaciones"));
+            
+            Subquery<Integer> subqueryHabitaciones = query.subquery(Integer.class);
+            Root<com.StayFlow.model.TipoHabitacion> tipoHabRoot = subqueryHabitaciones.from(com.StayFlow.model.TipoHabitacion.class);
+            subqueryHabitaciones.select(cb.literal(1));
+            subqueryHabitaciones.where(cb.and(
+                cb.equal(tipoHabRoot.get("propiedad"), root),
+                cb.isFalse(tipoHabRoot.get("estaEliminado"))
+            ));
+            Predicate esHotelConCuartos = cb.and(
+                cb.isTrue(root.get("seRentaPorHabitaciones")),
+                cb.exists(subqueryHabitaciones)
+            );
+            
+            predicates.add(cb.or(esCasaCompleta, esHotelConCuartos));
+
             // Filtro de Texto (Con diccionario de sinónimos quemado ya que por la etapa en la que se encuentra el proyecto no es viable implementar un sistema de sinónimos más robusto o directo en la base de datos)
            if (termino != null && !termino.trim().isEmpty()) {
                 String busqueda = termino.toLowerCase().trim();

@@ -66,6 +66,9 @@ public class PropiedadMapper {
         response.setContadorReservas(propiedad.getContadorReservas());
         response.setDescripcion(propiedad.getDescripcion());
         response.setPrecioNoche(propiedad.getPrecioNoche());
+
+        response.setHoraCheckIn(propiedad.getHoraCheckIn());
+        response.setHoraCheckOut(propiedad.getHoraCheckOut());
         // Agrega estado de propiedad al DTO de respuesta
         if (propiedad.getEstadoPropiedad() != null) {
             response.setEstadoPropiedad(propiedad.getEstadoPropiedad().name());
@@ -85,12 +88,31 @@ public class PropiedadMapper {
                 .collect(Collectors.toList()));
         }
 
-        if (propiedad.getFotos() != null && !propiedad.getFotos().isEmpty()) {
-            response.setFotosGenerales(propiedad.getFotos().stream()
-                .filter(foto -> !foto.isEstaEliminado() && foto.getTipoHabitacion() == null)
-                .map(this::toFotoResponseDTO)
-                .collect(Collectors.toList()));
-        }
+        List<FotoResponseDTO> fotosGenerales = java.util.Collections.emptyList();
+
+if (propiedad.getFotos() != null && !propiedad.getFotos().isEmpty()) {
+    fotosGenerales = propiedad.getFotos().stream()
+        .filter(foto -> foto != null)
+        .filter(foto -> !foto.isEstaEliminado())
+        .filter(foto -> foto.getTipoHabitacion() == null)
+        .map(this::toFotoResponseDTO)
+        .collect(Collectors.toList());
+}
+
+response.setFotosGenerales(fotosGenerales);
+
+String imagenPortada = fotosGenerales.stream()
+    .filter(FotoResponseDTO::isEsPrincipal)
+    .map(FotoResponseDTO::getUrlFoto)
+    .findFirst()
+    .orElse(
+        fotosGenerales.stream()
+            .map(FotoResponseDTO::getUrlFoto)
+            .findFirst()
+            .orElse(null)
+    );
+
+response.setImagenPortada(imagenPortada);
 
        response.setAmenidadesExtra(propiedad.getAmenidadesExtra());
 

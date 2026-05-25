@@ -2,6 +2,7 @@ package com.StayFlow.dto.response;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class ReservaResponseDTO {
 
@@ -20,9 +21,12 @@ public class ReservaResponseDTO {
     private String nombrePropiedad;
     private String imagenPortada;
 
+    private LocalTime horaCheckIn;
+    private LocalTime horaCheckOut;
+
     public ReservaResponseDTO() {}
 
-    public ReservaResponseDTO(Integer idReserva, Integer idHabitacion, String numeroHabitacion, Integer idCliente, String nombreCliente, LocalDate fechaEntrada, LocalDate fechaSalida, BigDecimal montoTotal, String estadoReserva, Integer idPropiedad, String nombrePropiedad, String imagenPortada) {
+    public ReservaResponseDTO(Integer idReserva, Integer idHabitacion, String numeroHabitacion, Integer idCliente, String nombreCliente, LocalDate fechaEntrada, LocalDate fechaSalida, BigDecimal montoTotal, String estadoReserva, Integer idPropiedad, String nombrePropiedad, String imagenPortada, LocalTime horaCheckIn, LocalTime horaCheckOut) {
         this.idReserva = idReserva;
         this.idHabitacion = idHabitacion;
         this.numeroHabitacion = numeroHabitacion;
@@ -35,6 +39,8 @@ public class ReservaResponseDTO {
         this.idPropiedad = idPropiedad;
         this.nombrePropiedad = nombrePropiedad;
         this.imagenPortada = imagenPortada;
+        this.horaCheckIn = horaCheckIn;
+        this.horaCheckOut = horaCheckOut;
     }
 
     // Getters y Setters
@@ -74,4 +80,10 @@ public class ReservaResponseDTO {
 
     public String getImagenPortada() { return imagenPortada; }
     public void setImagenPortada(String imagenPortada) { this.imagenPortada = imagenPortada; }
+
+    public LocalTime getHoraCheckIn() { return horaCheckIn; }
+    public void setHoraCheckIn(LocalTime horaCheckIn) { this.horaCheckIn = horaCheckIn; }
+
+    public LocalTime getHoraCheckOut() { return horaCheckOut; }
+    public void setHoraCheckOut(LocalTime horaCheckOut) { this.horaCheckOut = horaCheckOut; }
 }
