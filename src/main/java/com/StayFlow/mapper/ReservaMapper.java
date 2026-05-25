@@ -29,6 +29,9 @@ public class ReservaMapper {
                     
                     String nombre = propiedad.getNombreComercial();
                     dto.setNombrePropiedad(nombre != null ? nombre : "Alojamiento StayFlow");
+
+                    dto.setHoraCheckIn(propiedad.getHoraCheckIn());
+                    dto.setHoraCheckOut(propiedad.getHoraCheckOut());
                     
                     String urlImagen = null;
 

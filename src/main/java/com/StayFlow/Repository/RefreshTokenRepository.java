@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,11 +29,15 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     @Modifying
     @Transactional
     @Query("DELETE FROM RefreshToken rt WHERE rt.fechaExpiracion < :now")
-    int deleteAllExpiredTokens(@org.springframework.data.repository.query.Param("now") LocalDateTime now);
+    int deleteAllExpiredTokens(@Param("now") LocalDateTime now);
 
     @Schema(description = "Desactiva todos los refresh tokens de un usuario")
     @Modifying
     @Transactional
     @Query("UPDATE RefreshToken rt SET rt.activo = false WHERE rt.usuario = :usuario")
     int desactivarTokensPorUsuario(Usuario usuario);
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM RefreshToken rt WHERE rt.activo = false OR rt.fechaExpiracion < :now")
+    int limpiarTokensNoValidos(@Param("now") LocalDateTime now);
 }

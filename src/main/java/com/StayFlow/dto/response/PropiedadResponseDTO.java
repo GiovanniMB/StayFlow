@@ -1,7 +1,7 @@
 package com.StayFlow.dto.response;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.math.BigDecimal; // Importación necesaria para el precio
+import java.math.BigDecimal; 
 import java.time.LocalTime;
 import java.util.List;
 
@@ -11,7 +11,7 @@ public class PropiedadResponseDTO {
     private Integer idPropiedad;
     
     @Schema(description = "ID del usuario propietario", example = "3")
-    private Integer idDueno; // Solo enviamos el ID del dueño por seguridad
+    private Integer idDueno; 
     
     @Schema(description = "Nombre del alojamiento", example = "Hotel Paraíso")
     private String nombreComercial;
@@ -66,12 +66,15 @@ public class PropiedadResponseDTO {
     @Schema(description = "Precio máximo de habitación (si aplica)", example = "1500.00")
     private BigDecimal precioMaximo;
 
+    @Schema(description = "Imagen principal o portada de la propiedad", example = "/uploads/uuid_foto.jpg")
+    private String imagenPortada;
+
     // Constructor vacío
     public PropiedadResponseDTO() {
     }
 
     // Constructor completo
-    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios, String amenidadesExtra) {
+    public PropiedadResponseDTO(Integer idPropiedad, Integer idDueno, String nombreComercial, DireccionResponseDTO direccion, String telefono, boolean seRentaPorHabitaciones, Integer contadorReservas, String descripcion, BigDecimal precioNoche, List<ServicioResponseDTO> servicios, String amenidadesExtra, String imagenPortada) {
         this.idPropiedad = idPropiedad;
         this.idDueno = idDueno;
         this.nombreComercial = nombreComercial;
@@ -83,6 +86,7 @@ public class PropiedadResponseDTO {
         this.precioNoche = precioNoche; 
         this.servicios = servicios;
         this.amenidadesExtra = amenidadesExtra;
+        this.imagenPortada = imagenPortada;
     }
 
     // --- Getters y Setters ---
@@ -237,5 +241,13 @@ public class PropiedadResponseDTO {
 
     public void setPrecioMaximo(BigDecimal precioMaximo) {
         this.precioMaximo = precioMaximo;
+    }
+
+    public String getImagenPortada() {
+        return imagenPortada;
+    }
+
+    public void setImagenPortada(String imagenPortada) {
+        this.imagenPortada = imagenPortada;
     }
 }

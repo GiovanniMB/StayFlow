@@ -29,7 +29,8 @@ public class SecurityConstants {
               "/api/test/**",
             "/api/propiedades/**",
             "/api/catalogos/**",
-            "/ws/**"
+            "/ws/**",
+            "/api/admin/limpiar-tokens"
           
     	};
 }
