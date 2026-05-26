@@ -3,6 +3,8 @@ package com.StayFlow.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,14 +27,16 @@ public class Reserva extends AuditoriaBase {
     @Schema(description = "ID único de la reserva", example = "1")
     private Integer idReserva;
 
-    @ManyToOne
+   @ManyToOne
     @JoinColumn(name = "idHabitacion", nullable = false)
     @Schema(description = "Habitación reservada")
+    @JsonIgnoreProperties({"reservas", "propietario"})
     private Habitacion habitacion;
 
     @ManyToOne
     @JoinColumn(name = "idCliente", nullable = false)
     @Schema(description = "Usuario cliente que realiza la reserva")
+    @JsonIgnoreProperties({"reservas", "password", "rol"})
     private Usuario cliente;
 
     @Schema(description = "Fecha de entrada (check-in)", example = "2024-12-20", requiredMode = Schema.RequiredMode.REQUIRED)

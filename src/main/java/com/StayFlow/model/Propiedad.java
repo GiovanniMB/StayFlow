@@ -1,10 +1,13 @@
 package com.StayFlow.model;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +16,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "propiedad")
@@ -61,6 +67,45 @@ public class Propiedad extends AuditoriaBase {
     )
     @Schema(description = "Lista de servicios generales que ofrece esta propiedad")
     private List<Servicio> servicios;
+
+    @OneToMany(mappedBy = "propiedad")
+    private List<FotoHabitacion> fotos;
+
+    @Column(name = "precioNoche", precision = 10, scale = 2)
+    private BigDecimal precioNoche;
+
+    @OneToMany(mappedBy = "propiedad")
+    private List<TipoHabitacion> tiposHabitacion;
+
+    public enum EstadoPropiedad {
+        BORRADOR,   // Incompleta (sin fotos/cuartos), no visible al público
+        PUBLICADA,  // Lista y visible en el catálogo
+        OCULTA      // Pausada manualmente por el anfitrión
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado_propiedad", nullable = true) 
+    private EstadoPropiedad estadoPropiedad = EstadoPropiedad.PUBLICADA; 
+
+    @Schema(description = "Amenidades extra personalizadas escritas por el usuario")
+    @Column(columnDefinition = "TEXT")
+    private String amenidadesExtra;
+
+    @Schema(description = "Hora a partir de la cual el huésped puede hacer check-in", example = "15:00:00")
+    @Column(columnDefinition = "TIME DEFAULT '15:00:00'")
+    private LocalTime horaCheckIn;
+
+    @Schema(description = "Hora límite para que el huésped haga check-out", example = "11:00:00")
+    @Column(columnDefinition = "TIME DEFAULT '11:00:00'")
+    private LocalTime horaCheckOut;
+
+    @Schema(description = "Calificación promedio de la propiedad", example = "4.5")
+    @Column(columnDefinition = "DOUBLE DEFAULT 0.0")
+    private Double calificacionPromedio = 0.0;
+
+    @Schema(description = "Cantidad total de reseñas recibidas", example = "25")
+    @Column(columnDefinition = "INT DEFAULT 0")
+    private Integer cantidadResenas = 0;
 
     // Constructores
     public Propiedad() {}
@@ -138,11 +183,82 @@ public class Propiedad extends AuditoriaBase {
         this.servicios = servicios;
     }
 
+    public List<TipoHabitacion> getTiposHabitacion() {
+        return tiposHabitacion;
+    }
+
+    public void setTiposHabitacion(List<TipoHabitacion> tiposHabitacion) {
+        this.tiposHabitacion = tiposHabitacion;
+    }
+
     // Método de utilidad
     public void incrementarContadorReservas() {
         if (this.contadorReservas == null) {
             this.contadorReservas = 0;
         }
         this.contadorReservas++;
+    }
+
+    public List<FotoHabitacion> getFotos() { 
+        return fotos; 
+    }
+
+    public void setFotos(List<FotoHabitacion> fotos) { 
+        this.fotos = fotos; 
+    }
+
+    public BigDecimal getPrecioNoche() {
+        return precioNoche;
+    }
+
+    public void setPrecioNoche(BigDecimal precioNoche) {
+        this.precioNoche = precioNoche;
+    }
+
+    public EstadoPropiedad getEstadoPropiedad() {
+        return estadoPropiedad;
+    }
+
+    public void setEstadoPropiedad(EstadoPropiedad estadoPropiedad) {
+        this.estadoPropiedad = estadoPropiedad;
+    }
+
+    public String getAmenidadesExtra() {
+        return amenidadesExtra;
+    }
+    public void setAmenidadesExtra(String amenidadesExtra) {
+        this.amenidadesExtra = amenidadesExtra;
+    }
+
+    public LocalTime getHoraCheckIn() {
+        return horaCheckIn;
+    }
+
+    public void setHoraCheckIn(LocalTime horaCheckIn) {
+        this.horaCheckIn = horaCheckIn;
+    }
+
+    public LocalTime getHoraCheckOut() {
+        return horaCheckOut;
+    }
+
+    public void setHoraCheckOut(LocalTime horaCheckOut) {
+        this.horaCheckOut = horaCheckOut;
+    }
+
+    public Double getCalificacionPromedio() {
+        return calificacionPromedio;
+    }
+
+    public void setCalificacionPromedio(Double calificacionPromedio) {
+        this.calificacionPromedio = calificacionPromedio;
+    }
+
+    public Integer getCantidadResenas() {
+        return cantidadResenas;
+    }
+
+    public void setCantidadResenas(Integer cantidadResenas) {
+        this.cantidadResenas = cantidadResenas;
     }
 }

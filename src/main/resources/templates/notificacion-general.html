@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 40px 20px;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <tr>
+            <td style="text-align: center; padding: 30px 20px 20px; border-bottom: 1px solid #e5e7eb;">
+                <img src="cid:logoImage" alt="StayFlow Logo" style="max-width: 180px; height: auto;" />
+            </td>
+        </tr>
+        <tr>
+            <td style="padding: 30px; color: #374151; text-align: center;">
+                <h2 th:style="'margin-top: 0; color: ' + ${colorBoton}" th:text="${titulo}">Aviso Importante</h2>
+                
+                <div th:utext="${mensaje}" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 25px; margin: 20px 0; font-size: 16px; line-height: 1.5; text-align: left;">
+                    Este es el mensaje dinámico que enviamos desde el backend.
+                </div>
+                
+                <a href="http://localhost:5173/mis-reservas" th:style="'display: inline-block; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; color: #ffffff; background-color: ' + ${colorBoton}">Ir a mis viajes</a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; padding: 20px; font-size: 12px; color: #9ca3af; background-color: #f9fafb;">
+                <p style="margin: 0;">StayFlow - Notificaciones automáticas</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
