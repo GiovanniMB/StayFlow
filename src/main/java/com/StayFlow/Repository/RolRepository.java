@@ -34,4 +34,6 @@ public interface RolRepository extends JpaRepository<Rol, Integer>
     @Query("UPDATE Rol r SET r.estaEliminado = true WHERE r.idRol = :idRol")
     int eliminarLogico(@Param("idRol") Integer idRol);
     
+    @Query("SELECT r FROM Rol r WHERE LOWER(r.nombreRol) = LOWER(:nombreRol)")
+    Optional<Rol> buscarPorNombreRolIgnoreCase(@Param("nombreRol") String nombreRol);
 }

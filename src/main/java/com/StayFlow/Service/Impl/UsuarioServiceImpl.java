@@ -6,8 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.service.EmailService;
-import com.StayFlow.service.interfaces.IUsuarioService;
 import com.StayFlow.dto.request.LoginRequestDTO;
 import com.StayFlow.dto.request.ReactivarCuentaRequestDTO;
 import com.StayFlow.dto.request.RegistroRequestDTO;
@@ -25,6 +23,8 @@ import com.StayFlow.repository.RefreshTokenRepository;
 import com.StayFlow.repository.RolRepository;
 import com.StayFlow.repository.UsuarioRepository;
 import com.StayFlow.security.JwtUtil;
+import com.StayFlow.service.EmailService;
+import com.StayFlow.service.interfaces.IUsuarioService;
 import com.StayFlow.util.ValidationUtils;
 
 import io.swagger.v3.oas.annotations.Operation;

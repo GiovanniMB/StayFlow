@@ -5,12 +5,12 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.StayFlow.service.interfaces.ILogSistemaService;
-import com.StayFlow.service.interfaces.IPropiedadService;
 import com.StayFlow.dto.request.PropiedadRequestDTO;
 import com.StayFlow.dto.response.PropiedadResponseDTO;
 import com.StayFlow.exception.BusinessException;
@@ -29,8 +29,8 @@ import com.StayFlow.repository.PropiedadRepository;
 import com.StayFlow.repository.RolRepository;
 import com.StayFlow.repository.ServicioRepository;
 import com.StayFlow.repository.UsuarioRepository;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import com.StayFlow.service.interfaces.ILogSistemaService;
+import com.StayFlow.service.interfaces.IPropiedadService;
 import com.StayFlow.specification.PropiedadSpecification;
 
 @Service

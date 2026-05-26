@@ -30,6 +30,10 @@ public interface IReservaService {
     List<ReservaResponseDTO> obtenerReservasPorPropiedad(Integer idPropiedad);
 
     void actualizarEstadoReserva(Integer idReserva, EstadoReserva nuevoEstado);
+
+	long countByEstado(EstadoReserva confirmada);
+
+	long countAll();
     
 
 }

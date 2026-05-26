@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -45,4 +46,34 @@ public interface ReservaRepository extends JpaRepository<Reserva, Integer> {
     @Transactional
     @Query("UPDATE Reserva r SET r.estadoReserva = 'cancelada' WHERE r.estadoReserva = 'pendiente' AND r.fechaRegistro <= :limiteExpiracion")
     int cancelarReservasExpiradas(@Param("limiteExpiracion") LocalDateTime limiteExpiracion);
+ 
+    
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.fechaRegistro BETWEEN :inicio AND :fin")
+    long countByFechaRegistroBetween(@Param("inicio") LocalDateTime inicio, @Param("fin") LocalDateTime fin);
+    
+ 
+
+    @Query("SELECT COUNT(r) FROM Reserva r WHERE r.estadoReserva = :estado")
+    long countByEstadoReserva(@Param("estado") Reserva.EstadoReserva estado);
+    
+    @Query("SELECT p.idPropiedad, p.nombreComercial, COUNT(r.idReserva), SUM(r.montoTotal) " +
+           "FROM Reserva r " +
+           "JOIN r.habitacion h " +
+           "JOIN h.propiedad p " +
+           "WHERE r.estadoReserva = 'confirmada' " +
+           "GROUP BY p.idPropiedad, p.nombreComercial " +
+           "ORDER BY COUNT(r.idReserva) DESC")
+    List<Object[]> findTopPropiedades(PageRequest pageRequest);
+    
+    @Query("SELECT p.idPropiedad, p.nombreComercial, COUNT(r.idReserva), SUM(r.montoTotal) " +
+           "FROM Reserva r " +
+           "JOIN r.habitacion h " +
+           "JOIN h.propiedad p " +
+           "WHERE r.estadoReserva = 'confirmada' " +
+           "AND r.fechaEntrada BETWEEN :desde AND :hasta " +
+           "GROUP BY p.idPropiedad, p.nombreComercial " +
+           "ORDER BY COUNT(r.idReserva) DESC")
+    List<Object[]> findTopPropiedadesByFechaRange(@Param("desde") LocalDate desde, 
+                                                   @Param("hasta") LocalDate hasta, 
+                                                   PageRequest pageRequest);
 }

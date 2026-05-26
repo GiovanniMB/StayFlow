@@ -53,4 +53,5 @@ public interface PropiedadRepository extends JpaRepository<Propiedad, Integer>, 
            "AND h.estaEliminado = false " +
            "AND EXISTS (SELECT f FROM FotoHabitacion f WHERE f.propiedad = p AND f.estaEliminado = false)")
     List<Propiedad> findPropiedadesPublicasCompletas();
+
 }

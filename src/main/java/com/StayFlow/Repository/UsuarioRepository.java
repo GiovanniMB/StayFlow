@@ -46,7 +46,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
     List<Usuario> findByRolId(@Param("idRol") Integer idRol);
     
     @Schema(description = "Obtiene usuarios activos (no eliminados lógicamente)")
-    @Query(value = "SELECT * FROM usuario WHERE esta_eliminado = 0", nativeQuery = true)
+    @Query("SELECT u FROM Usuario u WHERE u.estaEliminado = false")
     List<Usuario> findUsuariosActivos();
     
     @Schema(description = "Actualiza el código de confirmación y su expiración")

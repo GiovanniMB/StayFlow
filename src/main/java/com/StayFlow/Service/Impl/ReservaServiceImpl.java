@@ -360,4 +360,16 @@ private BigDecimal obtenerPrecioPorNoche(Habitacion habitacion, LocalDate fecha)
         reserva.setEstadoReserva(nuevoEstado);
         reservaRepository.save(reserva);
     }
+    
+ 
+
+    @Override
+    public long countAll() {
+        return reservaRepository.count();
+    }
+
+    @Override
+    public long countByEstado(EstadoReserva estado) {
+        return reservaRepository.countByEstadoReserva(estado);
+    }
 }
